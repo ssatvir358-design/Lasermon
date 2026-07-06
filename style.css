@@ -1,0 +1,1200 @@
+/* ==========================================================
+   1. STRUTTURA BASE E CONFIGURAZIONE SCHERMATE
+   ========================================================== */
+body {
+    background-color: #f0f0f0;
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.schermata {
+    display: none; /* Di base tutte le schermate sono nascoste */
+    width: 100vw;
+    height: 100vh;
+    box-sizing: border-box;
+    position: absolute; /* Impedisce alle schermate di spingersi a vicenda */
+    top: 0;
+    left: 0;
+}
+
+/* Quando una schermata ha anche la classe .attiva, si mostra a tutto schermo */
+.schermata.attiva {
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#schermata-start {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url("Sfondo.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 10; /* Tiene lo start sopra tutto finché è attivo */
+}
+
+#btn-start {
+    padding: 20px 50px; font-size: 32px; font-weight: bold; background-color: #ffcc00;
+    border: 4px solid #333; border-radius: 10px; cursor: pointer; box-shadow: 0px 6px 0px #b38f00;
+}
+#btn-start:active { transform: translateY(6px); box-shadow: none; }
+
+
+/* ==========================================================
+   2. SCHERMATA DI SELEZIONE STARTER (A SCHERMO INTERO GIGANTE)
+   ========================================================== */
+#schermata-selezione {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url("Sfondo.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 10;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+/* Forziamo la schermata attiva ad allineare il titolo in alto e il contenitore sotto */
+#schermata-selezione.attiva {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 3vh 2vw !important;
+    box-sizing: border-box !important;
+}
+
+.titolo-selezione { 
+    font-size: 28px; 
+    margin-bottom: 20px; 
+    color: #333; 
+}
+
+/* Il contenitore reale delle 3 schede riempie il 75% dell'altezza dello schermo */
+#schermata-selezione #contenitore-starter { 
+    display: flex !important; 
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 3vw !important;          /* Spazio proporzionale tra le 3 colonne */
+    width: 95vw !important;        /* Sfrutta quasi tutta la larghezza dello schermo */
+    height: 75vh !important;       /* Prende il 75% dell'altezza totale dello schermo */
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    flex-wrap: nowrap !important;  /* Impedisce tassativamente alle schede di andare a capo */
+}
+
+/* Le colonne degli starter si espandono per dividersi equamente lo schermo */
+#schermata-selezione .colonna-starter {
+    flex: 1 !important;            /* Si dividono lo schermo in 3 parti esattamente uguali */
+    width: auto !important;        /* Rimuove il vecchio limite fisso a 200px */
+    max-width: 28vw !important;    /* Evita che diventino troppo larghe su monitor giganti */
+    height: 100% !important;       /* Altezza massima dentro il contenitore */
+    background-color: white; 
+    border: 3px solid #333; 
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden; 
+    
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+/* Il blocco colorato della foto diventa enorme visivamente solo nella selezione */
+#schermata-selezione .colonna-starter .blocco-foto { 
+    width: 100% !important;
+    height: 45vh !important; /* Si prende quasi metà altezza schermo */
+    display: flex !important; 
+    justify-content: center !important; 
+    align-items: center !important; 
+    border-bottom: 3px solid #333; 
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+/* La foto ora cresce e riempie il box senza tagliarsi nella selezione */
+#schermata-selezione .colonna-starter .blocco-foto img.sprite-pokemon {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none !important; 
+    max-width: none !important;
+    object-fit: contain !important; /* Mostra l'immagine INTERA senza ritagliarla mai */
+    padding: 10px !important; /* Leggero distacco interno dai bordi neri */
+    box-sizing: border-box !important;
+    background-color: transparent !important;
+}
+
+/* Testi delle statistiche fluidi e leggibili */
+#schermata-selezione .colonna-starter .blocco-stats { 
+    width: 100% !important;
+    padding: 2vh 1.5vw !important; 
+    flex-grow: 1 !important; 
+    background-color: #fafafa; 
+    font-size: 1.8vh !important; /* Testo scalabile in base all'altezza dello schermo */
+    line-height: 1.5 !important; 
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+}
+
+/* Pulsante finale allineato */
+#schermata-selezione .colonna-starter .blocco-pulsante { 
+    width: 100% !important;
+    padding: 15px !important; 
+    text-align: center; 
+    background-color: #fff; 
+    border-top: 1px solid #eee; 
+    box-sizing: border-box !important;
+}
+
+.btn-scegli { 
+    width: 100%; padding: 10px; background-color: #4CAF50; color: white; 
+    border: 2px solid #333; border-radius: 5px; font-weight: bold; cursor: pointer; 
+}
+.btn-scegli:hover { background-color: #45a049; }
+
+/* ==========================================================
+   2B. COMPORTAMENTO DEL POKEDEX (SCHEDE GIGANTI: 3 PER VOLTA A SCHERMO)
+   ========================================================== */
+#info-griglia-schede {
+    display: flex !important;
+    flex-direction: row !important;   /* La griglia scorre in ORIZZONTALE */
+    overflow-x: auto !important;       /* Attiva lo scroll con rotellina */
+    overflow-y: hidden !important;     /* Blocca categoricamente lo scroll verticale */
+    flex-wrap: nowrap !important;      /* Impedisce alle schede di andare a capo */
+    gap: 20px !important;              /* Spazio fisso tra una scheda e l'altra */
+    padding: 10px 15px !important;
+    width: 100% !important;
+    height: calc(100% - 70px) !important; /* Sfrutta tutta l'altezza sotto l'header delle rarità */
+    box-sizing: border-box !important;
+    align-items: center !important;
+}
+
+/* La singola scheda del Pokedex: Si allarga e si alza per riempire il div */
+.scheda-info-pokedex {
+    /* MATH: (100% del div - 40px di spazio totale dei due gap) diviso 3 schede esatte */
+    flex: 0 0 calc((100% - 40px) / 3) !important; 
+    height: 98% !important;            /* Riempie verticalmente tutto il div info-griglia-schede */
+    display: flex !important; 
+    flex-direction: column !important; /* Layout verticale: immagine sopra, statistiche sotto */
+    justify-content: space-between !important;
+    align-items: center !important;
+    overflow: hidden !important; 
+    padding: 20px !important;          /* Più spazio interno dato che ora sono giganti */
+    border: 4px solid #222 !important; 
+    border-radius: 16px !important;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.35) !important;
+    box-sizing: border-box !important;
+}
+
+/* Il riquadro nero/grigio della foto (In alto) - Diventa proporzionalmente enorme */
+.blocco-foto-pokedex { 
+    width: 100% !important;
+    height: 55% !important;            /* Prende il 55% dell'altezza totale della scheda */
+    display: flex !important; 
+    justify-content: center !important; 
+    align-items: center !important; 
+    border: 3px solid #333 !important;
+    border-radius: 10px !important;
+    background: rgba(0, 0, 0, 0.12) !important;
+    margin-bottom: 10px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+/* L'immagine all'interno del riquadro */
+.blocco-foto-pokedex img {
+    width: 100% !important;    
+    height: 100% !important;  
+    object-fit: contain !important;    /* Mantiene le proporzioni perfette senza tagliare i Pokémon */
+    padding: 10px !important;
+    box-sizing: border-box !important;
+}
+
+/* Il riquadro inferiore contenente i testi (In basso) */
+.blocco-stats-pokedex { 
+    display: flex !important;
+    flex-direction: column !important; 
+    width: 100% !important;
+    height: 42% !important;            /* Prende il restante spazio sotto la foto */
+    color: #000 !important;
+    font-weight: bold !important;
+    text-shadow: 0px 1px 0px rgba(255,255,255,0.3) !important;
+    box-sizing: border-box !important;
+    justify-content: flex-start !important;
+}
+
+/* Titolo e Nome Pokémon */
+.blocco-stats-pokedex .info-titolo {
+    text-align: center !important;
+    margin-bottom: 2px !important;
+}
+
+.blocco-stats-pokedex .nome-pkm {
+    font-size: 24px !important;        /* Nome bello grande e leggibile */
+    text-transform: uppercase !important;
+    letter-spacing: 1px;
+}
+
+.blocco-stats-pokedex .rarita-pkm {
+    font-size: 13px !important;
+    opacity: 0.8 !important;
+}
+
+/* Linea separatrice */
+.blocco-stats-pokedex .separatore-pkm {
+    border: 0 !important;
+    border-top: 3px solid rgba(0,0,0,0.2) !important;
+    margin: 4px 0 8px 0 !important;
+}
+
+/* Valori delle statistiche (HP, ATK, DEF, VEL) */
+.blocco-stats-pokedex .valori-stats {
+    text-align: left !important;
+    font-size: 18px !important;        /* Testo delle statistiche ingrandito proporzionalmente */
+    padding-left: 20px !important;     /* Più rientro a sinistra per ordine visivo */
+    line-height: 1.5 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    flex-grow: 1 !important;
+}
+
+/* ==========================================================
+   3. STRUTTURA E GESTIONE DELLA MAPPA DI GIOCO
+   ========================================================== */
+#schermata-mappa {
+    background-image: url("1.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    padding: 20px;
+    overflow: hidden; /* Impedisce barre di scorrimento fastidiose */
+}
+
+#schermata-mappa h2 {
+    text-align: center;
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 0;
+    z-index: 5;
+}
+
+#mappa-collegamenti {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1 !important; /* Linee dei collegamenti sotto i nodi */
+}
+
+#albero-container {
+    background: transparent !important;
+    border: none !important;
+    width: 100%;
+    height: calc(100vh - 120px);
+    position: relative;
+    z-index: 5; /* Sopra lo sfondo per click immediati */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Boss in cima, start in fondo */
+    align-items: center;
+    margin: 0;
+    padding: 10px 0;
+}
+
+.piano {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    width: 100%;
+    min-height: 60px; 
+}
+
+.radice-mappa { 
+    width: 50px;
+    height: 50px;
+    background-color: #333;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    font-weight: bold;
+    position: relative;
+    z-index: 10 !important;
+}
+
+.nodo-bottone {
+    width: 60px;
+    height: 60px;
+    border: none !important;
+    background-color: transparent !important;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: not-allowed;
+    transition: transform 0.2s, filter 0.2s;
+    font-size: 0;
+    outline: none;
+    filter: none; 
+    opacity: 0.9;
+}
+
+.nodo-passato {
+    opacity: 0.4;
+    filter: grayscale(100%) !important; /* Bianco e nero sulla strada già percorsa */
+    cursor: not-allowed;
+}
+
+.nodo-selezionabile {
+    cursor: pointer;
+    opacity: 1;
+    filter: drop-shadow(0px 0px 8px rgba(255, 204, 0, 0.8)); /* Bagliore sulle scelte attuali */
+}
+
+.nodo-selezionabile:hover {
+    transform: scale(1.2);
+    filter: drop-shadow(0px 0px 12px rgba(255, 204, 0, 1));
+}
+
+/* PNG delle icone mappa */
+.evento-cespuglio { background-image: url("grass.png") !important; }
+.evento-npc { background-image: url("team-rocket.png") !important; }
+.evento-pokeball { background-image: url("pokeball.png") !important; }
+.evento-medico { background-image: url("poke-center.png") !important; }
+.evento-disco { background-image: url("disco.png") !important; background-color: #9c27b0; }
+
+
+/* ==========================================================
+   4. INTERFACCIA SQUADRA VISIBILE NELLA MAPPA
+   ========================================================== */
+#griglia-squadra {
+    position: absolute;
+    top: 20px;       
+    left: 20px;      
+    display: flex;
+    flex-direction: column; 
+    gap: 12px; /* Un po' più di spazio tra una foto e l'altra */        
+    z-index: 10;     
+    background: rgba(0, 0, 0, 0.6); 
+    padding: 12px;
+    border-radius: 12px;
+}
+
+.icona-squadra { 
+    width: 80px !important; /* Molto più grande */
+    height: 80px !important; 
+    border: 4px solid #333 !important; 
+    border-radius: 50% !important; 
+    cursor: pointer; 
+    position: relative;
+    background-size: cover !important;
+    background-position: top center !important; /* Centra il viso */
+    background-repeat: no-repeat !important;
+    background-color: #fff !important; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.5) !important;
+    transition: transform 0.2s !important;
+}
+.icona-squadra:hover {
+    transform: scale(1.1) !important; /* Effetto zoom al passaggio del mouse */
+}
+.icona-squadra.primo-posto { 
+    border-color: #ffcc00 !important; 
+    box-shadow: 0 0 15px #ffcc00 !important; 
+}
+.icona-squadra.primo-posto::after { 
+    content: "★"; position: absolute; top: 0px; right: 0px; background: #ffcc00; 
+    color: #333; font-size: 14px; padding: 4px; border-radius: 50%; border: 2px solid #333; 
+}
+
+
+/* ==========================================================
+   5. SCHERMATA INTRO VS ANIMATA (ISOLATA)
+   ========================================================== */
+#intro-vs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    z-index: 99999; /* Sopra a tutto il resto del gioco */
+    overflow: hidden;
+}
+
+.sfondo-vs-split {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #1e3c72 49.9%, #000 50%, #b22222 50.1%);
+}
+
+.lato-giocatore, .lato-nemico {
+    width: 45%;
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    transition: transform 0.5s ease-out;
+}
+
+.lato-giocatore { left: 0; transform: translateX(-100%); }
+.lato-nemico { right: 0; transform: translateX(100%); }
+.lato-giocatore.entra, .lato-nemico.entra { transform: translateX(0); }
+
+.lato-giocatore img, .lato-nemico img {
+    max-width: 90%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.scritta-vs {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-size: 80px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 20px #ffeb3b, 4px 4px 0px #000;
+    z-index: 10;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.scritta-vs.attiva { transform: translate(-50%, -50%) scale(1); }
+
+/* ==========================================================
+   6. ARENA DI COMBATTIMENTO RPG A SCHERMO INTERO CORRETTA
+   ========================================================== */
+#schermata-gioco {
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    box-sizing: border-box !important;
+    background: #2f3640 !important;
+    z-index: 9999 !important;
+    background-image: url('Combattimento.png') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    /* Assicura che lo sfondo sia sempre sotto gli altri elementi */
+    
+}
+
+#gioco-container-arena, 
+.scheda-arena, 
+.box-sprite-arena-grande {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+#gioco-container-arena { 
+    display: flex !important; 
+    flex-direction: column !important; 
+    justify-content: space-between !important; 
+    width: 100% !important; 
+    height: 100% !important; 
+    background-color: #f5f6fa !important; 
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+/* Sfondo del campo di battaglia a tutto schermo */
+/* Sfondo del campo di battaglia a tutto schermo con immagine custom */
+#arena-diagonale { 
+    display: flex !important; 
+    flex-direction: column !important; 
+    justify-content: space-between !important; 
+    flex-grow: 1 !important;
+    width: 100% !important; 
+    
+    /* IMPOSTAZIONE IMMAGINE DI SFONDO */
+    background-image: url("Combattimento.png") !important; /* Sostituisci "Sfondo.png" con il nome esatto del tuo file (es. background.jpg o arena.png) */
+    background-size: cover !important;             /* Fa in modo che l'immagine copra tutta l'arena senza deformarsi */
+    background-position: center !important;         /* Centra l'immagine nello schermo */
+    background-repeat: no-repeat !important;        /* Evita che l'immagine si duplichi se lo schermo è troppo grande */
+    
+    padding: 40px !important; 
+    box-sizing: border-box !important;
+}
+
+/* Le singole schede fluttuanti dei pokemon */
+.scheda-arena {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 40px !important;
+    width: 100% !important;
+}
+
+.scheda-arena.nemico { 
+    justify-content: flex-end !important; 
+}
+.scheda-arena.giocatore { 
+    justify-content: flex-start !important; 
+}
+
+/* HUD dei Dati (Nome, HP, Barre) */
+.hud-status {
+    background: #ffffff !important;
+    border: 3px solid #2f3640 !important;
+    border-radius: 12px !important;
+    padding: 15px 20px !important;
+    width: 320px !important;
+    box-shadow: 4px 4px 0px #2f3640 !important;
+    box-sizing: border-box !important;
+}
+
+.nome-pkm-arena {
+    font-size: 22px !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    color: #2f3640 !important;
+}
+
+.lvl-tag {
+    font-size: 16px !important;
+    color: #718093 !important;
+    font-weight: normal !important;
+}
+
+.mossa-tag {
+    font-size: 13px !important;
+    color: #4cd137 !important;
+    background: #2f3640 !important;
+    padding: 3px 8px !important;
+    border-radius: 4px !important;
+    display: inline-block !important;
+    margin-top: 6px !important;
+}
+
+/* Barra degli HP */
+.barra-hp-container-arena { 
+    background-color: #dcdde1 !important; 
+    border: 2px solid #2f3640 !important; 
+    height: 18px !important; 
+    border-radius: 9px !important; 
+    overflow: hidden !important; 
+    margin: 10px 0 !important;
+    width: 100% !important;
+}
+
+.barra-hp { 
+    height: 100% !important; 
+    width: 100%; /* <-- RIMOSSO !IMPORTANT QUI! In questo modo il JavaScript può accorciarla */
+    transition: width 0.4s ease, background-color 0.3s !important; 
+}
+
+.sotto-barra {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+}
+
+.testo-hp-arena { color: #2f3640 !important; }
+.pokemon-rimanenti { color: #718093 !important; }
+
+/* Sprite dei Pokémon in Arena - Dimensioni e Contorno Bianco Corretti */
+/* 1. Il contenitore rimane flessibile e trasparente */
+.box-sprite-arena-grande {
+    width: 30vw !important;
+    min-width: 200px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-end !important;
+    
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* 2. L'immagine si ingrandisce ma NON occupa spazio nel flusso (così non sposta i tasti) */
+.sprite-pokemon-grande {
+    width: auto !important;
+    height: 40vh !important;       /* Regola questo valore se vuoi i personaggi più o meno alti */
+    max-height: 900 !important;  /* Limite di sicurezza per non coprire le scritte */
+    
+    object-fit: contain !important;
+    image-rendering: pixelated !important;
+    
+    /* Questo assicura che non si sovrappongano */
+    position: relative !important;
+    pointer-events: none !important; /* Non interferisce col clic sui tasti */
+}
+
+/* ==========================================================
+   7. SEZIONE CRUSCOTTO INFERIORE (A TUTTO SCHERMO)
+   ========================================================== */
+.interfaccia-centrale-arena { 
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100% !important;
+    height: 180px !important; /* Leggermente più alto per display grandi */
+    background-color: #2f3640 !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.pannello-sinistro-controlli {
+    width: 50% !important;
+    height: 100% !important;
+    border-right: 4px solid #f5f6fa !important;
+    box-sizing: border-box !important;
+    padding: 20px !important;
+}
+
+#controlli-arena {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 12px !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.pannello-destro-log {
+    width: 50% !important;
+    height: 100% !important;
+    box-sizing: border-box !important;
+    padding: 20px !important;
+}
+
+#console-log { 
+    width: 100% !important;
+    height: 100% !important;
+    background-color: #1e272e !important; 
+    color: #ffffff !important; 
+    padding: 15px !important; 
+    border-radius: 8px !important; 
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 16px !important; 
+    line-height: 1.5 !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+    border: 2px solid #718093 !important;
+}
+
+/* Pulsanti Battle */
+.btn-battle {
+    width: 100% !important;
+    max-width: 350px !important;
+    padding: 14px 0 !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    color: #2f3640 !important;
+    background-color: #ffca28 !important;
+    border: 3px solid #f5f6fa !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 0px #c79100 !important;
+    transition: transform 0.1s, box-shadow 0.1s !important;
+}
+
+.btn-battle:hover { background-color: #ffe082 !important; }
+.btn-battle:active { transform: translateY(4px) !important; box-shadow: none !important; }
+
+.btn-battle:disabled {
+    background-color: #718093 !important;
+    color: #dcdde1 !important;
+    border-color: #2f3640 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    cursor: not-allowed !important;
+}
+
+.btn-utility {
+    background-color: #00cec9 !important;
+    box-shadow: 0 4px 0px #009794 !important;
+}
+.btn-utility:hover { background-color: #81ecec !important; }
+
+.btn-win {
+    background-color: #2ecc71 !important;
+    color: white !important;
+    box-shadow: 0 4px 0px #27ae60 !important;
+}
+.btn-win:hover { background-color: #58d68d !important; }
+
+/* Centra la scheda di dettaglio a schermo intero sopra la mappa */
+#schermata-dettaglio {
+    background: rgba(0, 0, 0, 0.85) !important;
+    display: none;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 10000 !important;
+    box-sizing: border-box !important;
+}
+
+#schermata-dettaglio.attiva {
+    display: flex !important;
+}
+
+/* BOX CONTENITORE GIGANTE (Aumentato per renderlo imponente) */
+.contenitore-dettaglio-scheda {
+    width: 480px !important;   /* Molto più larga per valorizzare i dettagli */
+    height: 700px !important;  /* Bella alta stile carta collezionabile */
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+}
+
+/* SCHEDA INTERNA RE-PROPORZIONATA */
+.info-scheda-dettaglio {
+    flex: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    animation: popIn 0.25s ease-out !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 30px !important; /* Più respiro ai bordi */
+    box-sizing: border-box !important;
+    border: 5px solid #2f3640 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+}
+
+/* Ingrandiamo la foto del Pokémon nel dettaglio */
+.info-scheda-dettaglio .blocco-foto-pokedex {
+    width: 100% !important;
+    height: 240px !important; /* Più spazio alla grafica del personaggio */
+    background-color: #f5f6fa !important;
+    border: 3px solid #2f3640 !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    overflow: hidden;
+}
+
+.info-scheda-dettaglio .blocco-foto-pokedex img {
+    height: 90% !important;
+    width: 90% !important;
+    object-fit: contain !important;
+    image-rendering: pixelated !important;
+}
+
+/* Ingrandiamo il blocco delle statistiche */
+.info-scheda-dettaglio .blocco-stats-pokedex {
+    width: 100% !important;
+    background: #ffffff !important;
+    border: 3px solid #2f3640 !important;
+    border-radius: 12px !important;
+    padding: 15px 20px !important;
+    box-sizing: border-box !important;
+    flex-grow: 1 !important;
+    margin: 15px 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+}
+
+.info-scheda-dettaglio .nome-pkm {
+    font-size: 26px !important; /* Nome enorme leggibile */
+    font-weight: bold !important;
+}
+
+.info-scheda-dettaglio .valori-stats div {
+    font-size: 18px !important; /* Numeri di attacco, difesa ecc aumentati */
+    margin-bottom: 4px;
+}
+
+/* STILE RETRO PER IL MENU A TENDINA <SELECT> */
+.select-stile-retro {
+    width: 100% !important;
+    max-width: 320px !important;
+    padding: 10px !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 15px !important;
+    font-weight: bold !important;
+    color: #2f3640 !important;
+    background-color: #ffffff !important;
+    border: 3px solid #2f3640 !important;
+    border-radius: 6px !important;
+    outline: none !important;
+    cursor: pointer !important;
+    box-shadow: 2px 2px 0px #2f3640 !important;
+}
+
+.select-stile-retro:focus {
+    border-color: #ffca28 !important;
+}/* Sostituisci gli ID qui sotto con quelli effettivi delle immagini nel combattimento */
+
+#sprite-giocatore, #sprite-nemico {
+    height: 85vh !important; /* 85vh = 85% dell'altezza dello schermo, li spinge quasi fino in cima */
+    width: 45vw !important;  /* Li rende più larghi (45% della larghezza dello schermo) */
+    
+    /* SCEGLI UNA DI QUESTE DUE OPZIONI PER L'OBJECT-FIT: */
+    
+    /* Opzione A (Consigliata per le foto): 
+       'cover' riempie tutto lo spazio tagliando i bordi in eccesso, ma non deforma le facce. */
+    object-fit: cover !important; 
+    
+    /* Opzione B (Forzatura): 
+       'fill' allarga e allunga l'immagine ignorando le proporzioni. 
+       Le persone sembreranno un po' "schiacciate", ma riempiranno lo spazio al 100%. */
+    /* object-fit: fill !important; */
+    
+    object-position: bottom !important; /* Tiene i personaggi ancorati al suolo, in basso */
+    image-rendering: auto !important; /* Rimuove l'effetto pixelato che su delle vere foto sta male */
+}
+
+/* Rimuovi i limiti dai contenitori dei personaggi nell'arena (spesso bloccano l'immagine) */
+#gioco-container-arena div {
+    overflow: visible !important; 
+}
+
+/* Forza le immagini (gli sprite) dentro l'arena a riempire lo schermo */
+
+
+/* Il cerchio del Pokémon in squadra */
+.cerchio-pokemon { /* CAMBIA QUESTO NOME CON QUELLO CHE USI TU */
+    width: 80px !important;  /* Molto più grande (prima magari era 30 o 40px) */
+    height: 80px !important;
+    border-radius: 50% !important; /* Mantiene la forma a cerchio */
+    border: 3px solid #2f3640 !important; /* Bordo visibile */
+    background-color: white !important;
+    
+    /* Queste tre righe servono per centrare bene l'immagine che metteremo dentro */
+    background-size: cover !important; 
+    background-position: top center !important; /* 'top' è utile per le foto di persone, per inquadrare il viso */
+    background-repeat: no-repeat !important;
+    
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5) !important;
+    cursor: pointer;
+}
+
+/* FORZATURA TOTALE GAME OVER */
+#schermata-gameover {
+    display: none !important; /* Di base nascosto */
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: black !important;
+    z-index: 9999999 !important; /* Numero altissimo */
+    justify-content: center !important;
+    align-items: center !important;
+    flex-direction: column !important;
+}
+
+/* ==========================================================
+   INTERFACCIA SCHERMATA DISCO MOSSA
+   ========================================================== */
+#schermata-disco {
+    background: rgba(15, 20, 30, 0.9) !important; /* Sfondo scuro profondo retro */
+    display: none;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 10000 !important;
+    box-sizing: border-box !important;
+}
+
+#schermata-disco.attiva {
+    display: flex !important;
+}
+
+.contenitore-disco-full {
+    width: 90% !important;
+    max-width: 1200px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.titolo-selezione-retro {
+    font-size: 36px !important;
+    color: #ffca28 !important;
+    text-shadow: 3px 3px 0px #000 !important;
+    margin-bottom: 10px !important;
+    text-align: center !important;
+    font-family: 'Courier New', Courier, monospace !important;
+}
+
+.sottotitolo-disco {
+    color: #ffffff !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    margin-bottom: 40px !important;
+    text-align: center !important;
+}
+
+/* La griglia che contiene i Pokémon della squadra */
+.griglia-opzioni-disco {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 30px !important;
+    width: 100% !important;
+    flex-wrap: wrap !important;
+}
+
+/* LA SCHEDA GRANDE DEL POTENZIAMENTO */
+.scheda-disco-pokemon {
+    width: 260px !important;
+    height: 400px !important;
+    background-color: #ffffff !important;
+    border: 4px solid #2f3640 !important;
+    border-radius: 14px !important;
+    box-shadow: 5px 5px 0px #2f3640 !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    cursor: pointer !important;
+    transition: transform 0.2s, box-shadow 0.2s !important;
+}
+
+.scheda-disco-pokemon:hover {
+    transform: translateY(-8px) !important;
+    box-shadow: 8px 12px 0px #000 !important;
+    border-color: #ffca28 !important;
+}
+
+/* Box Immagine dentro la scheda */
+.foto-disco-pkm {
+    width: 100% !important;
+    height: 160px !important;
+    background: #f5f6fa !important;
+    border: 2px solid #2f3640 !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.foto-disco-pkm img {
+    height: 90% !important;
+    width: 90% !important;
+    object-fit: contain !important;
+    image-rendering: pixelated !important;
+}
+
+/* Info Testuali */
+.info-disco-pkm {
+    text-align: center !important;
+    width: 100% !important;
+}
+
+.nome-disco-pkm {
+    font-size: 20px !important;
+    font-weight: bold !important;
+    color: #2f3640 !important;
+    margin-bottom: 5px !important;
+    text-transform: uppercase !important;
+}
+
+.mossa-disco-pkm {
+    font-size: 14px !important;
+    color: #2c3e50 !important;
+    background: #ecf0f1 !important;
+    padding: 6px !important;
+    border-radius: 6px !important;
+    border: 1px dashed #718093 !important;
+    margin-top: 5px !important;
+}
+
+/* ==========================================================
+   ANIMAZIONE INTRO BOSS BATTLE DEDICATA
+   ========================================================== */
+#intro-boss {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 999999 !important; /* Sopra a ogni cosa */
+    background-color: #000000 !important;
+    overflow: hidden !important;
+}
+
+.contenitore-intro-boss {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+/* L'immagine del boss ("NomeULT.png") sotto a tutto */
+.boss-bg-animato {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    opacity: 0;
+    transform: scale(1.2);
+    animation: comparsaBossSfondo 1.5s forwards ease-in-out;
+}
+
+/* Contenitore sopraelevato per la scritta (spostato leggermente verso il basso) */
+.scritta-boss-container {
+    position: relative !important;
+    z-index: 10 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin-top: 900px !important; /* Aumenta questo valore (es. 120px o 150px) se vuoi abbassarla ancora di più */
+}
+
+/* La scritta ScrittaBossFight.png che appare sopra con un sussulto */
+.scritta-boss-animata {
+    max-width: 80% !important;
+    max-height: 50vh !important;
+    object-fit: contain !important;
+    transform: scale(0);
+    opacity: 0;
+    animation: comparsaScrittaBoss 1s 0.8s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /*Il primo valore (1s) indica quanto tempo impiega la scritta a zoomare e comparire a schermo. Il secondo valore (0.8s) è il tempo di attesa iniziale (il delay prima che si muova). è
+    Se allunghi l'animazione nel CSS, la schermata nera dell'intro deve rimanere visibile più a lungo, altrimenti il gioco caricherà l'arena tagliando a metà l'animazione.
+    In fondo alla funzione avviaBossBattle, modifica il valore numerico dell'ultimo setTimeout (attualmente impostato a 3500 millisecondi, cioè 3.5 secondi):
+       }, 3500); // <-- Aumenta questo valore (es: portalo a 4500 o 5000) per dare più tempo alla scritta di rimanere visibile prima che inizi il combattimento vero e proprio.
+    */
+}
+
+/* Keyframes Animazioni */
+@keyframes comparsaBossSfondo {
+    0% { opacity: 0; transform: scale(1.2); filter: brightness(0.2) grayscale(1); }
+    50% { opacity: 1; filter: brightness(0.6) grayscale(0.5); }
+    100% { opacity: 1; transform: scale(1); filter: brightness(0.8) grayscale(0); }
+}
+
+@keyframes comparsaScrittaBoss {
+    0% { transform: scale(0); opacity: 0; }
+    70% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* ==========================================================
+   INTERFACCIA SCHERMATA CENTRO MEDICO (Stile Retro Scuro)
+   ========================================================== */
+#schermata-centro-medico {
+    background: #0f141e !important; /* Forza lo sfondo scuro profondo a tutto schermo */
+    display: none;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 10000 !important;
+    box-sizing: border-box !important;
+}
+
+#schermata-centro-medico.attiva {
+    display: flex !important;
+}
+
+/* Rende trasparente il contenitore interno così si vede lo sfondo scuro */
+#schermata-centro-medico .contenitore-disco-full {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Stile del Bottone Retro */
+#schermata-centro-medico .btn-scegli {
+    background-color: #4cd137 !important;
+    border: 3px solid #2f3640 !important;
+    color: #ffffff !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    box-shadow: 4px 4px 0px #2f3640 !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    
+    /* DISTANZIAMENTO MAGGIORE DALLE SCHEDE */
+    margin-top: 50px !important; 
+    width: 320px !important;
+    padding: 15px !important;
+}
+
+/* Effetto Hover (Passaggio del mouse) */
+#schermata-centro-medico .btn-scegli:hover {
+    background-color: #44bd32 !important;
+    box-shadow: 6px 6px 0px #1e252f !important;
+    transform: translate(-2px, -2px) !important;
+}
+
+/* Effetto Active (Click del mouse) */
+#schermata-centro-medico .btn-scegli:active {
+    background-color: #44bd32 !important;
+    box-shadow: 1px 1px 0px #2f3640 !important;
+    transform: translate(3px, 3px) !important;
+}

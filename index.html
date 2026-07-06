@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Poke-Clone Roguelike v4</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="intro-boss" style="display: none;">
+        <div class="contenitore-intro-boss">
+            <img id="img-boss-background" src="" alt="Boss Sfondo" class="boss-bg-animato">
+            
+            <div class="scritta-boss-container">
+                <img src="ScrittaBossFight.png" alt="BOSS FIGHT" class="scritta-boss-animata">
+            </div>
+        </div>
+    </div>
+    <div id="intro-vs" style="display: none;">
+        <div class="sfondo-vs-split">
+            <div class="lato-giocatore">
+                <img id="img-vs-giocatore" src="" alt="Giocatore">
+            </div>
+            <div class="scritta-vs">VS</div>
+            <div class="lato-nemico">
+                <img id="img-vs-nemico" src="" alt="Nemico">
+            </div>
+        </div>
+    </div>
+    
+    <div id="schermata-start" class="schermata attiva">
+        <div style="position: absolute; top: 20px; left: 20px; display: flex; gap: 15px; z-index: 20;">
+            <button onclick="apriModalImpostazioni()" style="background: none; border: none; cursor: pointer; padding: 0;">
+                <img src="impostazioni.jpg" alt="Impostazioni" style="width: 45px; height: 45px; object-fit: contain;">
+            </button>
+            <button onclick="apriModalInfo()" style="background: none; border: none; cursor: pointer; padding: 0;">
+                <img src="info.jpg" alt="Info DB" style="width: 45px; height: 45px; object-fit: contain;">
+            </button>
+        </div>
+
+        <div id="modal-info" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85vw; height: 80vh; background: rgba(10, 10, 10, 0.95); border: 3px solid #444; border-radius: 16px; z-index: 110; color: white; font-family: monospace; padding: 20px; box-sizing: border-box;">
+            
+            <div id="info-header" style="text-align: center; margin-bottom: 20px; font-size: 14px; line-height: 1.6;"></div>
+            
+            <div id="info-griglia-schede" style="display: flex; flex-wrap: nowrap; gap: 20px; overflow-x: auto; overflow-y: hidden; padding-bottom: 15px; height: calc(100% - 120px); scroll-behavior: smooth;">
+                </div>
+            
+            <button onclick="chiudiModalInfo()" style="position: absolute; bottom: 15px; right: 20px; padding: 10px 25px; background: #c62828; color: white; border: none; border-radius: 6px; cursor: pointer; font-family: monospace; font-weight: bold;">CHIUDI</button>
+        </div>
+
+        <div id="modal-impostazioni" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); border: 3px solid #333; padding: 20px; border-radius: 12px; z-index: 100; color: white; font-family: monospace;">
+            <h3 style="margin-top: 0; text-align: center;">IMPOSTAZIONI</h3>
+            <hr>
+            <div style="margin: 15px 0;">
+                <label>Volume Musica:</label>
+                <input type="range" id="slider-volume" min="0" max="1" step="0.1" value="0.5" oninput="regolaVolume(this.value)">
+            </div>
+            <div style="margin: 15px 0;">
+                <label>
+                    <input type="checkbox" id="chk-muto" onchange="toggleMuto(this.checked)"> Muta Audio
+                </label>
+            </div>
+            <div style="margin: 15px 0;">
+                <label>
+                    <input type="checkbox" id="chk-autoskip" onchange="toggleAutoskip(this.checked)"> Autoskip Combattimento
+                </label>
+            </div>
+            <hr>
+            <button onclick="chiudiModalImpostazioni()" style="width: 100%; padding: 8px; background: #333; color: white; border: none; cursor: pointer; font-family: monospace;">CHIUDI</button>
+        </div>
+
+        <button id="btn-start" onclick="mostraSelezione()">START</button>
+    </div>
+
+    <div id="schermata-selezione" class="schermata">
+        <h1 id="titolo-selezione" class="titolo-selezione">Scegli il tuo Pokémon</h1>
+        <div id="contenitore-starter"></div>
+    </div>
+
+    <<div id="schermata-mappa" class="schermata">
+        <h2 style="color: white; font-family: monospace; text-shadow: 2px 2px #000; z-index: 10; margin: 10px 0 0 0;">PERCORSO</h2>
+        
+        <div style="position: relative; width: 100%; flex-grow: 1;">
+            <svg id="mappa-collegamenti" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2;"></svg>
+            
+            <div id="albero-container" style="z-index: 5;"></div>
+        </div>
+
+        <div id="griglia-squadra" style="z-index: 10;"></div>
+    </div>
+    
+
+    <div id="schermata-gameover" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 150; justify-content: center; align-items: center; flex-direction: column;">
+        <div style="text-align: center;">
+            <img src="gameover.jpg" alt="Game Over" style="max-width: 80%; max-height: 40vh; object-fit: contain; margin-bottom: 30px;">
+            <br>
+            <button onclick="window.location.reload()" style="font-family: monospace; font-size: 28px; font-weight: bold; padding: 20px 60px; background-color: #c62828; color: white; border: 4px solid #fff; border-radius: 12px; cursor: pointer; box-shadow: 0px 0px 20px rgba(255, 0, 0, 0.6); transition: transform 0.2s;">
+                RIPROVA
+            </button>
+        </div>
+    </div>
+
+    <div id="schermata-gioco" class="schermata">
+        <h2 id="titolo-incontro" style="position: absolute; top: 10px; width: 100%; text-align: center; color: #2f3640; z-index: 10;"></h2>
+
+        <div id="gioco-container-arena">
+            
+            <div id="arena-diagonale">
+                <div class="scheda-arena nemico">
+                    <div class="hud-status">
+                        <div class="info-arena">
+                            <span id="nome-nemico" class="nome-pkm-arena">---</span>
+                        </div>
+                        <div class="barra-hp-container-arena">
+                            <div id="barra-nemico" class="barra-hp"></div>
+                        </div>
+                        <div class="sotto-barra">
+                            <div id="rimanenti-nemico" class="pokemon-rimanenti"></div>
+                            <div class="testo-hp-arena"><span id="hp-nemico">-/-</span> HP</div>
+                        </div>
+                    </div>
+                    <div class="box-sprite-arena-grande">
+                        <img id="img-nemico" src="" alt="Sprite Nemico" class="sprite-pokemon-grande">
+                    </div>
+                </div>
+                
+                <div class="scheda-arena giocatore">
+                    <div class="box-sprite-arena-grande">
+                        <img id="img-giocatore" src="" alt="Sprite Giocatore" class="sprite-pokemon-grande">
+                    </div>
+                    <div class="hud-status">
+                        <div class="info-arena">
+                            <span id="nome-giocatore" class="nome-pkm-arena">---</span>
+                        </div>
+                        <div class="barra-hp-container-arena">
+                            <div id="barra-giocatore" class="barra-hp"></div>
+                        </div>
+                        <div class="sotto-barra">
+                            <div id="rimanenti-giocatore" class="pokemon-rimanenti"></div>
+                            <div class="testo-hp-arena"><span id="hp-giocatore">-/-</span> HP</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="interfaccia-centrale-arena">
+                <div class="pannello-sinistro-controlli">
+                    <div id="controlli-arena">
+                        <button id="btn-attacco" class="btn-battle" onclick="turnoGiocatore()">ATTACCA</button>
+                        <button id="btn-skip" class="btn-battle btn-utility" onclick="attivaSkip()">SKIP</button>
+                        <button id="btn-torna-mappa" class="btn-battle btn-win" onclick="tornaAllaMappa()" style="display: none;">TORNA ALLA MAPPA</button>
+                    </div>
+                </div>
+                <div class="pannello-destro-log">
+                    <div id="console-log">Scontro iniziato! Preparati alla battaglia.</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="schermata-centro-medico" class="schermata">
+        <div class="contenitore-disco-full">
+            <h1 class="titolo-selezione-retro">🏥 CENTRO MEDICO 🏥</h1>
+            <p class="sottotitolo-disco">
+                Tutti i Pokémon della tua squadra sono stati completamente curati!
+            </p>
+            
+            <div id="contenitore-medico-squadra" class="griglia-opzioni-disco"></div>
+
+            <button class="btn-scegli" onclick="tornaAllaMappa()">Riprendi il Cammino</button>
+        </div>
+    </div>
+
+    <div id="schermata-dettaglio" class="schermata">
+        <div class="contenitore-dettaglio-scheda">
+            <div class="scheda-info-pokedex info-scheda-dettaglio">
+                <div class="blocco-foto-pokedex">
+                    <img id="dettaglio-img" src="" alt="Foto Pokémon">
+                </div>
+                <div class="blocco-stats-pokedex">
+                    <div class="info-titolo">
+                        <div id="dettaglio-nome" class="nome-pkm">---</div>
+                        <div id="dettaglio-rarita" class="rarita-pkm">---</div>
+                    </div>
+                    <hr class="separatore-pkm">
+                    <div class="valori-stats">
+                        <div>LVL: <span id="dettaglio-livello">-</span></div>
+                        <div>HP: <span id="dettaglio-hp">-/-</span></div>
+                        <div>ATK: <span id="dettaglio-atk">-</span></div>
+                        <div>DEF: <span id="dettaglio-def">-</span></div>
+                        <div>VEL: <span id="dettaglio-vel">-</span></div>
+                        <div style="margin-top: 8px; font-size: 15px; color: #1e272e;">MOSSA: <span id="dettaglio-mossa" style="color: #2ecc71; font-weight: bold;">-</span></div>
+                    </div>
+                </div>
+                
+                <div class="blocco-cambio-posizione" style="width: 100%; text-align: center; margin-top: 10px;">
+                    <label for="select-posizione" style="font-family: monospace; font-weight: bold; color: #2f3640; font-size: 13px; display: block; margin-bottom: 5px;">CAMBIA POSIZIONE SQUADRA:</label>
+                    <select id="select-posizione" class="select-stile-retro" onchange="eseguiScambioPosizione()"></select>
+                </div>
+
+                <button class="btn-battle btn-win" onclick="cambiaSchermata('schermata-dettaglio', 'schermata-mappa')" style="margin-top: 15px; width: 100%;">CHIUDI</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="schermata-disco" class="schermata">
+        <div class="contenitore-disco-full">
+            <h1 class="titolo-selezione-retro">💿 DISCO MOSSA TROVATO! 💿</h1>
+            <p class="sottotitolo-disco">
+                Scegli quale Pokémon della tua squadra vuoi potenziare (Max Lvl 3):
+            </p>
+            
+            <div id="contenitore-opzioni-disco" class="griglia-opzioni-disco"></div>
+        </div>
+    </div>
+    <audio id="musica-gioco" src="lobby.mp3"></audio>
+
+
+    <script src="script.js"></script>
+</body>
+</html>
