@@ -91,14 +91,13 @@
         <button id="btn-start" onclick="mostraSelezione()">START</button>
     </div>
 
-    <!-- ============= SCHERMATA SELEZIONE STARTER / POKEBALL ============= -->
-    <div id="schermata-selezione" class="schermata">
+    <!-- ============= SCHERMATA SELEZIONE STARTER E POKEBALL ============= -->
+    <div id="schermata-selezione" class="schermata" style="background: #111 !important;">
         <h1 id="titolo-selezione" class="titolo-selezione">Scegli il tuo Pokémon</h1>
         <div id="contenitore-starter"></div>
+        <button id="btn-torna-lobby" onclick="cambiaSchermata('schermata-selezione', 'schermata-start')" class="btn-battle" style="margin: 20px auto 0 auto; display: none; background-color: #e74c3c; width: 100%; max-width: 300px; font-size: 18px;">Torna alla Lobby</button>
     </div>
-
-    <!-- ============= SCHERMATA EVENTO MISTERIOSO ============= -->
-    <div id="schermata-mistero" class="schermata">
+    <div id="schermata-mistero" class="schermata" style="background-color: #111;">
         <div class="contenitore-selezione-retro" style="border-color: #9b59b6; width: 80vw; max-width: 600px; text-align: center;">
             <h1 class="titolo-selezione-retro" style="color: #9b59b6;">❓ EVENTO MISTERIOSO ❓</h1>
             <h2 id="mistero-titolo-evento" style="font-family: monospace; color: #2f3640; font-size: 24px; margin-top: 20px;">-</h2>
@@ -108,7 +107,7 @@
     </div>
 
     <!-- ============= SCHERMATA EVENTO ITEM ============= -->
-    <div id="schermata-evento-item" class="schermata">
+    <div id="schermata-evento-item" class="schermata" style="background-color: #111;">
         <div class="contenitore-selezione-retro" style="border-color: #3498db; width: 90vw; max-width: 800px; text-align: center;">
             <h1 class="titolo-selezione-retro" style="color: #3498db;">🎁 EVENTO ITEM 🎁</h1>
             <p style="color: white; font-size: 18px; margin-bottom: 20px;">Scegli un oggetto da aggiungere allo zaino!</p>
@@ -300,6 +299,10 @@
                         <div>VEL: <span id="dettaglio-vel">-</span></div>
                         <div style="margin-top: 8px; font-size: 15px; color: #1e272e;">MOSSA: <span id="dettaglio-mossa" style="color: #2ecc71; font-weight: bold;">-</span></div>
                     </div>
+
+                    <div id="dettaglio-oggetti" style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed #ccc;">
+                        <!-- Renderizzato in JS -->
+                    </div>
                 </div>
 
                 <div class="blocco-cambio-posizione" style="width: 100%; text-align: center; margin-top: 10px;">
@@ -323,8 +326,8 @@
         </div>
     </div>
 
-    <!-- ============= SCHERMATA SCAMBIO ============= -->
-    <div id="schermata-scambio" class="schermata">
+    <!-- ============= SCHERMATA ZONA SCAMBIO ============= -->
+    <div id="schermata-scambio" class="schermata" style="background: #111 !important;">
         <div class="contenitore-selezione-retro" style="width: 85vw; max-width: 900px;">
             <h1 class="titolo-selezione-retro">🔄 ZONA SCAMBIO POKÉMON 🔄</h1>
 

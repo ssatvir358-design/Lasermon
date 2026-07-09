@@ -10,6 +10,9 @@
 function generaOpzioniPokeball() {
     cambiaSchermata("schermata-mappa", "schermata-selezione");
     
+    let btnTornaLobby = document.getElementById("btn-torna-lobby");
+    if (btnTornaLobby) btnTornaLobby.style.display = "none";
+    
     let titolo = document.getElementById("titolo-selezione");
     if (titolo) titolo.innerText = "Una Pokéball! Scegli chi unire alla squadra o prosegui.";
     
@@ -182,8 +185,13 @@ function avviaEventoItem() {
     if (!contenitoreOpzioni) return;
     contenitoreOpzioni.innerHTML = "";
     
-    // Filtra gli oggetti che si trovano solo per terra (non acquistabili)
-    const itemPerTerra = DB_OGGETTI.filter(o => o.acquistabile === false && o.categoria === "equipaggiabile");
+    // Filtra gli oggetti che si trovano solo per terra (non acquistabili) e validi per la mappa attuale
+    let numeroMappaCorrente = parseInt(mappaAttuale.replace("mappa", "")) || 1;
+    const itemPerTerra = DB_OGGETTI.filter(o => 
+        o.acquistabile === false && 
+        o.categoria === "equipaggiabile" &&
+        (o.mappeAbilitate.length === 0 || o.mappeAbilitate.includes(numeroMappaCorrente))
+    );
     
     if (itemPerTerra.length === 0) {
         saltaEventoItem();
@@ -205,11 +213,22 @@ function avviaEventoItem() {
         const div = document.createElement("div");
         div.className = "card-item-shop";
         div.style.cursor = "pointer";
-        div.style.borderColor = "#3498db";
+        div.style.border = "2px solid #3498db";
+        div.style.borderRadius = "10px";
+        div.style.padding = "15px";
+        div.style.width = "200px";
+        div.style.display = "flex";
+        div.style.flexDirection = "column";
+        div.style.justifyContent = "space-between";
+        div.style.backgroundColor = "#2c3e50"; 
+        div.style.color = "white"; 
         div.innerHTML = `
-            <div style="font-weight: bold; color: #3498db;">${item.nome}</div>
-            <div style="font-size: 12px; margin: 5px 0; color: #ddd;">${item.descrizione}</div>
-            <button class="btn-scegli" style="background-color: #3498db; width: 100%; margin-top: 10px;">PRENDI</button>
+            <div style="text-align: center; margin-bottom: 8px; flex-shrink: 0;">
+                <img src="${item.icona}" style="width: 120px; height: 120px; min-width: 120px; min-height: 120px; object-fit: contain;" onerror="this.style.display='none'">
+            </div>
+            <div style="font-weight: bold; color: #3498db; text-align: center; font-size: 16px;">${item.nome}</div>
+            <div style="font-size: 13px; margin: 10px 0; color: #ddd; text-align: center; flex-grow: 1;">${item.descrizione}</div>
+            <button class="btn-scegli" style="background-color: #3498db; width: 100%; margin-top: auto;">PRENDI</button>
         `;
         div.onclick = () => selezionaItemEvento(item);
         contenitoreOpzioni.appendChild(div);

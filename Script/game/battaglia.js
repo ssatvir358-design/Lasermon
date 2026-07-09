@@ -45,7 +45,11 @@ function aggiornaGrafica() {
 
         const vivi = miaSquadra.filter(p => p.hpAttuali > 0).length;
         document.getElementById("rimanenti-giocatore").innerText = `In Squadra: ${vivi}`;
-        document.getElementById("img-giocatore").src = mioPokemon.immagine;
+        
+        // Evita di resettare lo sprite se è KO
+        if (mioPokemon.hpAttuali > 0) {
+            document.getElementById("img-giocatore").src = mioPokemon.immagine;
+        }
     }
 
     if (nemicoPokemon) {
@@ -66,7 +70,11 @@ function aggiornaGrafica() {
         }
 
         document.getElementById("rimanenti-nemico").innerText = `In attesa: ${nemiciIncontro.length}`;
-        document.getElementById("img-nemico").src = nemicoPokemon.immagine;
+        
+        // Evita di resettare lo sprite se è KO
+        if (nemicoPokemon.hpAttuali > 0) {
+            document.getElementById("img-nemico").src = nemicoPokemon.immagine;
+        }
     }
 }
 

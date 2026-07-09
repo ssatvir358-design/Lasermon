@@ -114,12 +114,18 @@ function creaPokemon(infoBase, livello, livelloMossa = 1) {
     const def   = calcolaStat(infoBase.defBase, livello, statsElem.def, molRar);
     const vel   = calcolaStat(infoBase.velBase, livello, statsElem.vel, molRar);
 
-    return {
+    const p = {
         nome:         infoBase.nome,
         livello:      livello,
         livelloMossa: livelloMossa,
+        // Valori Base (senza item)
+        baseHpMax:    hpMax,
+        baseAtk:      atk,
+        baseDef:      def,
+        baseVel:      vel,
+        // Valori finali (inizializzati con i base, aggiornati da applicaBonusOggetti)
         hpMax:        hpMax,
-        hpAttuali:    hpMax,
+        hpAttuali:    hpMax, // Attenzione: applicaBonusOggetti potrebbe aumentare questo proporzionalmente
         atk:          atk,
         def:          def,
         vel:          vel,
@@ -135,16 +141,104 @@ function creaPokemon(infoBase, livello, livelloMossa = 1) {
         infoBase:     infoBase,
         colore:       CONFIG_RARITA[infoBase.raritaTipo]?.colore || "#ffe066",
         boss:         infoBase.boss || false,
-        // Slot item equipaggiabili del Pokémon.
-        // Array di { dbId: string } con lunghezza massima CONFIG_SLOT_ITEM_PER_POKEMON.
-        // I consumabili usati in battaglia NON occupano questi slot.
         oggetti:      [],
-        // --- PERK (abilità passiva) ---
-        // perkId:   stringa dell'ID perk selezionato (es. "salvavita"), null = nessun perk
-        // perkTier: 0 = nessuno, 1 = Lv.45, 2 = Lv.100
-        perkId:   null,
-        perkTier: 0
+        perkId:       null,
+        perkTier:     0
     };
+    
+    applicaBonusOggetti(p);
+    // Assicura che gli hp attuali siano al massimo (per la factory iniziale)
+    p.hpAttuali = p.hpMax;
+    
+    return p;
+}
+
+/**
+ * Ricalcola atk, def, vel, hpMax sommando i bonus degli oggetti.
+ * Salva i bonus calcolati in p.bonus per l'UI.
+ */
+function applicaBonusOggetti(p) {
+    if (!p) return;
+    
+    // 1. Ripristina statistiche ai valori base (dal livello)
+    p.hpMax = p.baseHpMax;
+    p.atk   = p.baseAtk;
+    p.def   = p.baseDef;
+    p.vel   = p.baseVel;
+    
+    p.bonus = { hp: 0, atk: 0, def: 0, vel: 0 };
+    
+    if (!p.oggetti || p.oggetti.length === 0) return;
+    
+    // Helper per sommare flat/percent
+    const addStat = (statName, valType, val) => {
+        let baseVal = 0;
+        if (statName === "hp") baseVal = p.baseHpMax;
+        if (statName === "atk") baseVal = p.baseAtk;
+        if (statName === "def") baseVal = p.baseDef;
+        if (statName === "vel") baseVal = p.baseVel;
+        
+        let diff = 0;
+        if (valType === "percent") {
+            diff = Math.round(baseVal * val);
+        } else {
+            diff = val;
+        }
+        
+        if (statName === "hp") p.bonus.hp += diff;
+        if (statName === "atk") p.bonus.atk += diff;
+        if (statName === "def") p.bonus.def += diff;
+        if (statName === "vel") p.bonus.vel += diff;
+    };
+    
+    // 2. Calcola i bonus dagli oggetti
+    p.oggetti.forEach(item => {
+        // Cerca l'item completo nel DB (se l'array oggetti contiene solo l'ID o l'oggetto intero)
+        // Se contiene l'oggetto intero:
+        let obj = item;
+        if (typeof item === 'string') {
+            obj = (typeof DB_OGGETTI !== 'undefined') ? DB_OGGETTI.find(o => o.id === item) : null;
+        }
+        
+        if (obj) {
+            // Stat primaria
+            if (obj.stat && obj.stat !== "tutto") {
+                addStat(obj.stat, obj.valoreType, obj.valore);
+            }
+            // Multi-stat (tutte)
+            if (obj.stat === "tutto") {
+                addStat("hp", obj.valoreType, obj.valore);
+                addStat("atk", obj.valoreType, obj.valore);
+                addStat("def", obj.valoreType, obj.valore);
+                addStat("vel", obj.valoreType, obj.valore);
+            }
+            // Stat bonus extra
+            if (obj.bonusStatistica) {
+                addStat(obj.bonusStatistica, obj.bonusValoreType, obj.bonusValore);
+            }
+            // Malus (oggetti maledetti)
+            if (obj.malusStatistica) {
+                addStat(obj.malusStatistica, obj.malusValoreType, obj.malusValore); // malusValore è già negativo nel DB
+            }
+        }
+    });
+    
+    // 3. Applica i bonus alle statistiche finali
+    p.hpMax += p.bonus.hp;
+    p.atk   += p.bonus.atk;
+    p.def   += p.bonus.def;
+    p.vel   += p.bonus.vel;
+    
+    // Evita valori negativi o nulli per errore
+    if (p.hpMax < 1) p.hpMax = 1;
+    if (p.atk < 0) p.atk = 0;
+    if (p.def < 0) p.def = 0;
+    if (p.vel < 0) p.vel = 0;
+    
+    // Assicurati che gli HP attuali non superino il nuovo max
+    if (p.hpAttuali > p.hpMax) {
+        p.hpAttuali = p.hpMax;
+    }
 }
 
 /**
@@ -206,12 +300,15 @@ function aggiornaStatsLivello(p, nuoviLivelli) {
     }
     // else: hpAttuali rimane invariato (nessuna cura, nessun reviva)
 
-    // Aggiorna tutte le stat
+    // Aggiorna tutte le stat base
     p.livello = nuovoLivello;
-    p.hpMax   = nuovoHpMax;
-    p.atk     = nuovoAtk;
-    p.def     = nuovoDef;
-    p.vel     = nuovaVel;
+    p.baseHpMax   = nuovoHpMax;
+    p.baseAtk     = nuovoAtk;
+    p.baseDef     = nuovoDef;
+    p.baseVel     = nuovaVel;
+    
+    // Riapplica i bonus oggetti per calcolare le finali
+    applicaBonusOggetti(p);
 }
 
 /**
@@ -235,10 +332,12 @@ function forzaLivello(p, nuovoLivello) {
     
     // Ricalcola SEMPRE da zero, ignorando il livello corrente
     p.livello    = nuovoLivello;
-    p.hpMax      = calcolaHP   (p.infoBase.hpBase,  nuovoLivello, statsElem.hp,  molRar);
-    p.atk        = calcolaStat (p.infoBase.atkBase, nuovoLivello, statsElem.atk, molRar);
-    p.def        = calcolaStat (p.infoBase.defBase, nuovoLivello, statsElem.def, molRar);
-    p.vel        = calcolaStat (p.infoBase.velBase, nuovoLivello, statsElem.vel, molRar);
+    p.baseHpMax  = calcolaHP   (p.infoBase.hpBase,  nuovoLivello, statsElem.hp,  molRar);
+    p.baseAtk    = calcolaStat (p.infoBase.atkBase, nuovoLivello, statsElem.atk, molRar);
+    p.baseDef    = calcolaStat (p.infoBase.defBase, nuovoLivello, statsElem.def, molRar);
+    p.baseVel    = calcolaStat (p.infoBase.velBase, nuovoLivello, statsElem.vel, molRar);
+    
+    applicaBonusOggetti(p);
     p.hpAttuali  = p.hpMax;
     console.log(`[DevTool] ${p.nome} → Lv.${p.livello} | HP:${p.hpMax} ATK:${p.atk} DEF:${p.def} VEL:${p.vel}`);
 }

@@ -32,6 +32,9 @@ function mostraSelezione() {
     cambiaSchermata("schermata-start", "schermata-selezione");
     document.getElementById("titolo-selezione").innerText = "Scegli il tuo Pokémon Iniziale";
     
+    let btnTornaLobby = document.getElementById("btn-torna-lobby");
+    if (btnTornaLobby) btnTornaLobby.style.display = "block";
+    
     const contenitore = document.getElementById("contenitore-starter");
     contenitore.innerHTML = "";
     
@@ -88,26 +91,18 @@ function generaOpzioniPokemon(quanti, isStarter) {
             // Squadra piena: mostra select per scegliere chi sostituire
             let opzioniSostituzione = `<option value="keep">Lascia nella Pokéball (Tienilo così)</option>`;
             miaSquadra.forEach((membro, idx) => {
-                opzioniSostituzione += `<option value="${idx}">Sostituisci ${membro.nome} (Lvl ${membro.livello})</option>`;
+                opzioniSostituzione += `<option value="${idx}">Sostituisci ${membro.nome} (Lvl.${membro.livello})</option>`;
             });
             
             bloccoAzioneHTML = `
-                <div style="padding: 0 10px; text-align: left; font-size: 11px;">
-                    <label style="font-weight:bold;">Squadra piena! Gestisci:</label>
-                    <select id="select-sostituisci-${i}" style="width:100%; margin: 4px 0; font-family:monospace; font-size:11px;">
-                        ${opzioniSostituzione}
-                    </select>
-                </div>
-                <div class="blocco-pulsante">
-                    <button class="btn-scegli" onclick="confermaSceltaConSostituzione(${i}, ${JSON.stringify(p).replace(/"/g, '&quot;')})">CONFERMA</button>
-                </div>
+                <select id="select-sostituisci-${i}" style="margin-top: 10px; width: 100%; font-size: 14px; padding: 5px;">
+                    ${opzioniSostituzione}
+                </select>
+                <button class="btn-scegli" style="margin-top: 5px; width: 100%;" onclick='confermaSceltaConSostituzione(${i}, ${JSON.stringify(p).replace(/'/g, "\\'")})'>CONFERMA</button>
             `;
         } else {
-            bloccoAzioneHTML = `
-                <div class="blocco-pulsante">
-                    <button class="btn-scegli" onclick="aggiungiASquadra(${JSON.stringify(p).replace(/"/g, '&quot;')})">SCEGLI</button>
-                </div>
-            `;
+            // C'è spazio, semplice tasto Scegli
+            bloccoAzioneHTML = `<button class="btn-scegli" onclick='aggiungiASquadra(${JSON.stringify(p).replace(/'/g, "\\'")})'>Scegli</button>`;
         }
 
         colonna.innerHTML = `
@@ -115,13 +110,19 @@ function generaOpzioniPokemon(quanti, isStarter) {
                 <img src="${p.immagine}" alt="${p.nome}" class="sprite-pokemon">
             </div>
             <div class="blocco-stats">
-                <strong>${p.nome}</strong><br>
-                • Livello: ${p.livello}<br>
-                • ATK: ${p.atk}<br>
-                • HP: ${p.hpMax}<br>
-                • Mossa: ${getNomeMossaAttuale(p)} (Lvl ${p.livelloMossa})
+                <strong>${p.nome}</strong> (${p.raritaTipo.toUpperCase()})<br>
+                Elemento: ${getHtmlElemento(p.elemento)}<br>
+                Livello: ${p.livello}<br>
+                HP: ${p.hpMax}<br>
+                ATK: ${p.atk}<br>
+                DEF: ${p.def}<br>
+                VEL: ${p.vel}<br>
+                <br>
+                <span class="mossa-tag">${getNomeMossaAttuale(p)} (Lvl ${p.livelloMossa})</span>
             </div>
-            ${bloccoAzioneHTML}
+            <div class="blocco-pulsante">
+                ${bloccoAzioneHTML}
+            </div>
         `;
         contenitore.appendChild(colonna);
     }
@@ -161,15 +162,29 @@ function apriPannelloZainoMappa() {
     if (zaino.length === 0) {
         contenitore.innerHTML = "<p style='color: white; width: 100%; text-align: center;'>Lo zaino è vuoto.</p>";
     } else {
-        zaino.forEach(item => {
+        zaino.forEach((item, indexZaino) => {
             const divItem = document.createElement("div");
             divItem.className = "card-item-shop";
             divItem.style.cursor = "default";
             
-            divItem.innerHTML = `
+            let htmlInner = `
                 <div style="font-weight: bold; color: #f1c40f;">${item.nome}</div>
                 <div style="font-size: 12px; margin: 5px 0; color: #ddd;">${item.descrizione || "Nessuna descrizione."}</div>
             `;
+            
+            if (item.categoria === "equipaggiabile") {
+                let opzioni = miaSquadra.map((p, i) => `<option value="${i}">${p.nome}</option>`).join("");
+                htmlInner += `
+                    <div style="margin-top: 10px; display: flex; gap: 5px;">
+                        <select id="select-equip-${indexZaino}" style="flex: 1; padding: 5px; background: #2c3e50; color: white; border: 1px solid #34495e; border-radius: 4px;">
+                            ${opzioni}
+                        </select>
+                        <button class="btn-scegli" onclick="equipaggiaDaZaino(${indexZaino})" style="padding: 5px 10px; font-size: 12px;">DAI</button>
+                    </div>
+                `;
+            }
+            
+            divItem.innerHTML = htmlInner;
             contenitore.appendChild(divItem);
         });
     }
@@ -180,6 +195,37 @@ function apriPannelloZainoMappa() {
 function chiudiPannelloZainoMappa() {
     const modale = document.getElementById("modale-zaino-mappa");
     if (modale) modale.style.display = "none";
+}
+
+function equipaggiaDaZaino(indexZaino) {
+    const select = document.getElementById(`select-equip-${indexZaino}`);
+    if (!select) return;
+    
+    let pIndex = parseInt(select.value);
+    let p = miaSquadra[pIndex];
+    let item = zaino[indexZaino];
+    
+    // Controlla se il pokemon ha già raggiunto il limite di oggetti (es. 1 o 2)
+    // Per ora non c'è limite, ma volendo si può aggiungere un check
+    
+    // Aggiungi l'item al pokemon
+    p.oggetti.push(item);
+    
+    // Rimuovi l'item dallo zaino
+    zaino.splice(indexZaino, 1);
+    
+    // Riapplica i bonus statistici
+    if (typeof applicaBonusOggetti === "function") {
+        applicaBonusOggetti(p);
+    }
+    
+    // Notifica visiva (opzionale)
+    let log = document.getElementById("console-log");
+    if (log) log.innerHTML = `✅ ${item.nome} equipaggiato a ${p.nome}!`;
+    
+    // Ricarica la schermata
+    aggiornaSquadraMappa();
+    apriPannelloZainoMappa();
 }
 
 // Aggiunge un Pokémon alla squadra e va alla mappa
@@ -204,13 +250,25 @@ function aggiornaSquadraMappa() {
     if(!griglia) return;
     griglia.innerHTML = "";
     
+    const mapElementoColore = {
+        "fuoco": "#ff4d4d",
+        "acqua": "#3498db",
+        "erba": "#2ecc71",
+        "luce": "#f1c40f",
+        "buio": "#9b59b6"
+    };
+
     miaSquadra.forEach((p, index) => {
         let quadratino = document.createElement("div");
         quadratino.className = "icona-squadra";
         if (index === 0) quadratino.classList.add("primo-posto"); 
         
         quadratino.setAttribute("data-rarita", p.raritaTipo);
-        quadratino.style.borderColor = p.colore; 
+        
+        let col = p.elemento ? mapElementoColore[p.elemento.toLowerCase()] || p.colore : p.colore;
+        quadratino.style.borderColor = col;
+        // Glow molto intenso sia all'esterno che all'interno del bordo
+        quadratino.style.boxShadow = `0 0 25px 8px ${col}, inset 0 0 15px ${col}`;
         quadratino.style.backgroundImage = `url('${p.immagine}')`;
         quadratino.style.opacity = p.hpAttuali <= 0 ? "0.4" : "1"; 
         
@@ -234,6 +292,24 @@ function aggiornaSquadraMappa() {
 }
 
 // Apre la schermata dettaglio di un Pokémon della squadra
+function rimuoviOggettoDaPokemon(pIndex, indexOgg) {
+    let p = miaSquadra[pIndex];
+    if (!p || !p.oggetti || p.oggetti.length <= indexOgg) return;
+    
+    // Rimuovi l'oggetto e mettilo nello zaino
+    let itemRimossa = p.oggetti.splice(indexOgg, 1)[0];
+    zaino.push(itemRimossa);
+    
+    // Ricalcola le stats senza quell'oggetto
+    if (typeof applicaBonusOggetti === "function") {
+        applicaBonusOggetti(p);
+    }
+    
+    // Aggiorna visivamente il dettaglio e la mappa
+    mostraDettaglioPokemon(pIndex);
+    aggiornaSquadraMappa();
+}
+
 function mostraDettaglioPokemon(index) {
     let p = miaSquadra[index]; 
     if (!p) return;
@@ -258,12 +334,69 @@ function mostraDettaglioPokemon(index) {
     }
 
     document.getElementById("dettaglio-livello").innerText = p.livello;
-    document.getElementById("dettaglio-hp").innerText = `${p.hpAttuali}/${p.hpMax}`;
-    document.getElementById("dettaglio-atk").innerText = p.atk;
-    document.getElementById("dettaglio-def").innerText = p.def;
-    document.getElementById("dettaglio-vel").innerText = p.vel;
+    
+    const getStatString = (statName, val) => {
+        if (p.bonus && p.bonus[statName]) {
+            const b = p.bonus[statName];
+            const sign = b > 0 ? "+" : "";
+            return `${val} (${sign}${b})`;
+        }
+        return val;
+    };
+    
+    document.getElementById("dettaglio-hp").innerText = `${p.hpAttuali}/${getStatString("hp", p.hpMax)}`;
+    document.getElementById("dettaglio-atk").innerText = getStatString("atk", p.atk);
+    document.getElementById("dettaglio-def").innerText = getStatString("def", p.def);
+    document.getElementById("dettaglio-vel").innerText = getStatString("vel", p.vel);
+    
     document.getElementById("dettaglio-mossa").innerText = `${getNomeMossaAttuale(p)} (Lvl ${p.livelloMossa})`;
-
+    
+    // Renderizza gli oggetti equipaggiati
+    let divOggetti = document.getElementById("dettaglio-oggetti");
+    if (divOggetti) {
+        divOggetti.innerHTML = "";
+        if (p.oggetti && p.oggetti.length > 0) {
+            let titoloOgg = document.createElement("div");
+            titoloOgg.innerText = "OGGETTI EQUIPAGGIATI:";
+            titoloOgg.style.fontWeight = "bold";
+            titoloOgg.style.color = "#34495e";
+            titoloOgg.style.fontSize = "13px";
+            titoloOgg.style.marginBottom = "5px";
+            divOggetti.appendChild(titoloOgg);
+            
+            p.oggetti.forEach((item, indexOgg) => {
+                let card = document.createElement("div");
+                card.style.display = "flex";
+                card.style.alignItems = "center";
+                card.style.justifyContent = "space-between";
+                card.style.backgroundColor = "#ecf0f1";
+                card.style.padding = "5px";
+                card.style.borderRadius = "4px";
+                card.style.marginBottom = "5px";
+                card.style.fontSize = "12px";
+                card.style.border = "1px solid #bdc3c7";
+                
+                let info = document.createElement("div");
+                info.style.color = "#2c3e50";
+                info.innerHTML = `<strong>${item.nome}</strong><br><span style="font-size:10px; color:#7f8c8d;">${item.descrizione}</span>`;
+                
+                let btn = document.createElement("button");
+                btn.innerText = "RIMUOVI";
+                btn.style.backgroundColor = "#e74c3c";
+                btn.style.color = "white";
+                btn.style.border = "none";
+                btn.style.padding = "3px 6px";
+                btn.style.borderRadius = "3px";
+                btn.style.cursor = "pointer";
+                btn.style.fontSize = "10px";
+                btn.onclick = () => rimuoviOggettoDaPokemon(index, indexOgg);
+                
+                card.appendChild(info);
+                card.appendChild(btn);
+                divOggetti.appendChild(card);
+            });
+        }
+    }
     // Popola il select per cambiare la posizione in squadra
     let select = document.getElementById("select-posizione");
     if (select) {
