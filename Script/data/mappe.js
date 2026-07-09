@@ -6,9 +6,9 @@
 const ARCHIVIO_MAPPE = {
     "mappa1": {
         sfondo: "../Sprite/mappe/1.png",
-        livelloMin: 45,
-        livelloMaxRelativo: 45,  // Massimo fino a metà mappa
-        livelloMaxMassimo: 45,  // Massimo nella seconda metà
+        livelloMin: 1,
+        livelloMaxRelativo: 5,  // Massimo fino a metà mappa
+        livelloMaxMassimo: 10,  // Massimo nella seconda metà
         mossaMin: 1,
         mossaMaxRel: 1,         // Fino a metà mappa escono mosse solo a liv 1
         mossaMaxMax: 2,         // Nella seconda metà possono uscire mosse di liv 1 o 2
