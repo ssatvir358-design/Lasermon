@@ -1,0 +1,189 @@
+/* ==========================================================
+   INTERFACCIA SCHERMATA DISCO MOSSA
+   ========================================================== */
+#schermata-disco {
+    background: rgba(15, 20, 30, 0.9) !important; /* Sfondo scuro profondo retro */
+    display: none;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 10000 !important;
+    box-sizing: border-box !important;
+}
+
+#schermata-disco.attiva {
+    display: flex !important;
+}
+
+.contenitore-disco-full {
+    width: 90% !important;
+    max-width: 1200px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.titolo-selezione-retro {
+    font-size: 36px !important;
+    color: #ffca28 !important;
+    text-shadow: 3px 3px 0px #000 !important;
+    margin-bottom: 10px !important;
+    text-align: center !important;
+    font-family: 'Courier New', Courier, monospace !important;
+}
+
+.sottotitolo-disco {
+    color: #ffffff !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    margin-bottom: 40px !important;
+    text-align: center !important;
+}
+
+/* La griglia che contiene i Pokémon della squadra */
+.griglia-opzioni-disco {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 30px !important;
+    width: 100% !important;
+    flex-wrap: wrap !important;
+}
+
+/* LA SCHEDA GRANDE DEL POTENZIAMENTO */
+.scheda-disco-pokemon {
+    width: 260px !important;
+    height: 400px !important;
+    background-color: #ffffff !important;
+    border: 4px solid #2f3640 !important;
+    border-radius: 14px !important;
+    box-shadow: 5px 5px 0px #2f3640 !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    cursor: pointer !important;
+    transition: transform 0.2s, box-shadow 0.2s !important;
+}
+
+.scheda-disco-pokemon:hover {
+    transform: translateY(-8px) !important;
+    box-shadow: 8px 12px 0px #000 !important;
+    border-color: #ffca28 !important;
+}
+
+/* Box Immagine dentro la scheda */
+.foto-disco-pkm {
+    width: 100% !important;
+    height: 160px !important;
+    background: #f5f6fa !important;
+    border: 2px solid #2f3640 !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.foto-disco-pkm img {
+    height: 90% !important;
+    width: 90% !important;
+    object-fit: contain !important;
+    image-rendering: pixelated !important;
+}
+
+/* Info Testuali */
+.info-disco-pkm {
+    text-align: center !important;
+    width: 100% !important;
+}
+
+.nome-disco-pkm {
+    font-size: 20px !important;
+    font-weight: bold !important;
+    color: #2f3640 !important;
+    margin-bottom: 5px !important;
+    text-transform: uppercase !important;
+}
+
+.mossa-disco-pkm {
+    font-size: 14px !important;
+    color: #2c3e50 !important;
+    background: #ecf0f1 !important;
+    padding: 6px !important;
+    border-radius: 6px !important;
+    border: 1px dashed #718093 !important;
+    margin-top: 5px !important;
+}
+
+/* ==========================================================
+   INTERFACCIA SCHERMATA CENTRO MEDICO (Stile Retro Scuro)
+   ========================================================== */
+#schermata-centro-medico {
+    background: #0f141e !important; /* Forza lo sfondo scuro profondo a tutto schermo */
+    display: none;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 10000 !important;
+    box-sizing: border-box !important;
+}
+
+#schermata-centro-medico.attiva {
+    display: flex !important;
+}
+
+/* Rende trasparente il contenitore interno così si vede lo sfondo scuro */
+#schermata-centro-medico .contenitore-disco-full {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Stile del Bottone Retro */
+#schermata-centro-medico .btn-scegli {
+    background-color: #4cd137 !important;
+    border: 3px solid #2f3640 !important;
+    color: #ffffff !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    box-shadow: 4px 4px 0px #2f3640 !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    
+    /* DISTANZIAMENTO MAGGIORE DALLE SCHEDE */
+    margin-top: 50px !important; 
+    width: 320px !important;
+    padding: 15px !important;
+}
+
+/* Effetto Hover (Passaggio del mouse) */
+#schermata-centro-medico .btn-scegli:hover {
+    background-color: #44bd32 !important;
+    box-shadow: 6px 6px 0px #1e252f !important;
+    transform: translate(-2px, -2px) !important;
+}
+
+/* Effetto Active (Click del mouse) */
+#schermata-centro-medico .btn-scegli:active {
+    background-color: #44bd32 !important;
+    box-shadow: 1px 1px 0px #2f3640 !important;
+    transform: translate(3px, 3px) !important;
+}

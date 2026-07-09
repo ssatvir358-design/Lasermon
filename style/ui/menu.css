@@ -1,0 +1,431 @@
+/* ==========================================================
+   SCHERMATA START E LOBBY
+   ========================================================== */
+#schermata-start {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url("../../Sprite/UI/Lobby/Sfondo.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 10; /* Tiene lo start sopra tutto finché è attivo */
+}
+
+#btn-start {
+    padding: 20px 50px; font-size: 32px; font-weight: bold; background-color: #ffcc00;
+    border: 4px solid #333; border-radius: 10px; cursor: pointer; box-shadow: 0px 6px 0px #b38f00;
+}
+#btn-start:active { transform: translateY(6px); box-shadow: none; }
+
+
+/* ==========================================================
+   SCHERMATA DI SELEZIONE STARTER (A SCHERMO INTERO GIGANTE)
+   ========================================================== */
+#schermata-selezione {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url("../../Sprite/UI/Lobby/Sfondo.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 10;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+/* Forziamo la schermata attiva ad allineare il titolo in alto e il contenitore sotto */
+#schermata-selezione.attiva {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 3vh 2vw !important;
+    box-sizing: border-box !important;
+}
+
+.titolo-selezione { 
+    font-size: 28px; 
+    margin-bottom: 20px; 
+    color: #333; 
+}
+
+/* Il contenitore reale delle 3 schede riempie il 75% dell'altezza dello schermo */
+#schermata-selezione #contenitore-starter { 
+    display: flex !important; 
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 3vw !important;          /* Spazio proporzionale tra le 3 colonne */
+    width: 95vw !important;        /* Sfrutta quasi tutta la larghezza dello schermo */
+    height: 75vh !important;       /* Prende il 75% dell'altezza totale dello schermo */
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    flex-wrap: nowrap !important;  /* Impedisce tassativamente alle schede di andare a capo */
+}
+
+/* Le colonne degli starter si espandono per dividersi equamente lo schermo */
+#schermata-selezione .colonna-starter {
+    flex: 1 !important;            /* Si dividono lo schermo in 3 parti esattamente uguali */
+    width: auto !important;        /* Rimuove il vecchio limite fisso a 200px */
+    max-width: 28vw !important;    /* Evita che diventino troppo larghe su monitor giganti */
+    height: 100% !important;       /* Altezza massima dentro il contenitore */
+    background-color: white; 
+    border: 3px solid #333; 
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden; 
+    
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+/* Il blocco colorato della foto diventa enorme visivamente solo nella selezione */
+#schermata-selezione .colonna-starter .blocco-foto { 
+    width: 100% !important;
+    height: 45vh !important; /* Si prende quasi metà altezza schermo */
+    display: flex !important; 
+    justify-content: center !important; 
+    align-items: center !important; 
+    border-bottom: 3px solid #333; 
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+/* La foto ora cresce e riempie il box senza tagliarsi nella selezione */
+#schermata-selezione .colonna-starter .blocco-foto img.sprite-pokemon {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none !important; 
+    max-width: none !important;
+    object-fit: contain !important; /* Mostra l'immagine INTERA senza ritagliarla mai */
+    padding: 10px !important; /* Leggero distacco interno dai bordi neri */
+    box-sizing: border-box !important;
+    background-color: transparent !important;
+}
+
+/* Testi delle statistiche fluidi e leggibili */
+#schermata-selezione .colonna-starter .blocco-stats { 
+    width: 100% !important;
+    padding: 2vh 1.5vw !important; 
+    flex-grow: 1 !important; 
+    background-color: #fafafa; 
+    font-size: 1.8vh !important; /* Testo scalabile in base all'altezza dello schermo */
+    line-height: 1.5 !important; 
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+}
+
+/* Pulsante finale allineato */
+#schermata-selezione .colonna-starter .blocco-pulsante { 
+    width: 100% !important;
+    padding: 15px !important; 
+    text-align: center; 
+    background-color: #fff; 
+    border-top: 1px solid #eee; 
+    box-sizing: border-box !important;
+}
+
+.btn-scegli { 
+    width: 100%; padding: 10px; background-color: #4CAF50; color: white; 
+    border: 2px solid #333; border-radius: 5px; font-weight: bold; cursor: pointer; 
+}
+.btn-scegli:hover { background-color: #45a049; }
+
+/* ==========================================================
+   COMPORTAMENTO DEL POKEDEX (SCHEDE GIGANTI: 3 PER VOLTA A SCHERMO)
+   ========================================================== */
+#info-griglia-schede {
+    display: flex !important;
+    flex-direction: row !important;   /* La griglia scorre in ORIZZONTALE */
+    overflow-x: auto !important;       /* Attiva lo scroll con rotellina */
+    overflow-y: hidden !important;     /* Blocca categoricamente lo scroll verticale */
+    flex-wrap: nowrap !important;      /* Impedisce alle schede di andare a capo */
+    gap: 20px !important;              /* Spazio fisso tra una scheda e l'altra */
+    padding: 10px 15px !important;
+    width: 100% !important;
+    height: calc(100% - 70px) !important; /* Sfrutta tutta l'altezza sotto l'header delle rarità */
+    box-sizing: border-box !important;
+    align-items: center !important;
+}
+
+/* La singola scheda del Pokedex: Si allarga e si alza per riempire il div */
+.scheda-info-pokedex {
+    /* MATH: (100% del div - 40px di spazio totale dei due gap) diviso 3 schede esatte */
+    flex: 0 0 calc((100% - 40px) / 3) !important; 
+    height: 98% !important;            /* Riempie verticalmente tutto il div info-griglia-schede */
+    display: flex !important; 
+    flex-direction: column !important; /* Layout verticale: immagine sopra, statistiche sotto */
+    justify-content: space-between !important;
+    align-items: center !important;
+    overflow: hidden !important; 
+    padding: 20px !important;          /* Più spazio interno dato che ora sono giganti */
+    border: 4px solid #222 !important; 
+    border-radius: 16px !important;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.35) !important;
+    box-sizing: border-box !important;
+}
+
+/* Il riquadro nero/grigio della foto (In alto) - Diventa proporzionalmente enorme */
+.blocco-foto-pokedex { 
+    width: 100% !important;
+    height: 55% !important;            /* Prende il 55% dell'altezza totale della scheda */
+    display: flex !important; 
+    justify-content: center !important; 
+    align-items: center !important; 
+    border: 3px solid #333 !important;
+    border-radius: 10px !important;
+    background: rgba(0, 0, 0, 0.12) !important;
+    margin-bottom: 10px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+/* L'immagine all'interno del riquadro */
+.blocco-foto-pokedex img {
+    width: 100% !important;    
+    height: 100% !important;  
+    object-fit: contain !important;    /* Mantiene le proporzioni perfette senza tagliare i Pokémon */
+    padding: 10px !important;
+    box-sizing: border-box !important;
+}
+
+/* Il riquadro inferiore contenente i testi (In basso) */
+.blocco-stats-pokedex { 
+    display: flex !important;
+    flex-direction: column !important; 
+    width: 100% !important;
+    height: 42% !important;            /* Prende il restante spazio sotto la foto */
+    color: #000 !important;
+    font-weight: bold !important;
+    text-shadow: 0px 1px 0px rgba(255,255,255,0.3) !important;
+    box-sizing: border-box !important;
+    justify-content: flex-start !important;
+}
+
+/* Titolo e Nome Pokémon */
+.blocco-stats-pokedex .info-titolo {
+    text-align: center !important;
+    margin-bottom: 2px !important;
+}
+
+.blocco-stats-pokedex .nome-pkm {
+    font-size: 24px !important;        /* Nome bello grande e leggibile */
+    text-transform: uppercase !important;
+    letter-spacing: 1px;
+}
+
+.blocco-stats-pokedex .rarita-pkm {
+    font-size: 13px !important;
+    opacity: 0.8 !important;
+}
+
+/* Linea separatrice */
+.blocco-stats-pokedex .separatore-pkm {
+    border: 0 !important;
+    border-top: 3px solid rgba(0,0,0,0.2) !important;
+    margin: 4px 0 8px 0 !important;
+}
+
+/* Valori delle statistiche (HP, ATK, DEF, VEL) */
+.blocco-stats-pokedex .valori-stats {
+    text-align: left !important;
+    font-size: 18px !important;        /* Testo delle statistiche ingrandito proporzionalmente */
+    padding-left: 20px !important;     /* Più rientro a sinistra per ordine visivo */
+    line-height: 1.5 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    flex-grow: 1 !important;
+}
+
+/* ==========================================================
+   SCHERMATA DETTAGLIO POKEMON (MODAL)
+   ========================================================== */
+/* Centra la scheda di dettaglio a schermo intero sopra la mappa */
+#schermata-dettaglio {
+    background: rgba(0, 0, 0, 0.85) !important;
+    display: none;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 10000 !important;
+    box-sizing: border-box !important;
+}
+
+#schermata-dettaglio.attiva {
+    display: flex !important;
+}
+
+/* BOX CONTENITORE GIGANTE (Aumentato per renderlo imponente) */
+.contenitore-dettaglio-scheda {
+    width: 480px !important;   /* Molto più larga per valorizzare i dettagli */
+    height: 700px !important;  /* Bella alta stile carta collezionabile */
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+}
+
+/* SCHEDA INTERNA RE-PROPORZIONATA */
+.info-scheda-dettaglio {
+    flex: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    animation: popIn 0.25s ease-out !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 30px !important; /* Più respiro ai bordi */
+    box-sizing: border-box !important;
+    border: 5px solid #2f3640 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+}
+
+/* Ingrandiamo la foto del Pokémon nel dettaglio */
+.info-scheda-dettaglio .blocco-foto-pokedex {
+    width: 100% !important;
+    height: 240px !important; /* Più spazio alla grafica del personaggio */
+    background-color: #f5f6fa !important;
+    border: 3px solid #2f3640 !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    overflow: hidden;
+}
+
+.info-scheda-dettaglio .blocco-foto-pokedex img {
+    height: 90% !important;
+    width: 90% !important;
+    object-fit: contain !important;
+    image-rendering: pixelated !important;
+}
+
+/* Ingrandiamo il blocco delle statistiche */
+.info-scheda-dettaglio .blocco-stats-pokedex {
+    width: 100% !important;
+    background: #ffffff !important;
+    border: 3px solid #2f3640 !important;
+    border-radius: 12px !important;
+    padding: 15px 20px !important;
+    box-sizing: border-box !important;
+    flex-grow: 1 !important;
+    margin: 15px 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+}
+
+.info-scheda-dettaglio .nome-pkm {
+    font-size: 26px !important; /* Nome enorme leggibile */
+    font-weight: bold !important;
+}
+
+.info-scheda-dettaglio .valori-stats div {
+    font-size: 18px !important; /* Numeri di attacco, difesa ecc aumentati */
+    margin-bottom: 4px;
+}
+
+/* STILE RETRO PER IL MENU A TENDINA <SELECT> */
+.select-stile-retro {
+    width: 100% !important;
+    max-width: 320px !important;
+    padding: 10px !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 15px !important;
+    font-weight: bold !important;
+    color: #2f3640 !important;
+    background-color: #ffffff !important;
+    border: 3px solid #2f3640 !important;
+    border-radius: 6px !important;
+    outline: none !important;
+    cursor: pointer !important;
+    box-shadow: 2px 2px 0px #2f3640 !important;
+}
+
+.select-stile-retro:focus {
+    border-color: #ffca28 !important;
+}
+
+/* ALLINEAMENTO E STILE PER IL TIPO NELLA SCHEDA DETTAGLIO */
+#dettaglio-elemento-badge {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    font-weight: bold;
+    color: #1e272e;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Spazio corto e pulito tra la scritta TIPO: e il quadratino colorato */
+}
+
+/* ==========================================================
+   FIX GRAFICO DEFINITIVO PER LA SCHERMATA DETTAGLIO
+   ========================================================== */
+
+/* 1. Allunghiamo la scheda di dettaglio e diamogli una larghezza fissa da vera colonna informativa */
+.info-scheda-dettaglio {
+    height: 92vh !important;        /* Sfrutta quasi tutta l'altezza dello schermo */
+    width: 420px !important;        /* Dimensione solida e quadrata */
+    max-width: 95vw !important;
+    justify-content: flex-start !important; /* Dispone gli elementi dall'alto verso il basso */
+    gap: 12px !important;           /* Spazio controllato tra i macro-blocchi */
+    overflow-y: auto !important;    /* Se lo schermo è piccolo, permette di scorrere senza tagliare i tasti */
+}
+
+/* 2. Riduciamo il box della foto dal 55% a una dimensione proporzionata, liberando spazio per i comandi inferiori */
+.info-scheda-dettaglio .blocco-foto-pokedex {
+    height: 32% !important; 
+    flex-shrink: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* 3. Sblocchiamo l'altezza rigida del box delle statistiche */
+.info-scheda-dettaglio .blocco-stats-pokedex {
+    height: auto !important;
+    flex-shrink: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* 4. Forziamo l'allineamento pixel-art e la dimensione del badge del Tipo */
+#dettaglio-elemento-badge {
+    font-size: 15px !important;     /* Dimensione pulita e leggibile */
+    margin-bottom: 8px !important;  /* Distanza corretta dal livello inferiore */
+    display: flex !important;
+    align-items: center !important; /* Allinea perfettamente la scritta TIPO: e l'icona dell'elemento */
+    gap: 6px !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    color: #1e272e !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+}
+
+/* Assicura che il badge interno generato da getHtmlElemento si allinei in linea flessibile */
+#dettaglio-elemento-badge .badge-elemento {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+}

@@ -1,0 +1,435 @@
+/* ============================================================
+   negozio.css — Negozio, Centro Medico, Item in battaglia
+
+   ARCHITETTURA UI:
+   - #schermata-negozio è un OVERLAY FISSO (position:fixed, z-index:200)
+     e NON fa parte del sistema .schermata/.attiva.
+     JS apre/chiude direttamente con style.display = 'flex'/'none'.
+     Quindi i suoi figli (#negozio-header etc.) hanno display dichiarato
+     normalmente qui, e vengono nascosti solo quando il genitore è nascosto.
+
+   - #schermata-centro-medico È una .schermata normale.
+     Le sue fasi interne (#centro-fase-scelta, #centro-fase-cura) partono
+     con display:none e vengono mostrate da JS con style.display.
+
+   - #monete-display-mappa vive dentro #schermata-mappa, è nascosto di default
+     dalla regola .schermata { display:none } applicata al genitore.
+
+   - #btn-skip-fixed vive dentro #schermata-gioco, stesso discorso.
+   ============================================================ */
+
+
+/* ============================================================
+   MONETE — Badge mappa (figlio di #schermata-mappa)
+   ============================================================ */
+#monete-display-mappa {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: rgba(22, 33, 62, 0.92);
+    color: #f9ca24;
+    font-family: monospace;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 2px solid #f9ca24;
+    z-index: 10;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+
+/* ============================================================
+   SKIP BUTTON — Fisso top-left di #schermata-gioco
+   ============================================================ */
+#btn-skip-fixed {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 20;
+    background: rgba(20, 20, 30, 0.75);
+    color: #aaa;
+    border: 2px solid #555;
+    border-radius: 8px;
+    padding: 5px 11px;
+    font-size: 18px;
+    cursor: pointer;
+    font-family: monospace;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    line-height: 1;
+    user-select: none;
+}
+
+#btn-skip-fixed:hover {
+    background: rgba(20, 20, 30, 0.95);
+    border-color: #aaa;
+    color: #fff;
+}
+
+#btn-skip-fixed.attivo {
+    border-color: #4cd137;
+    color: #4cd137;
+    background: rgba(76, 209, 55, 0.15);
+}
+
+
+/* ============================================================
+   CENTRO MEDICO — Fasi interne
+   Le fasi partono con display:none via JS; il CSS gestisce solo il look.
+   ============================================================ */
+#centro-fase-scelta {
+    /* display gestito da JS: apriCentroMedico() → display:flex */
+    gap: 24px;
+    justify-content: center;
+    align-items: stretch;
+    flex-wrap: wrap;
+    margin: 20px 0;
+    width: 100%;
+}
+
+#centro-fase-cura {
+    /* display gestito da JS: scegliCura() → display:block */
+    width: 100%;
+    text-align: center;
+}
+
+.centro-scelta-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 28px 36px;
+    background: #f5f6fa;
+    border: 3px solid #2f3640;
+    border-radius: 14px;
+    cursor: pointer;
+    font-family: monospace;
+    font-size: 15px;
+    font-weight: bold;
+    color: #2f3640;
+    transition: transform 0.15s, box-shadow 0.15s;
+    min-width: 180px;
+    box-shadow: 4px 4px 0 #2f3640;
+    user-select: none;
+}
+
+.centro-scelta-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 4px 8px 0 #2f3640;
+}
+
+.centro-scelta-btn .scelta-emoji {
+    font-size: 44px;
+    line-height: 1;
+}
+
+.centro-scelta-btn.btn-negozio {
+    background: #f9ca24;
+    border-color: #d4a000;
+    box-shadow: 4px 4px 0 #a07800;
+    color: #1a1a2e;
+}
+
+.centro-scelta-btn.btn-negozio:hover {
+    box-shadow: 4px 8px 0 #a07800;
+}
+
+
+/* ============================================================
+   NEGOZIO — Layout principale (overlay fisso)
+   Il genitore #schermata-negozio è position:fixed; display:none
+   inline in HTML. Quando JS fa style.display='flex', tutto qui
+   sotto diventa visibile.
+   ============================================================ */
+
+/* Header negozio */
+#negozio-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px;
+    background: #0f0f1f;
+    border-bottom: 3px solid #f9ca24;
+    flex-shrink: 0;
+}
+
+#negozio-header h1 {
+    color: #f9ca24;
+    font-size: 20px;
+    margin: 0;
+    text-shadow: 2px 2px 0 #000;
+    letter-spacing: 1px;
+}
+
+#negozio-monete-header {
+    font-size: 18px;
+    font-weight: bold;
+    color: #f9ca24;
+    background: #2d2d44;
+    padding: 6px 18px;
+    border-radius: 20px;
+    border: 2px solid #f9ca24;
+}
+
+/* Layout 2 colonne */
+#negozio-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* Colonna sinistra: lista item */
+#negozio-lista {
+    width: 45%;
+    min-width: 200px;
+    overflow-y: auto;
+    background: #16213e;
+    border-right: 3px solid #f9ca24;
+}
+
+.negozio-item-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #2d2d44;
+    border-left: 4px solid transparent;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.negozio-item-row:hover,
+.negozio-item-row.selezionato {
+    background: #2d2d44;
+    border-left-color: #f9ca24;
+}
+
+.negozio-item-row .item-icona {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    flex-shrink: 0;
+}
+
+.negozio-item-row .item-icona-fallback {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    line-height: 1;
+}
+
+.negozio-item-row .item-nome {
+    flex: 1;
+    color: #e0e0e0;
+    font-size: 13px;
+    line-height: 1.3;
+}
+
+.negozio-item-row .item-costo {
+    color: #f9ca24;
+    font-size: 13px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.negozio-item-row .item-costo.non-acquistabile {
+    color: #666;
+    text-decoration: line-through;
+}
+
+/* Colonna destra: dettaglio */
+#negozio-dettaglio {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 28px 24px;
+    background: #1a1a2e;
+    overflow-y: auto;
+}
+
+#negozio-dettaglio-nome {
+    font-size: 20px;
+    color: #f9ca24;
+    font-weight: bold;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+}
+
+#negozio-dettaglio-desc {
+    font-size: 14px;
+    color: #ccc;
+    line-height: 1.7;
+    background: #16213e;
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid #2d2d44;
+    margin-bottom: 20px;
+}
+
+#negozio-dettaglio-costo {
+    font-size: 26px;
+    color: #f9ca24;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+#btn-acquista {
+    padding: 14px 28px;
+    font-size: 15px;
+    font-family: monospace;
+    font-weight: bold;
+    background: #f9ca24;
+    color: #1a1a2e;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    transition: transform 0.1s, background 0.15s;
+    letter-spacing: 0.5px;
+}
+
+#btn-acquista:hover:not(:disabled) {
+    transform: scale(1.02);
+    background: #ffd32a;
+}
+
+#btn-acquista:disabled {
+    background: #3a3a4a;
+    color: #666;
+    cursor: not-allowed;
+}
+
+/* Footer negozio */
+#negozio-footer {
+    display: flex;
+    padding: 12px 24px;
+    background: #0f0f1f;
+    border-top: 2px solid #2d2d44;
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+#btn-chiudi-negozio {
+    padding: 10px 24px;
+    font-family: monospace;
+    font-size: 14px;
+    font-weight: bold;
+    background: #c0392b;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+#btn-chiudi-negozio:hover { background: #e74c3c; }
+
+
+/* ============================================================
+   PANNELLO ITEM IN BATTAGLIA
+   ============================================================ */
+#pannello-item-battaglia {
+    display: none;  /* mostrato da JS quando click su btn-item */
+    position: absolute;
+    bottom: 70px;
+    left: 8px;
+    width: 270px;
+    max-height: 310px;
+    background: rgba(18, 24, 45, 0.98);
+    border: 3px solid #f9ca24;
+    border-radius: 10px;
+    overflow-y: auto;
+    z-index: 50;
+    font-family: monospace;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+}
+
+.pannello-item-titolo {
+    padding: 9px 13px;
+    background: #2d2d44;
+    color: #f9ca24;
+    font-weight: bold;
+    font-size: 13px;
+    border-bottom: 2px solid #f9ca24;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+}
+
+.pannello-item-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #2d2d44;
+    transition: background 0.15s;
+}
+
+.pannello-item-row:hover { background: #2d2d44; }
+
+.pannello-item-row .p-icona {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    flex-shrink: 0;
+}
+
+.pannello-item-row .p-icona-fb {
+    width: 28px;
+    height: 28px;
+    font-size: 22px;
+    line-height: 28px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.pannello-item-row .p-nome {
+    color: #e0e0e0;
+    font-size: 12px;
+    flex: 1;
+    line-height: 1.3;
+}
+
+.pannello-item-row .p-qty {
+    color: #f9ca24;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.pannello-item-vuoto {
+    padding: 20px 16px;
+    color: #777;
+    font-size: 12px;
+    text-align: center;
+    line-height: 1.6;
+}
+
+/* ---- BOTTONE ITEM IN BATTAGLIA ---- */
+#btn-item {
+    background: #f9ca24;
+    color: #1a1a2e;
+    font-weight: bold;
+    position: relative;
+}
+
+#btn-item:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+#btn-item:hover:not(:disabled) {
+    background: #ffd32a;
+}

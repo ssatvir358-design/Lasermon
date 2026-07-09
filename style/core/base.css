@@ -1,0 +1,84 @@
+/* ==========================================================
+   STRUTTURA BASE E CONFIGURAZIONE SCHERMATE
+   ========================================================== */
+body {
+    background-color: #f0f0f0;
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.schermata {
+    display: none; /* Di base tutte le schermate sono nascoste */
+    width: 100vw;
+    height: 100vh;
+    box-sizing: border-box;
+    position: absolute; /* Impedisce alle schermate di spingersi a vicenda */
+    top: 0;
+    left: 0;
+}
+
+/* Quando una schermata ha anche la classe .attiva, si mostra a tutto schermo */
+.schermata.attiva {
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* FORZATURA TOTALE GAME OVER */
+#schermata-gameover {
+    display: none !important; /* Di base nascosto */
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: black !important;
+    z-index: 9999999 !important; /* Numero altissimo */
+    justify-content: center !important;
+    align-items: center !important;
+    flex-direction: column !important;
+}
+
+/* ==========================================================
+   STILI DEI CODICI COLORE ELEMENTI E ICONE
+   ========================================================== */
+.testo-fuoco { color: #ff4d4d !important; font-weight: bold; }
+.testo-acqua { color: #3498db !important; font-weight: bold; }
+.testo-erba  { color: #2ecc71 !important; font-weight: bold; }
+.testo-luce  { color: #f1c40f !important; font-weight: bold; text-shadow: 1px 1px 0px rgba(0,0,0,0.2); }
+.testo-buio  { color: #9b59b6 !important; font-weight: bold; }
+
+/* Contenitore inline per mostrare l'icona affiancata al testo */
+.badge-elemento {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: monospace;
+    text-transform: uppercase;
+}
+
+/* Icona dell'elemento */
+.icona-elemento {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    vertical-align: middle;
+}
+
+/* Variante leggermente più grande per la schermata di fight o dettagli */
+.icona-elemento-grande {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    vertical-align: middle;
+}
+
+@keyframes zoomUlt {
+    0% { transform: scale(0.95); filter: brightness(0.8); }
+    100% { transform: scale(1.05); filter: brightness(1.2); }
+}

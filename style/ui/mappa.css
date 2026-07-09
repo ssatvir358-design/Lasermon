@@ -1,0 +1,211 @@
+/* ==========================================================
+   STRUTTURA E GESTIONE DELLA MAPPA DI GIOCO
+   ========================================================== */
+#schermata-mappa {
+    background-image: url("../../Sprite/mappe/1.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    padding: 20px;
+    overflow: hidden; /* Impedisce barre di scorrimento fastidiose */
+}
+
+#schermata-mappa h2 {
+    text-align: center;
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 0;
+    z-index: 5;
+}
+
+#mappa-collegamenti {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1 !important; /* Linee dei collegamenti sotto i nodi */
+}
+
+/* Container principale della mappa: diamo un po' di margine responsive */
+#albero-container {
+    background: transparent !important;
+    border: none !important;
+    width: 100%;
+    height: calc(100vh - 120px);
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    /* Margini dinamici per non far attaccare i nodi ai bordi dello schermo */
+    padding: 4vh 2vw; 
+    box-sizing: border-box;
+}
+
+/* Maggiore spaziatura orizzontale tra le icone */
+.piano {
+    display: flex;
+    justify-content: center;
+    gap: 7vw; /* Spaziatura flessibile in base allo schermo */
+    width: 100%;
+    min-height: 60px; 
+}
+
+/* Nodo START proporzionato */
+.radice-mappa { 
+    width: 50px;
+    height: 50px;
+    background-color: #333;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 11px;
+    font-weight: bold;
+    position: relative;
+    z-index: 10 !important;
+}
+
+/* Icone degli eventi a dimensione normale e pulita */
+.nodo-bottone {
+    width: 50px;
+    height: 50px;
+    border: none !important;
+    background-color: transparent !important;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: not-allowed;
+    transition: transform 0.2s, filter 0.2s;
+    font-size: 0;
+    outline: none;
+    filter: none; 
+    opacity: 0.9;
+    position: relative !important;
+    z-index: 20 !important; 
+}
+
+.nodo-passato {
+    opacity: 0.4;
+    filter: grayscale(100%) !important; /* Bianco e nero sulla strada già percorsa */
+    cursor: not-allowed;
+}
+
+.nodo-selezionabile {
+    cursor: pointer;
+    opacity: 1;
+    filter: drop-shadow(0px 0px 8px rgba(255, 204, 0, 0.8)); /* Bagliore sulle scelte attuali */
+}
+
+.nodo-selezionabile:hover {
+    transform: scale(1.2);
+    filter: drop-shadow(0px 0px 12px rgba(255, 204, 0, 1));
+}
+
+/* PNG delle icone mappa */
+.evento-cespuglio { background-image: url("../../Sprite/nodi/grass.png") !important; }
+.evento-npc { background-image: url("../../Sprite/nodi/team-rocket.png") !important; }
+.evento-pokeball { background-image: url("../../Sprite/nodi/pokeball.png") !important; }
+.evento-centro-medico { background-image: url("../../Sprite/nodi/poke-center.png") !important; }
+.evento-disco { background-image: url("../../Sprite/nodi/disco.png") !important; background-color: #9c27b0; }
+.evento-scambio { background-image: url("../../Sprite/nodi/scambio.png") !important; }
+.evento-mistero { background-image: url("../../Sprite/nodi/mistery.png") !important; }
+.evento-item { background-image: url("../../Sprite/nodi/item.png") !important; }
+
+/* ==========================================================
+   INTERFACCIA SQUADRA VISIBILE NELLA MAPPA
+   ========================================================== */
+#griglia-squadra {
+    position: absolute;
+    top: 20px;       
+    left: 20px;      
+    display: flex;
+    flex-direction: column; 
+    gap: 12px; /* Un po' più di spazio tra una foto e l'altra */        
+    z-index: 10;     
+    background: rgba(0, 0, 0, 0.6); 
+    padding: 12px;
+    border-radius: 12px;
+}
+
+.icona-squadra { 
+    width: 80px !important; /* Molto più grande */
+    height: 80px !important; 
+    border: 4px solid #333 !important; 
+    border-radius: 50% !important; 
+    cursor: pointer; 
+    position: relative;
+    background-size: cover !important;
+    background-position: top center !important; /* Centra il viso */
+    background-repeat: no-repeat !important;
+    background-color: #fff !important; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.5) !important;
+    transition: transform 0.2s !important;
+}
+.icona-squadra:hover {
+    transform: scale(1.1) !important; /* Effetto zoom al passaggio del mouse */
+}
+.icona-squadra.primo-posto { 
+    border-color: #ffcc00 !important; 
+    box-shadow: 0 0 15px #ffcc00 !important; 
+}
+.icona-squadra.primo-posto::after { 
+    content: "★"; position: absolute; top: 0px; right: 0px; background: #ffcc00; 
+    color: #333; font-size: 14px; padding: 4px; border-radius: 50%; border: 2px solid #333; 
+}
+
+/* Il cerchio del Pokémon in squadra */
+.cerchio-pokemon { /* CAMBIA QUESTO NOME CON QUELLO CHE USI TU */
+    width: 80px !important;  /* Molto più grande (prima magari era 30 o 40px) */
+    height: 80px !important;
+    border-radius: 50% !important; /* Mantiene la forma a cerchio */
+    border: 3px solid #2f3640 !important; /* Bordo visibile */
+    background-color: white !important;
+    
+    /* Queste tre righe servono per centrare bene l'immagine che metteremo dentro */
+    background-size: cover !important; 
+    background-position: top center !important; /* 'top' è utile per le foto di persone, per inquadrare il viso */
+    background-repeat: no-repeat !important;
+    
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5) !important;
+    cursor: pointer;
+}
+
+/* ==========================================================
+   GESTIONE DIMENSIONI ICONE CHIBI DEI BOSS SULLA MAPPA
+   ========================================================== */
+
+/* Il Boss leggermente più grande ma senza esagerare */
+.nodo-boss, .nodo-mappa.boss, [data-tipo="boss"] {
+    width: 150px !important;  
+    height: 150px !important; 
+    z-index: 999 !important; 
+}
+
+/* L'immagine reale del boss: si adatta al nuovo contenitore e aggiunge effetti */
+.nodo-boss img, .chibi-boss, [data-tipo="boss"] img {
+    width: 100% !important;         /* Prende tutti i 65px del contenitore */
+    height: 100% !important;        /* Prende tutti i 65px del contenitore */
+    object-fit: contain !important; /* Evita che l'immagine si deformi o si schiacci */
+    filter: drop-shadow(0px 0px 8px #ff3838) !important; /* Crea un'ombra rossa luminosa attorno al boss */
+    border: 2px solid #ff3838 !important;                /* Aggiunge un bordo rosso solido */
+    border-radius: 50% !important;                       /* Rende il bordo perfettamente circolare */
+    background-color: rgba(255, 0, 0, 0.2) !important;   /* Sfondo rosso trasparente dietro l'icona */
+    transition: transform 0.2s ease-in-out !important;   /* Prepara un'animazione fluida per l'hover */
+}
+
+/* Effetto quando passi il mouse sopra il boss sulla mappa */
+.nodo-boss img:hover, .chibi-boss:hover {
+    transform: scale(1.15) !important; /* Ingrandisce l'icona del 15% al passaggio del mouse */
+}

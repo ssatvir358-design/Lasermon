@@ -1,0 +1,187 @@
+/* ==========================================================
+   perk.css — Stile schermata di selezione Perk
+   Schermata a pagina intera (simile a schermata-disco).
+   Visibilità controllata dalla classe .attiva.
+   ========================================================== */
+
+/* ---- Schermata contenitore principale ---- */
+#schermata-perk {
+    background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a14 100%);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 15000;
+    box-sizing: border-box;
+    padding: 20px;
+    overflow-y: auto;
+    gap: 18px;
+    font-family: monospace;
+}
+
+#schermata-perk.attiva {
+    display: flex;
+}
+
+/* ---- Header ---- */
+#perk-header {
+    text-align: center;
+}
+
+#perk-header h1 {
+    font-size: clamp(20px, 4vw, 32px);
+    color: #f9ca24;
+    text-shadow: 0 0 20px rgba(249, 202, 36, 0.5);
+    margin: 0 0 6px 0;
+    letter-spacing: 2px;
+}
+
+#perk-header h2 {
+    font-size: clamp(14px, 2.5vw, 20px);
+    color: #aaa;
+    margin: 0;
+    font-weight: normal;
+}
+
+/* ---- Sezione Pokémon ---- */
+#perk-pokemon-info {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: rgba(255,255,255,0.04);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 14px 24px;
+}
+
+#perk-pokemon-img {
+    width: clamp(60px, 10vw, 100px);
+    height: clamp(60px, 10vw, 100px);
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+.perk-pokemon-nome {
+    font-size: clamp(18px, 3vw, 26px);
+    color: #fff;
+    font-weight: bold;
+}
+
+.perk-pokemon-lvl {
+    font-size: 13px;
+    color: #aaa;
+    margin-top: 4px;
+}
+
+/* ---- Badge stat dominante ---- */
+.perk-stat-badge {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.perk-stat-vita     { background: #c0392b; color: #fff; }
+.perk-stat-attacco  { background: #d35400; color: #fff; }
+.perk-stat-difesa   { background: #1a5276; color: #fff; }
+.perk-stat-velocita { background: #6c3483; color: #fff; }
+
+/* ---- Contenitore opzioni ---- */
+#perk-opzioni {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 820px;
+}
+
+/* ---- Card singola opzione ---- */
+.perk-card {
+    flex: 1 1 300px;
+    max-width: 370px;
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 16px;
+    padding: 24px 20px;
+    cursor: pointer;
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+    user-select: none;
+}
+
+.perk-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    border-color: #f9ca24;
+    box-shadow: 0 8px 32px rgba(249, 202, 36, 0.25);
+    background: rgba(249, 202, 36, 0.07);
+}
+
+.perk-card.selezionato {
+    border-color: #2ecc71;
+    box-shadow: 0 0 30px rgba(46, 204, 113, 0.45);
+    background: rgba(46, 204, 113, 0.1);
+    transform: scale(1.03);
+}
+
+/* Emoji grande ---- */
+.perk-card-emoji {
+    font-size: clamp(32px, 6vw, 50px);
+    line-height: 1;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+}
+
+/* Nome perk ---- */
+.perk-card-nome {
+    font-size: clamp(15px, 2.5vw, 20px);
+    font-weight: bold;
+    color: #f9ca24;
+    letter-spacing: 1px;
+}
+
+/* Descrizione ---- */
+.perk-card-desc {
+    font-size: clamp(12px, 1.8vw, 15px);
+    color: #ccc;
+    line-height: 1.5;
+    flex: 1;
+}
+
+/* Badge di conferma ---- */
+.perk-card-scegli {
+    margin-top: 10px;
+    padding: 8px 22px;
+    background: #2ecc71;
+    color: #0a0a14;
+    border: none;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    letter-spacing: 1px;
+}
+
+.perk-card-scegli:hover {
+    background: #27ae60;
+    transform: scale(1.04);
+}
+
+/* ---- Indicatore coda ---- */
+#perk-coda-info {
+    font-size: 13px;
+    color: #555;
+    text-align: center;
+}
