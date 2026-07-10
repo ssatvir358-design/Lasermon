@@ -263,6 +263,7 @@ function avviaEvento(pianoSelezionato, indiceNodo, tipoEvento) {
 
     // Nodo boss (ultimo piano)
     if (tipoEvento === "boss") {
+        document.getElementById("titolo-incontro").innerText = `SFIDA BOSS\n-- PIANO ${pianoAttuale} --`;
         const idBossCorrente = ARCHIVIO_MAPPE[mappaAttuale].idBoss;
         avviaBossBattle(idBossCorrente);
         return;
@@ -302,7 +303,7 @@ function avviaEvento(pianoSelezionato, indiceNodo, tipoEvento) {
     // Default: combattimento (cespuglio o npc)
     cambiaSchermata("schermata-mappa", "schermata-gioco");
     document.getElementById("titolo-incontro").innerText = tipoEvento === "cespuglio"
-        ? `Erba Alta - Piano ${pianoAttuale}`
-        : `Sfida Allenatore - Piano ${pianoAttuale}`;
+        ? `ERBA ALTA\n-- PIANO ${pianoAttuale} --`
+        : `SFIDA ALLENATORE\n-- PIANO ${pianoAttuale} --`;
     preparaIncontroBattaglia(tipoEvento);
 }

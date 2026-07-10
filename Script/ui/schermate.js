@@ -445,12 +445,16 @@ function tornaAllaMappa() {
     aggiornaSquadraMappa();
     if (typeof aggiornaDisplayMonete === "function") aggiornaDisplayMonete();
     
-    document.getElementById("btn-attacco").style.display = "inline-block";
+    document.getElementById("btn-attacco").style.display = "flex";
     document.getElementById("btn-attacco").disabled = false;
     document.getElementById("btn-torna-mappa").style.display = "none";
     // Ripristina btn-item visibile e disabilitato (sarà ri-abilitato a inizio prossimo incontro)
     const btnItem = document.getElementById("btn-item");
-    if (btnItem) { btnItem.style.display = "inline-block"; btnItem.disabled = true; }
+    if (btnItem) { btnItem.style.display = "flex"; btnItem.disabled = true; }
+    const btnPokemon = document.getElementById("btn-pokemon");
+    if (btnPokemon) { btnPokemon.style.display = "flex"; btnPokemon.disabled = true; }
+    const btnFuga = document.getElementById("btn-fuga");
+    if (btnFuga) { btnFuga.style.display = "flex"; btnFuga.disabled = false; }
 }
 
 // Torna alla mappa dopo aver usato un disco mossa
@@ -460,11 +464,15 @@ function tornaAllaMappaDaDisco() {
     generaMappaAlbero();
     aggiornaSquadraMappa();
     if (typeof aggiornaDisplayMonete === "function") aggiornaDisplayMonete();
-    document.getElementById("btn-attacco").style.display = "inline-block";
+    document.getElementById("btn-attacco").style.display = "flex";
     document.getElementById("btn-attacco").disabled = false;
     document.getElementById("btn-torna-mappa").style.display = "none";
     const btnItem = document.getElementById("btn-item");
-    if (btnItem) { btnItem.style.display = "inline-block"; btnItem.disabled = true; }
+    if (btnItem) { btnItem.style.display = "flex"; btnItem.disabled = true; }
+    const btnPokemon = document.getElementById("btn-pokemon");
+    if (btnPokemon) { btnPokemon.style.display = "flex"; btnPokemon.disabled = true; }
+    const btnFuga = document.getElementById("btn-fuga");
+    if (btnFuga) { btnFuga.style.display = "flex"; btnFuga.disabled = false; }
 }
 
 // Apre la schermata disco mossa con la lista della squadra cliccabile

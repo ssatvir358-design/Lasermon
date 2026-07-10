@@ -70,7 +70,7 @@
     box-sizing: border-box !important;
     background: #2f3640 !important;
     z-index: 9999 !important;
-    background-image: url('../../Sprite/UI/Combattimento/Combattimento.png') !important;
+    background-image: url('../../Sprite/UI/Combattimento/Combattimento2.png') !important;
     background-size: cover !important;
     background-position: center !important;
     background-repeat: no-repeat !important;
@@ -108,7 +108,7 @@
     width: 100% !important; 
     
     /* IMPOSTAZIONE IMMAGINE DI SFONDO */
-    background-image: url("../../Sprite/UI/Combattimento/Combattimento.png") !important;
+    background-image: url("../../Sprite/UI/Combattimento/Combattimento2.png") !important;
     background-size: cover !important;             /* Fa in modo che l'immagine copra tutta l'arena senza deformarsi */
     background-position: center !important;         /* Centra l'immagine nello schermo */
     background-repeat: no-repeat !important;        /* Evita che l'immagine si duplichi se lo schermo è troppo grande */
@@ -120,47 +120,52 @@
 /* Le singole schede fluttuanti dei pokemon */
 .scheda-arena {
     display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 40px !important;
+    flex-direction: column-reverse !important;
+    gap: 15px !important;
     width: 100% !important;
 }
 
 .scheda-arena.nemico { 
-    justify-content: flex-end !important; 
+    align-items: flex-end !important;
+    margin-top: 55px !important; /* Sposta l'HUD nemico più in basso per non coprire il banner */
 }
 .scheda-arena.giocatore { 
-    justify-content: flex-start !important; 
+    align-items: flex-start !important;
+    padding-left: 20px !important;
 }
 
 /* HUD dei Dati (Nome, HP, Barre) */
 .hud-status {
-    background: #ffffff !important;
-    border: 3px solid #2f3640 !important;
+    position: relative !important;
+    background: rgba(30, 39, 46, 0.95) !important;
+    border: 3px solid #576574 !important;
     border-radius: 12px !important;
     padding: 15px 20px !important;
-    width: 320px !important;
-    box-shadow: 4px 4px 0px #2f3640 !important;
+    width: 350px !important;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.5) !important;
     box-sizing: border-box !important;
+    color: #f5f6fa !important;
+    margin: 0 40px !important; /* Spazio dai bordi dello schermo */
 }
 
 .nome-pkm-arena {
     font-size: 22px !important;
     font-weight: bold !important;
     text-transform: uppercase !important;
-    color: #2f3640 !important;
+    color: #f5f6fa !important;
 }
 
 .lvl-tag {
     font-size: 16px !important;
-    color: #718093 !important;
+    color: #dcdde1 !important;
     font-weight: normal !important;
 }
 
 .mossa-tag {
     font-size: 13px !important;
     color: #4cd137 !important;
-    background: #2f3640 !important;
+    background: #1e272e !important;
+    border: 1px solid #4cd137 !important;
     padding: 3px 8px !important;
     border-radius: 4px !important;
     display: inline-block !important;
@@ -169,13 +174,24 @@
 
 /* Barra degli HP */
 .barra-hp-container-arena { 
-    background-color: #dcdde1 !important; 
-    border: 2px solid #2f3640 !important; 
+    position: relative !important;
+    background-color: #2f3640 !important; 
+    border: 2px solid #576574 !important; 
     height: 18px !important; 
     border-radius: 9px !important; 
     overflow: hidden !important; 
-    margin: 10px 0 !important;
-    width: 100% !important;
+    margin: 15px 0 5px 35px !important;
+    width: calc(100% - 35px) !important;
+}
+.barra-hp-container-arena::before {
+    content: "PS";
+    position: absolute;
+    left: -32px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 15px;
+    font-weight: bold;
+    color: #dcdde1;
 }
 
 .barra-hp { 
@@ -186,20 +202,27 @@
 
 .sotto-barra {
     display: flex !important;
-    justify-content: space-between !important;
+    justify-content: flex-end !important;
     align-items: center !important;
     font-size: 14px !important;
     font-weight: bold !important;
 }
 
-.testo-hp-arena { color: #2f3640 !important; }
-.pokemon-rimanenti { color: #718093 !important; }
+.testo-hp-arena { color: #dcdde1 !important; }
+
+.pokemon-rimanenti { 
+    position: absolute !important;
+    bottom: -32px !important;
+    left: 15px !important;
+}
 
 /* Sprite dei Pokémon in Arena - Dimensioni e Contorno Bianco Corretti */
 /* 1. Il contenitore rimane flessibile e trasparente */
 .box-sprite-arena-grande {
     width: 30vw !important;
     min-width: 200px !important;
+    height: 10vh !important; /* Mantiene un'altezza minima per non distruggere il flex */
+    position: relative !important; /* Per poter usare absolute sulle immagini */
     display: flex !important;
     justify-content: center !important;
     align-items: flex-end !important;
@@ -215,34 +238,31 @@
 .sprite-pokemon-grande {
     width: auto !important;
     height: 40vh !important;       /* Regola questo valore se vuoi i personaggi più o meno alti */
-    max-height: 900 !important;  /* Limite di sicurezza per non coprire le scritte */
+    max-height: 900px !important;  /* Limite di sicurezza per non coprire le scritte */
     
     object-fit: contain !important;
     image-rendering: pixelated !important;
     
-    /* Questo assicura che non si sovrappongano */
-    position: relative !important;
+    /* Questo assicura che non si sovrappongano e non espandano la cella flex in altezza */
+    position: absolute !important;
+    bottom: 0 !important;
     pointer-events: none !important; /* Non interferisce col clic sui tasti */
 }
 
 /* Sostituisci gli ID qui sotto con quelli effettivi delle immagini nel combattimento */
-#sprite-giocatore, #sprite-nemico {
-    height: 85vh !important; /* 85vh = 85% dell'altezza dello schermo, li spinge quasi fino in cima */
-    width: 45vw !important;  /* Li rende più larghi (45% della larghezza dello schermo) */
-    
-    /* SCEGLI UNA DI QUESTE DUE OPZIONI PER L'OBJECT-FIT: */
-    
-    /* Opzione A (Consigliata per le foto): 
-       'cover' riempie tutto lo spazio tagliando i bordi in eccesso, ma non deforma le facce. */
-    object-fit: cover !important; 
-    
-    /* Opzione B (Forzatura): 
-       'fill' allarga e allunga l'immagine ignorando le proporzioni. 
-       Le persone sembreranno un po' "schiacciate", ma riempiranno lo spazio al 100%. */
-    /* object-fit: fill !important; */
-    
-    object-position: bottom !important; /* Tiene i personaggi ancorati al suolo, in basso */
-    image-rendering: auto !important; /* Rimuove l'effetto pixelato che su delle vere foto sta male */
+#img-giocatore, #img-nemico {
+    height: 55vh !important;
+    width: auto !important;
+    object-fit: contain !important;
+    object-position: bottom !important; 
+    image-rendering: pixelated !important; 
+}
+#img-giocatore {
+    transform: translateX(10vw) !important;
+}
+#img-nemico {
+    height: 48vh !important;
+    transform: translate(-10vw, 30vh) !important;
 }
 
 /* Rimuovi i limiti dai contenitori dei personaggi nell'arena (spesso bloccano l'immagine) */
@@ -259,6 +279,9 @@
     flex-direction: row !important;
     width: 100% !important;
     height: 180px !important; /* Leggermente più alto per display grandi */
+    flex-shrink: 0 !important; /* Impedisce che si rimpicciolisca */
+    z-index: 100 !important; /* Mantiene la barra sopra i personaggi */
+    position: relative !important;
     background-color: #2f3640 !important;
     box-sizing: border-box !important;
     margin: 0 !important;
@@ -274,10 +297,9 @@
 }
 
 #controlli-arena {
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: 1fr 1fr !important;
     gap: 12px !important;
     width: 100% !important;
     height: 100% !important;
@@ -424,4 +446,66 @@
     0% { transform: scale(0); opacity: 0; }
     70% { transform: scale(1.1); opacity: 1; }
     100% { transform: scale(1); opacity: 1; }
+}
+
+/* ---- AGGIUNTE UI CUSTOM ---- */
+#banner-incontro {
+    position: absolute !important;
+    top: 15px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    background: #2f3640 !important;
+    border: 3px solid #718093 !important;
+    border-radius: 12px !important;
+    padding: 10px 30px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
+    z-index: 10 !important;
+}
+#banner-incontro h2 {
+    color: #f5f6fa !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 20px !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    white-space: pre-line !important;
+    text-align: center !important;
+    margin: 0 !important;
+}
+.banner-pokeball {
+    width: 24px !important;
+    height: 24px !important;
+    image-rendering: pixelated !important;
+}
+.btn-action {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+    height: 100% !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    color: #f5f6fa !important;
+    background-color: #2f3640 !important;
+    border: 3px solid #f5f6fa !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+    transition: transform 0.1s !important;
+}
+#btn-attacco { background-color: #ffca28 !important; color: #2f3640 !important; }
+#btn-attacco:hover { background-color: #ffe082 !important; }
+.btn-action:not(#btn-attacco):hover { background-color: #353b48 !important; }
+.btn-action:disabled {
+    background-color: #718093 !important;
+    color: #dcdde1 !important;
+    cursor: not-allowed !important;
+}
+.btn-icon {
+    width: 60px !important;
+    height: 60px !important;
+    image-rendering: pixelated !important;
 }

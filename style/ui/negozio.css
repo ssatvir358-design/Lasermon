@@ -38,36 +38,40 @@
 
 
 /* ============================================================
-   SKIP BUTTON — Fisso top-left di #schermata-gioco
+   SKIP BUTTON – Fisso top-left di #schermata-gioco
    ============================================================ */
 #btn-skip-fixed {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 15px;
+    left: 15px;
     z-index: 20;
-    background: rgba(20, 20, 30, 0.75);
-    color: #aaa;
-    border: 2px solid #555;
-    border-radius: 8px;
-    padding: 5px 11px;
-    font-size: 18px;
+    background: rgba(47, 54, 64, 0.85);
+    color: #f5f6fa;
+    border: 3px solid #718093;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-size: 20px;
+    font-weight: bold;
     cursor: pointer;
-    font-family: monospace;
-    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    font-family: 'Courier New', Courier, monospace;
+    transition: all 0.2s;
     line-height: 1;
     user-select: none;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
 }
 
 #btn-skip-fixed:hover {
-    background: rgba(20, 20, 30, 0.95);
-    border-color: #aaa;
-    color: #fff;
+    background: rgba(53, 59, 72, 0.95);
+    border-color: #f5f6fa;
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.3);
 }
 
 #btn-skip-fixed.attivo {
     border-color: #4cd137;
     color: #4cd137;
-    background: rgba(76, 209, 55, 0.15);
+    background: rgba(76, 209, 55, 0.2);
+    box-shadow: 0 0 10px rgba(76,209,55,0.4), 0 4px 0 rgba(0,0,0,0.3);
 }
 
 

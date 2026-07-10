@@ -24,6 +24,18 @@ function getMessaggioEfficacia(moltiplicatore) {
     return "";
 }
 
+function generaHtmlPokeball(conteggio) {
+    let html = "";
+    for (let i = 0; i < conteggio; i++) {
+        html += `<img src="../Sprite/UI/Combattimento/pokeball.png" style="width: 26px; height: 26px; margin-right: 4px; image-rendering: pixelated; vertical-align: middle;">`;
+    }
+    const vuote = 5 - conteggio;
+    for (let i = 0; i < vuote; i++) {
+        html += `<div style="display: inline-block; width: 22px; height: 22px; border: 2px solid #718093; border-radius: 50%; margin-right: 4px; vertical-align: middle;"></div>`;
+    }
+    return html;
+}
+
 // Aggiorna tutta la grafica dell'arena (barre HP, nomi, immagini, contatori)
 function aggiornaGrafica() {
     if (mioPokemon) {
@@ -43,8 +55,8 @@ function aggiornaGrafica() {
             else                  barraG.style.backgroundColor = "#4cd137";
         }
 
-        const vivi = miaSquadra.filter(p => p.hpAttuali > 0).length;
-        document.getElementById("rimanenti-giocatore").innerText = `In Squadra: ${vivi}`;
+        const vivi = Math.max(0, miaSquadra.filter(p => p.hpAttuali > 0).length - 1);
+        document.getElementById("rimanenti-giocatore").innerHTML = generaHtmlPokeball(vivi);
         
         // Evita di resettare lo sprite se è KO
         if (mioPokemon.hpAttuali > 0) {
@@ -69,7 +81,7 @@ function aggiornaGrafica() {
             else                  barraN.style.backgroundColor = "#4cd137";
         }
 
-        document.getElementById("rimanenti-nemico").innerText = `In attesa: ${nemiciIncontro.length}`;
+        document.getElementById("rimanenti-nemico").innerHTML = generaHtmlPokeball(nemiciIncontro.length);
         
         // Evita di resettare lo sprite se è KO
         if (nemicoPokemon.hpAttuali > 0) {
@@ -668,9 +680,11 @@ function gestisciVittoriaIncontro() {
         generaMappaProcedurale();
     }
 
-    // Mostra "TORNA ALLA MAPPA" e nasconde ATTACCA
+    // Mostra "TORNA ALLA MAPPA" e nasconde tutti gli altri
     document.getElementById("btn-attacco").style.display    = "none";
     document.getElementById("btn-item").style.display       = "none";
+    document.getElementById("btn-pokemon").style.display    = "none";
+    document.getElementById("btn-fuga").style.display       = "none";
     document.getElementById("btn-torna-mappa").style.display = "inline-block";
     aggiornaGrafica();
 
@@ -686,6 +700,8 @@ function gestisciVittoriaIncontro() {
             generaMappaAlbero();
             document.getElementById("btn-attacco").style.display    = "inline-block";
             document.getElementById("btn-item").style.display       = "inline-block";
+            document.getElementById("btn-pokemon").style.display    = "inline-block";
+            document.getElementById("btn-fuga").style.display       = "inline-block";
             document.getElementById("btn-torna-mappa").style.display = "none";
         });
     }, isSkipAttivo ? 1500 : 3000);
@@ -937,4 +953,34 @@ function toggleAutoskip(attivo) {
     isSkipAttivo        = attivo;
     const btn = document.getElementById("btn-skip-fixed");
     if (btn) btn.classList.toggle("attivo", attivo);
+}
+
+// ----------------------------------------------------------
+// FUGA DALLA BATTAGLIA
+// ----------------------------------------------------------
+function fugaBattaglia() {
+    // Non è possibile fuggire dalle Boss Fight
+    if (isBossFight || (typeof tipoEventoAttuale !== 'undefined' && tipoEventoAttuale === "boss")) {
+        document.getElementById("console-log").innerHTML = "<br><span style='color:#e1b12c; font-weight:bold;'>Non puoi fuggire da una Boss Fight!</span>";
+        return;
+    }
+
+    // Successo al 100%
+    document.getElementById("console-log").innerHTML = "<br><span style='color:#4cd137; font-weight:bold;'>Fuga riuscita con successo!</span>";
+    
+    // Disabilita i controlli mentre si fugge
+    document.getElementById("btn-attacco").disabled = true;
+    const btnItem = document.getElementById("btn-item");
+    if (btnItem) btnItem.disabled = true;
+    const btnFuga = document.getElementById("btn-fuga");
+    if (btnFuga) btnFuga.disabled = true;
+    const btnPokemon = document.getElementById("btn-pokemon");
+    if (btnPokemon) btnPokemon.disabled = true;
+
+    // Torna alla mappa dopo 1.5 secondi
+    setTimeout(() => {
+        if (typeof tornaAllaMappa === "function") {
+            tornaAllaMappa();
+        }
+    }, 1500);
 }
