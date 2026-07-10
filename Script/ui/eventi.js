@@ -38,7 +38,11 @@ function generaOpzioniPokeball() {
     btnAnnulla.style.marginTop = "20px";
     btnAnnulla.style.backgroundColor = "#e74c3c";
     btnAnnulla.innerText = "No, Grazie";
-    btnAnnulla.onclick = () => cambiaSchermata("schermata-selezione", "schermata-mappa");
+    btnAnnulla.onclick = () => {
+        cambiaSchermata("schermata-selezione", "schermata-mappa");
+        generaMappaAlbero(); // Aggiorna i nodi della mappa per proseguire
+        aggiornaSquadraMappa();
+    };
     
     contenitore.appendChild(btnAnnulla);
 }
