@@ -1,14 +1,2 @@
-﻿// ===== BUSSOLOTTI =====
-// Non Comune | Elemento: Acqua | Ruolo: Tank
-const CHAR_BUSSOLOTTI = {
-    nome: "Bussolotti",
-    hpBase: 4, atkBase: 2, defBase: 5, velBase: 2,
-    raritaTipo: "non comune",
-    elemento: "acqua",
-    immagine:    "../Sprite/personaggi/Bussolotti/Bussolotti.jpeg",
-    immagineAtk: "../Sprite/personaggi/Bussolotti/Bussolotti_atk.jpeg",
-    mossaLvl1: "Discord",
-    mossaLvl2: "LOL Player",
-    mossaLvl3: "Malattia",
-    boss: false
-};
+// ===== BUSSOLOTTI =====
+const CHAR_BUSSOLOTTI = { nome: "Bussolotti", hpBase: 4, atkBase: 3, defBase: 6, atkSpec: 3, defSpec: 4, velBase: 4, raritaTipo: "non comune", elemento: "terra", immagine: "../Sprite/personaggi/Bussolotti/Bussolotti.jpeg", immagineAtk: "../Sprite/personaggi/Bussolotti/Bussolotti_atk.jpeg", mossaLvl1: "Discord", mossaLvl2: "LOL Player", mossaLvl3: "Malattia", boss: false };

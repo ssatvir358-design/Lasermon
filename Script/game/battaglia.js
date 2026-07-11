@@ -254,7 +254,11 @@ function calcolaEdEseguiDannoGiocatore(moltMossa, nomeMossaUsata) {
         // Anche dopo una schivata: DOT e debuff continuano, poi è il turno del nemico
         applicaDotSeAttivo("nemico");
         decrementaDebuffTurno("nemico");
-        setTimeout(turnoNemico, isSkipAttivo ? 500 : 1000);
+        if (nemicoPokemon.hpAttuali <= 0) {
+            gestisciKONemico();
+        } else {
+            setTimeout(turnoNemico, isSkipAttivo ? 500 : 1000);
+        }
         return;
     }
 
@@ -316,30 +320,17 @@ function calcolaEdEseguiDannoGiocatore(moltMossa, nomeMossaUsata) {
     }
 
     if (nemicoPokemon.hpAttuali <= 0) {
-        // Mostra immagine KO del nemico
-        const folderNem = nemicoPokemon.nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3');
-        document.getElementById("img-nemico").src =
-            `../Sprite/personaggi/${folderNem}/${nemicoPokemon.nome}KO.jpeg`;
-
-        setTimeout(() => {
-            if (nemiciIncontro.length > 0) {
-                nemicoPokemon = nemiciIncontro.shift();
-                haUsatoUltNemico = false;
-                resettaEffettiSuTarget("nemico");
-                document.getElementById("console-log").innerHTML =
-                    `Il nemico manda in campo <strong>${nemicoPokemon.nome}</strong>! Tocca a te!`;
-                aggiornaGrafica();
-                abilitaControlliGiocatore();
-            } else {
-                gestisciVittoriaIncontro();
-            }
-        }, isSkipAttivo ? 1000 : 2000);
+        gestisciKONemico();
     } else {
         // Applica DOT bruciatura sul nemico se attiva (FUOCO Lv3)
         applicaDotSeAttivo("nemico");
         // Decrementa durata debuff velocità nemico
         decrementaDebuffTurno("nemico");
-        setTimeout(turnoNemico, isSkipAttivo ? 500 : 1000);
+        if (nemicoPokemon.hpAttuali <= 0) {
+            gestisciKONemico();
+        } else {
+            setTimeout(turnoNemico, isSkipAttivo ? 500 : 1000);
+        }
     }
 }
 
@@ -362,7 +353,11 @@ function calcolaEdEseguiDannoNemico(moltMossa, nomeMossaUsata) {
         decrementaDebuffTurno("giocatore");
         // Incrementa counter scudo (anche se non viene colpito)
         perkBattagliaGiocatore.scudoTurniPassati++;
-        abilitaControlliGiocatore();
+        if (mioPokemon.hpAttuali <= 0) {
+            gestisciKOGiocatore();
+        } else {
+            abilitaControlliGiocatore();
+        }
         return;
     }
 
@@ -376,11 +371,15 @@ function calcolaEdEseguiDannoNemico(moltMossa, nomeMossaUsata) {
         if (perkBattagliaGiocatore.scudoTurniPassati >= turniScudo) {
             perkBattagliaGiocatore.scudoTurniPassati = 0; // resetta il contatore
             document.getElementById("console-log").innerHTML =
-                `🔵 <strong>SCUDO!</strong> ${mioPokemon.nome} para completamente l'attacco!`;
+                `🛡️ <strong>SCUDO!</strong> ${mioPokemon.nome} para completamente l'attacco!`;
             aggiornaGrafica();
             applicaDotSeAttivo("giocatore");
             decrementaDebuffTurno("giocatore");
-            abilitaControlliGiocatore();
+            if (mioPokemon.hpAttuali <= 0) {
+                gestisciKOGiocatore();
+            } else {
+                abilitaControlliGiocatore();
+            }
             return;
         }
     }
@@ -443,10 +442,18 @@ function calcolaEdEseguiDannoNemico(moltMossa, nomeMossaUsata) {
     if (mioPokemon.hpAttuali <= 0) {
         gestisciKOGiocatore();
     } else {
-        // Applica DOT bruciatura sul giocatore se attiva
-        applicaDotSeAttivo("giocatore");
-        decrementaDebuffTurno("giocatore");
-        abilitaControlliGiocatore(); // Ritorna il turno al giocatore
+        if (nemicoPokemon.hpAttuali <= 0) {
+            gestisciKONemico();
+        } else {
+            // Applica DOT bruciatura sul giocatore se attiva
+            applicaDotSeAttivo("giocatore");
+            decrementaDebuffTurno("giocatore");
+            if (mioPokemon.hpAttuali <= 0) {
+                gestisciKOGiocatore();
+            } else {
+                abilitaControlliGiocatore(); // Ritorna il turno al giocatore
+            }
+        }
     }
 }
 
@@ -984,3 +991,26 @@ function fugaBattaglia() {
         }
     }, 1500);
 }
+
+
+
+function gestisciKONemico() {
+    const folderNem = nemicoPokemon.nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3');
+    document.getElementById("img-nemico").src =
+        `../Sprite/personaggi/${folderNem}/${nemicoPokemon.nome}KO.jpeg`;
+
+    setTimeout(() => {
+        if (nemiciIncontro.length > 0) {
+            nemicoPokemon = nemiciIncontro.shift();
+            haUsatoUltNemico = false;
+            resettaEffettiSuTarget("nemico");
+            document.getElementById("console-log").innerHTML =
+                `Il nemico manda in campo <strong>${nemicoPokemon.nome}</strong>! Tocca a te!`;
+            aggiornaGrafica();
+            abilitaControlliGiocatore();
+        } else {
+            gestisciVittoriaIncontro();
+        }
+    }, isSkipAttivo ? 1000 : 2000);
+}
+

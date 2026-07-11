@@ -1,0 +1,2 @@
+// ===== SALVATORE PROG =====
+const CHAR_SALVATOREPROG = { nome: "Salvatore prog", hpBase: 3, atkBase: 3, defBase: 3, atkSpec: 6, defSpec: 5, velBase: 4, raritaTipo: "non comune", elemento: "elettro", immagine: "../Sprite/personaggi/Salvatoreprog/Salvatoreprog.jpeg", immagineAtk: "../Sprite/personaggi/Salvatoreprog/Salvatoreprog_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "Attacco 3", boss: false };

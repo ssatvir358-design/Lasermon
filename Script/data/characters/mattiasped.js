@@ -1,0 +1,2 @@
+// ===== MATTIA SPED =====
+const CHAR_MATTIASPED = { nome: "Mattia Sped", hpBase: 4, atkBase: 4, defBase: 4, atkSpec: 3, defSpec: 3, velBase: 6, raritaTipo: "non comune", elemento: "volante", immagine: "../Sprite/personaggi/MattiaSped/MattiaSped.jpeg", immagineAtk: "../Sprite/personaggi/MattiaSped/MattiaSped_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "Attacco 3", boss: false };

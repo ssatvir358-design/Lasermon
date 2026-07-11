@@ -11,6 +11,15 @@ body {
     align-items: center;
 }
 
+img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    user-select: none;
+}
+
 .schermata {
     display: none; /* Di base tutte le schermate sono nascoste */
     width: 100vw;

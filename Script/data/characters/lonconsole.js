@@ -1,0 +1,2 @@
+// ===== LONCONSOLE =====
+const CHAR_LONCONSOLE = { nome: "Lonconsole", hpBase: 3, atkBase: 2, defBase: 2, atkSpec: 4, defSpec: 4, velBase: 3, raritaTipo: "comune", elemento: "ghiaccio", immagine: "../Sprite/personaggi/Lonconsole/Lonconsole.jpeg", immagineAtk: "../Sprite/personaggi/Lonconsole/Lonconsole_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "Attacco 3", boss: false };

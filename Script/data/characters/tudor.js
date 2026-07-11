@@ -1,16 +1,2 @@
-﻿// ===== TUDOR =====
-// Raro | Elemento: Erba | Ruolo: BOSS - Tank difensivo
-const CHAR_TUDOR = {
-    nome: "Tudor",
-    hpBase: 6, atkBase: 3, defBase: 5, velBase: 5,
-    raritaTipo: "raro",
-    elemento: "erba",
-    immagine:    "../Sprite/personaggi/Tudor/Tudor.jpeg",
-    immagineAtk: "../Sprite/personaggi/Tudor/Tudor_atk.jpeg",
-    mossaLvl1: "Scoreggia",
-    mossaLvl2: "Sono un tuo superiore",
-    mossaLvl3: "Lancio di tessera",
-    boss: true,
-    mossaULT: "Tessera Nucleare",
-    numFrameUlt: 3
-};
+// ===== TUDOR =====
+const CHAR_TUDOR = { nome: "Tudor", hpBase: 6, atkBase: 4, defBase: 6, atkSpec: 4, defSpec: 5, velBase: 5, raritaTipo: "raro", elemento: "erba", immagine: "../Sprite/personaggi/Tudor/Tudor.jpeg", immagineAtk: "../Sprite/personaggi/Tudor/Tudor_atk.jpeg", mossaLvl1: "Scoreggia", mossaLvl2: "Sono un tuo superiore", mossaLvl3: "Lancio di tessera", boss: true, mossaULT: "Tessera Nucleare", numFrameUlt: 3 };

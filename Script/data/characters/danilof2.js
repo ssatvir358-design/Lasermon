@@ -1,0 +1,2 @@
+// ===== DANILO F2 =====
+const CHAR_DANILOF2 = { nome: "Danilo F2", hpBase: 4, atkBase: 2, defBase: 2, atkSpec: 8, defSpec: 3, velBase: 5, raritaTipo: "non comune", elemento: "fuoco", immagine: "../Sprite/personaggi/DaniloF2/DaniloF2.jpeg", immagineAtk: "../Sprite/personaggi/DaniloF2/DaniloF2_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "Attacco 3", boss: false };
