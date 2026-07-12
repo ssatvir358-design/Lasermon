@@ -76,3 +76,19 @@ const SCALA_RARITA_MAPPA = {
     "special": 6,
     "bombers": 7
 };
+
+// ==========================================================
+// Livelli Generazione Mappe
+// ==========================================================
+const CONFIG_LIVELLI_MAPPE = {
+    1: { ingresso: 1,  boss: 10 },
+    2: { ingresso: 10, boss: 21 },
+    3: { ingresso: 21, boss: 32 },
+    4: { ingresso: 32, boss: 43 },
+    5: { ingresso: 43, boss: 54 },
+    6: { ingresso: 54, boss: 65 },
+    7: { ingresso: 65, boss: 76 },
+    8: { ingresso: 76, boss: 87 },
+    9: { ingresso: 87, boss: 100 },
+    10: { ingresso: 100, boss: 100 }
+};

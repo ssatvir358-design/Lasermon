@@ -123,7 +123,7 @@ function abilitaControlliGiocatore() {
 // PREPARAZIONE INCONTRO
 // ----------------------------------------------------------
 
-function preparaIncontroBattaglia(tipoEvento) {
+function preparaIncontroBattaglia(tipoEvento, elementoFiltro = null) {
     haUsatoUltGiocatore = false;
     haUsatoUltNemico    = false;
     nemiciIncontro      = [];
@@ -133,7 +133,7 @@ function preparaIncontroBattaglia(tipoEvento) {
     resettaPerkFight();   // Azzera tracking perk (salvavita, scudo) per questo scontro
     chiudiPannelloItemBattaglia(); // Assicura che il pannello item sia chiuso
 
-    const configGenerata = calcolaLivelloEMossaMappa(pianoAttuale);
+    const configGenerata = calcolaLivelloEMossaMappa(pianoAttuale, tipoEvento);
     const livNemico      = configGenerata.livello;
     const livMossaNemico = configGenerata.livelloMossa;
 
@@ -141,7 +141,7 @@ function preparaIncontroBattaglia(tipoEvento) {
         nemiciIncontro.push(creaPokemon(pescaPokemonCasuale(), livNemico, livMossaNemico));
     } else if (tipoEvento === "npc") {
         for (let i = 0; i < 2; i++) {
-            nemiciIncontro.push(creaPokemon(pescaPokemonCasuale(), livNemico, livMossaNemico));
+            nemiciIncontro.push(creaPokemon(pescaPokemonCasuale([], elementoFiltro), livNemico, livMossaNemico));
         }
     } else {
         nemiciIncontro.push(creaPokemon(pescaPokemonCasuale(), livNemico, livMossaNemico));
@@ -153,8 +153,9 @@ function preparaIncontroBattaglia(tipoEvento) {
     // Sfondo dinamico
     const schermataGioco = document.getElementById("schermata-gioco");
     if (schermataGioco && ARCHIVIO_MAPPE[mappaAttuale]) {
-        schermataGioco.style.backgroundImage    = `url('${ARCHIVIO_MAPPE[mappaAttuale].sfondo}')`;
-        schermataGioco.style.backgroundSize     = "cover";
+        // Applica sfondo specifico della mappa al combattimento
+        schermataGioco.style.backgroundImage    = `url('${ARCHIVIO_MAPPE[mappaAttuale].sfondoBattaglia}')`;
+        schermataGioco.style.backgroundSize    = "cover";
         schermataGioco.style.backgroundPosition = "center";
     }
 
@@ -212,6 +213,18 @@ function preparaIncontroBattaglia(tipoEvento) {
 
 function turnoGiocatore() {
     if (!mioPokemon) return;
+    
+    if (processaEffettiInizioTurno(mioPokemon, false)) {
+        // Salta il turno
+        processaEffettiFineTurno(mioPokemon, false);
+        if (mioPokemon.hpAttuali <= 0 || nemicoPokemon.hpAttuali <= 0) {
+            if (nemicoPokemon.hpAttuali <= 0) gestisciKONemico();
+            if (mioPokemon.hpAttuali <= 0) gestisciKOGiocatore();
+        } else {
+            setTimeout(turnoNemico, isSkipAttivo ? 500 : 1000);
+        }
+        return;
+    }
     if (document.getElementById("btn-attacco").disabled) return;
     document.getElementById("btn-attacco").disabled = true;
     aggiornaStatoBtnItem(); // Disabilita item button mentre attacca
@@ -245,222 +258,109 @@ function calcolaEdEseguiDannoGiocatore(moltMossa, nomeMossaUsata) {
     const moltiplicatoreTipo = CONFIG_DEBOLEZZE[mioPokemon.elemento]?.[nemicoPokemon.elemento] || 1.0;
 
     // --- SCHIVATA NEMICO ---
-    // Ogni attacco subito dal nemico ha una possibilità di essere schivato
-    // in base alla sua velocità e all'eventuale Perk SCHIVATA AUMENTATA.
     const schivataNemica = calcolaSchivata(nemicoPokemon);
     if (schivataNemica > 0 && Math.random() * 100 < schivataNemica) {
         document.getElementById("console-log").innerHTML =
-            `&#x1F4A8; ${nemicoPokemon.nome} <strong>schiva l'attacco!</strong> (${schivataNemica}% schivata)`;
-        // Anche dopo una schivata: DOT e debuff continuano, poi è il turno del nemico
-        applicaDotSeAttivo("nemico");
-        decrementaDebuffTurno("nemico");
-        if (nemicoPokemon.hpAttuali <= 0) {
-            gestisciKONemico();
+            `💨 ${nemicoPokemon.nome} <strong>schiva l'attacco!</strong> (${schivataNemica}% schivata)`;
+        
+        processaEffettiFineTurno(mioPokemon, false);
+        if (nemicoPokemon.hpAttuali <= 0 || mioPokemon.hpAttuali <= 0) {
+            if (nemicoPokemon.hpAttuali <= 0) gestisciKONemico();
+            if (mioPokemon.hpAttuali <= 0) gestisciKOGiocatore();
         } else {
             setTimeout(turnoNemico, isSkipAttivo ? 500 : 1000);
         }
         return;
     }
 
-    // ATK giocatore modificato da eventuale buff temporaneo (Contratto Determinato)
-    // e DEF nemico modificata da eventuale debuff (LUCE Lv3)
-    const atkEffettivo  = calcolaStatConEffetti(mioPokemon.atk,    null, effettiAttivi.giocatore.atkBoost);
-    let   defEffettiva  = calcolaStatConEffetti(nemicoPokemon.def, effettiAttivi.nemico.defRidotta, null);
+    // Identifica se l'attacco è fisico o speciale in base alla statistica maggiore del giocatore
+    const isSpecial = mioPokemon.atkSpec > mioPokemon.atk;
+    
+    // ATK/ATKSPEC giocatore modificato da eventuale buff temporaneo (Contratto Determinato)
+    // e DEF/DEFSPEC nemico modificata da eventuale debuff (LUCE Lv3)
+    let atkEffettivo = 0;
+    let defEffettiva = 0;
+    
+    if (isSpecial) {
+        atkEffettivo = calcolaStatConEffetti(mioPokemon.atkSpec, null, effettiAttivi.giocatore.atkBoost);
+        defEffettiva = calcolaStatConEffetti(nemicoPokemon.defSpec, effettiAttivi.nemico.defRidotta, null);
+    } else {
+        atkEffettivo = calcolaStatConEffetti(mioPokemon.atk, null, effettiAttivi.giocatore.atkBoost);
+        defEffettiva = calcolaStatConEffetti(nemicoPokemon.def, effettiAttivi.nemico.defRidotta, null);
+    }
 
     // --- PERK SFONDAMENTO ---
-    // Riduce la difesa nemica effettiva del 25% (Tier 1) o del 50% (Tier 2)
-    // prima del calcolo del danno base.
     if (mioPokemon.perkId === "sfondamento") {
         defEffettiva = Math.round(defEffettiva * (1 - CONFIG_PERK.sfondamentoPercTier1));
     } else if (mioPokemon.perkId === "sfondamento_2") {
         defEffettiva = Math.round(defEffettiva * (1 - CONFIG_PERK.sfondamentoPercTier2));
     }
 
+    // Calcolo Danno Base
     const dannoBase = (atkEffettivo * atkEffettivo) / (atkEffettivo + defEffettiva);
-    let dannoFatto  = Math.max(1, Math.round(dannoBase * moltiplicatoreTipo * moltMossa));
-
-    let msgEffetti = "";
-
-    // Effetti mossa Lv3 elementali del giocatore
-    if (mioPokemon.livelloMossa === 3) {
-        const ris = applicaEffettoElementaleSuNemico(mioPokemon, dannoFatto);
-        dannoFatto = ris.dannoFinale;
-        msgEffetti = ris.messaggio;
-    }
+    
+    // Modificatori buff/debuff
+    let modDanno = 1.0;
+    if (effettiAttivi.giocatore.difesaRidotta) modDanno -= effettiAttivi.giocatore.difesaRidotta.percentuale;
+    if (effettiAttivi.nemico.provocato) modDanno += effettiAttivi.nemico.provocato.percentuale;
+    
+    let dannoFatto = Math.max(1, Math.round(dannoBase * moltiplicatoreTipo * moltMossa * modDanno));
 
     // Decrementa boost ATK temporaneo (Contratto Determinato) dopo l'attacco
     if (effettiAttivi.giocatore.atkBoost) {
         effettiAttivi.giocatore.atkBoost.durata--;
         if (effettiAttivi.giocatore.atkBoost.durata <= 0) {
             effettiAttivi.giocatore.atkBoost = null;
-            msgEffetti += "<br>📋 Il Contratto Determinato è scaduto!";
         }
     }
 
-    nemicoPokemon.hpAttuali = Math.max(0, nemicoPokemon.hpAttuali - dannoFatto);
-
-    const msgEfficacia = getMessaggioEfficacia(moltiplicatoreTipo);
-    document.getElementById("console-log").innerHTML =
-        `${mioPokemon.nome} usa <strong>${nomeMossaUsata}</strong> ed infligge ${dannoFatto} danni!${msgEfficacia}${msgEffetti}`;
-    aggiornaGrafica();
+    // Rimuove scudo nemico se presente
+    if (nemicoPokemon.scudoPassivo > 0) {
+        dannoFatto = 0;
+        nemicoPokemon.scudoPassivo = 0;
+        document.getElementById("console-log").innerHTML =
+            `🛡️ ${nemicoPokemon.nome} usa il suo Scudo per bloccare l'attacco!`;
+        aggiornaGrafica();
+    } else {
+        nemicoPokemon.hpAttuali = Math.max(0, nemicoPokemon.hpAttuali - dannoFatto);
+        const msgEfficacia = getMessaggioEfficacia(moltiplicatoreTipo);
+        document.getElementById("console-log").innerHTML =
+            `${mioPokemon.nome} usa <strong>${nomeMossaUsata}</strong> ed infligge ${dannoFatto} danni!${msgEfficacia}`;
+        aggiornaGrafica();
+    }
 
     // --- PERK DOPPIO ATTACCO ---
-    // Probabilità di un secondo colpo (50% del danno base) nello stesso turno.
     const probDoppio = mioPokemon.perkId === "doppio_attacco_2"
         ? CONFIG_PERK.doppioAttaccoProbTier2
         : mioPokemon.perkId === "doppio_attacco"
             ? CONFIG_PERK.doppioAttaccoProbTier1
             : 0;
-    if (probDoppio > 0 && Math.random() < probDoppio && nemicoPokemon.hpAttuali > 0) {
+    if (probDoppio > 0 && Math.random() < probDoppio && nemicoPokemon.hpAttuali > 0 && nemicoPokemon.scudoPassivo === 0) {
         const dannoSecondo = Math.max(1, Math.round(dannoFatto * CONFIG_PERK.doppioAttaccoDannoPerc));
         nemicoPokemon.hpAttuali = Math.max(0, nemicoPokemon.hpAttuali - dannoSecondo);
         document.getElementById("console-log").innerHTML +=
-            `<br>⚡ <strong>Doppio Attacco!</strong> Secondo colpo: ${dannoSecondo} danni!`;
+            `<br>⚔️ <strong>Doppio Attacco!</strong> Secondo colpo: ${dannoSecondo} danni!`;
         aggiornaGrafica();
     }
 
-    if (nemicoPokemon.hpAttuali <= 0) {
-        gestisciKONemico();
+    let msgEffettiLv3 = "";
+    if (mioPokemon.livelloMossa >= 3 && Math.random() < 0.30) {
+        msgEffettiLv3 = applicaEffettoElementaleLv3(mioPokemon, nemicoPokemon, mioPokemon.elemento);
+    }
+    if (msgEffettiLv3 !== "") {
+        document.getElementById("console-log").innerHTML += msgEffettiLv3;
+        aggiornaGrafica();
+    }
+
+    processaEffettiFineTurno(mioPokemon, false);
+    
+    if (nemicoPokemon.hpAttuali <= 0 || mioPokemon.hpAttuali <= 0) {
+        if (nemicoPokemon.hpAttuali <= 0) gestisciKONemico();
+        if (mioPokemon.hpAttuali <= 0) gestisciKOGiocatore();
     } else {
-        // Applica DOT bruciatura sul nemico se attiva (FUOCO Lv3)
-        applicaDotSeAttivo("nemico");
-        // Decrementa durata debuff velocità nemico
-        decrementaDebuffTurno("nemico");
-        if (nemicoPokemon.hpAttuali <= 0) {
-            gestisciKONemico();
-        } else {
-            setTimeout(turnoNemico, isSkipAttivo ? 500 : 1000);
-        }
+        setTimeout(turnoNemico, isSkipAttivo ? 500 : 1000);
     }
 }
-
-
-// ----------------------------------------------------------
-// CALCOLO DANNO NEMICO → GIOCATORE
-// ----------------------------------------------------------
-
-function calcolaEdEseguiDannoNemico(moltMossa, nomeMossaUsata) {
-    const moltiplicatoreTipo = CONFIG_DEBOLEZZE[nemicoPokemon.elemento]?.[mioPokemon.elemento] || 1.0;
-
-    // --- SCHIVATA GIOCATORE ---
-    // La schivata del giocatore viene calcolata sulla sua velocità e perk.
-    const schivataGiocatore = calcolaSchivata(mioPokemon);
-    if (schivataGiocatore > 0 && Math.random() * 100 < schivataGiocatore) {
-        document.getElementById("console-log").innerHTML =
-            `&#x1F4A8; ${mioPokemon.nome} <strong>schiva l'attacco nemico!</strong> (${schivataGiocatore}% schivata)`;
-        // Anche dopo una schivata: DOT e debuff continuano, poi il turno torna al giocatore
-        applicaDotSeAttivo("giocatore");
-        decrementaDebuffTurno("giocatore");
-        // Incrementa counter scudo (anche se non viene colpito)
-        perkBattagliaGiocatore.scudoTurniPassati++;
-        if (mioPokemon.hpAttuali <= 0) {
-            gestisciKOGiocatore();
-        } else {
-            abilitaControlliGiocatore();
-        }
-        return;
-    }
-
-    // --- PERK SCUDO ---
-    // Ogni N turni, para completamente un attacco (danno azzerato).
-    const turniScudo = mioPokemon.perkId === "scudo_2"
-        ? CONFIG_PERK.scudoTurniTier2
-        : CONFIG_PERK.scudoTurniTier1;
-    if ((mioPokemon.perkId === "scudo" || mioPokemon.perkId === "scudo_2")) {
-        perkBattagliaGiocatore.scudoTurniPassati++;
-        if (perkBattagliaGiocatore.scudoTurniPassati >= turniScudo) {
-            perkBattagliaGiocatore.scudoTurniPassati = 0; // resetta il contatore
-            document.getElementById("console-log").innerHTML =
-                `🛡️ <strong>SCUDO!</strong> ${mioPokemon.nome} para completamente l'attacco!`;
-            aggiornaGrafica();
-            applicaDotSeAttivo("giocatore");
-            decrementaDebuffTurno("giocatore");
-            if (mioPokemon.hpAttuali <= 0) {
-                gestisciKOGiocatore();
-            } else {
-                abilitaControlliGiocatore();
-            }
-            return;
-        }
-    }
-
-    // DEF giocatore con eventuale debuff (LUCE Lv3 nemico)
-    const defEffettiva = calcolaStatConEffetti(mioPokemon.def, effettiAttivi.giocatore.defRidotta, null);
-
-    const dannoBase = (nemicoPokemon.atk * nemicoPokemon.atk) / (nemicoPokemon.atk + defEffettiva);
-    let dannoSubito = Math.max(1, Math.round(dannoBase * moltiplicatoreTipo * moltMossa));
-
-    let msgEffetti = "";
-
-    // Effetti mossa Lv3 elementali del nemico
-    if (nemicoPokemon.livelloMossa === 3) {
-        const ris = applicaEffettoElementaleSuGiocatore(nemicoPokemon, dannoSubito);
-        dannoSubito = ris.dannoFinale;
-        msgEffetti  = ris.messaggio;
-    }
-
-    // --- PERK RIGENERAZIONE TIER 2: immunità bruciatura ---
-    if ((mioPokemon.perkId === "rigenerazione_2") && effettiAttivi.giocatore.bruciatura) {
-        effettiAttivi.giocatore.bruciatura = null;
-        msgEffetti += "<br>🟢 Immune alla bruciatura!";
-    }
-
-    mioPokemon.hpAttuali = Math.max(0, mioPokemon.hpAttuali - dannoSubito);
-
-    // --- PERK FULL COUNTER ---
-    // Restituisce una percentuale del danno subito al nemico, ignorando la difesa.
-    const percCounter = mioPokemon.perkId === "full_counter_2"
-        ? CONFIG_PERK.fullCounterPercTier2
-        : mioPokemon.perkId === "full_counter"
-            ? CONFIG_PERK.fullCounterPercTier1
-            : 0;
-    if (percCounter > 0 && dannoSubito > 0) {
-        const dannoCounter = Math.max(1, Math.round(dannoSubito * percCounter));
-        nemicoPokemon.hpAttuali = Math.max(0, nemicoPokemon.hpAttuali - dannoCounter);
-        msgEffetti += `<br>🔄 <strong>Full Counter!</strong> ${mioPokemon.nome} restituisce ${dannoCounter} danni!`;
-    }
-
-    // --- PERK SPINE ---
-    // Danno di ritorsione fisso basato sulla DEF attuale, ignora la difesa nemica.
-    const spineDannoBase = mioPokemon.perkId === "spine_2"
-        ? CONFIG_PERK.spineDannoBaseTier2
-        : CONFIG_PERK.spineDannoBaseTier1;
-    const spineDivisore = mioPokemon.perkId === "spine_2"
-        ? CONFIG_PERK.spineDivisoreTier2
-        : CONFIG_PERK.spineDivisoreTier1;
-    if ((mioPokemon.perkId === "spine" || mioPokemon.perkId === "spine_2") && dannoSubito > 0) {
-        const dannoSpine = spineDannoBase + Math.floor(mioPokemon.def / spineDivisore);
-        nemicoPokemon.hpAttuali = Math.max(0, nemicoPokemon.hpAttuali - dannoSpine);
-        msgEffetti += `<br>🌵 <strong>Spine!</strong> ${mioPokemon.nome} infligge ${dannoSpine} danni di ritorsione!`;
-    }
-
-    const msgEfficacia = getMessaggioEfficacia(moltiplicatoreTipo);
-    document.getElementById("console-log").innerHTML =
-        `${nemicoPokemon.nome} usa <strong>${nomeMossaUsata}</strong> ed infligge ${dannoSubito} danni!${msgEfficacia}${msgEffetti}`;
-    aggiornaGrafica();
-
-    if (mioPokemon.hpAttuali <= 0) {
-        gestisciKOGiocatore();
-    } else {
-        if (nemicoPokemon.hpAttuali <= 0) {
-            gestisciKONemico();
-        } else {
-            // Applica DOT bruciatura sul giocatore se attiva
-            applicaDotSeAttivo("giocatore");
-            decrementaDebuffTurno("giocatore");
-            if (mioPokemon.hpAttuali <= 0) {
-                gestisciKOGiocatore();
-            } else {
-                abilitaControlliGiocatore(); // Ritorna il turno al giocatore
-            }
-        }
-    }
-}
-
-
-// ----------------------------------------------------------
-// TURNO NEMICO
-// ----------------------------------------------------------
 
 function turnoNemico() {
     if (!nemicoPokemon || nemicoPokemon.hpAttuali <= 0 || !mioPokemon) return;
@@ -532,6 +432,94 @@ function turnoNemico() {
             const moltMossa = CONFIG_MOSSE[nemicoPokemon.livelloMossa] || 1.0;
             calcolaEdEseguiDannoNemico(moltMossa, getNomeMossaAttuale(nemicoPokemon));
         }, isSkipAttivo ? 750 : 1500);
+    }
+}
+
+function calcolaEdEseguiDannoNemico(moltMossa, nomeMossaUsata) {
+    const moltiplicatoreTipo = CONFIG_DEBOLEZZE[nemicoPokemon.elemento]?.[mioPokemon.elemento] || 1.0;
+
+    // --- SCHIVATA GIOCATORE ---
+    const schivataGiocatore = calcolaSchivata(mioPokemon);
+    if (schivataGiocatore > 0 && Math.random() * 100 < schivataGiocatore) {
+        document.getElementById("console-log").innerHTML +=
+            `<br>💨 ${mioPokemon.nome} <strong>schiva l'attacco!</strong> (${schivataGiocatore}% schivata)`;
+        
+        processaEffettiFineTurno(nemicoPokemon, true);
+        if (nemicoPokemon.hpAttuali <= 0 || mioPokemon.hpAttuali <= 0) {
+            if (nemicoPokemon.hpAttuali <= 0) gestisciKONemico();
+            if (mioPokemon.hpAttuali <= 0) gestisciKOGiocatore();
+        } else {
+            abilitaControlliGiocatore();
+        }
+        return;
+    }
+
+    // Identifica se l'attacco è fisico o speciale in base alla statistica maggiore del nemico
+    const isSpecial = (nemicoPokemon.atkSpec || 0) > (nemicoPokemon.atk || 0);
+    
+    let atkEffettivo = 0;
+    let defEffettiva = 0;
+    
+    if (isSpecial) {
+        atkEffettivo = calcolaStatConEffetti(nemicoPokemon.atkSpec, null, effettiAttivi.nemico.atkBoost);
+        defEffettiva = calcolaStatConEffetti(mioPokemon.defSpec, effettiAttivi.giocatore.defRidotta, null);
+    } else {
+        atkEffettivo = calcolaStatConEffetti(nemicoPokemon.atk, null, effettiAttivi.nemico.atkBoost);
+        defEffettiva = calcolaStatConEffetti(mioPokemon.def, effettiAttivi.giocatore.defRidotta, null);
+    }
+
+    // --- PERK SFONDAMENTO PER GIOCATORE ---
+    // (I nemici non hanno perk sfondamento, a meno che non l'abbiano. Lo ometto per i nemici)
+
+    // Calcolo Danno Base
+    const dannoBase = (atkEffettivo * atkEffettivo) / (atkEffettivo + defEffettiva);
+    
+    // Modificatori buff/debuff
+    let modDanno = 1.0;
+    if (effettiAttivi.nemico.difesaRidotta) modDanno -= effettiAttivi.nemico.difesaRidotta.percentuale;
+    if (effettiAttivi.giocatore.provocato) modDanno += effettiAttivi.giocatore.provocato.percentuale;
+    
+    let dannoFatto = Math.max(1, Math.round(dannoBase * moltiplicatoreTipo * moltMossa * modDanno));
+
+    // Decrementa boost ATK temporaneo
+    if (effettiAttivi.nemico.atkBoost) {
+        effettiAttivi.nemico.atkBoost.durata--;
+        if (effettiAttivi.nemico.atkBoost.durata <= 0) {
+            effettiAttivi.nemico.atkBoost = null;
+        }
+    }
+
+    // Rimuove scudo giocatore se presente
+    if (mioPokemon.scudoPassivo > 0) {
+        dannoFatto = 0;
+        mioPokemon.scudoPassivo = 0;
+        document.getElementById("console-log").innerHTML +=
+            `<br>🛡️ ${mioPokemon.nome} usa il suo Scudo per bloccare l'attacco!`;
+        aggiornaGrafica();
+    } else {
+        mioPokemon.hpAttuali = Math.max(0, mioPokemon.hpAttuali - dannoFatto);
+        const msgEfficacia = getMessaggioEfficacia(moltiplicatoreTipo);
+        document.getElementById("console-log").innerHTML +=
+            `<br>${nemicoPokemon.nome} usa <strong>${nomeMossaUsata}</strong> ed infligge ${dannoFatto} danni!${msgEfficacia}`;
+        aggiornaGrafica();
+    }
+
+    let msgEffettiLv3 = "";
+    if (nemicoPokemon.livelloMossa >= 3 && Math.random() < 0.30) {
+        msgEffettiLv3 = applicaEffettoElementaleLv3(nemicoPokemon, mioPokemon, nemicoPokemon.elemento);
+    }
+    if (msgEffettiLv3 !== "") {
+        document.getElementById("console-log").innerHTML += msgEffettiLv3;
+        aggiornaGrafica();
+    }
+
+    processaEffettiFineTurno(nemicoPokemon, true);
+
+    if (nemicoPokemon.hpAttuali <= 0 || mioPokemon.hpAttuali <= 0) {
+        if (nemicoPokemon.hpAttuali <= 0) gestisciKONemico();
+        if (mioPokemon.hpAttuali <= 0) gestisciKOGiocatore();
+    } else {
+        abilitaControlliGiocatore();
     }
 }
 
@@ -826,81 +814,11 @@ function avviaBossBattle(idBoss) {
 // LUCE   → Debuff difesa: difesa nemico -15% per 3 turni
 // ==========================================================
 
-function applicaEffettoElementaleSuNemico(attaccante, dannoBase) {
-    let dannoFinale = dannoBase;
-    let messaggio   = "";
-    const elem = attaccante.elemento;
 
-    if (elem === "fuoco") {
-        const dannoFuoco = Math.round(attaccante.atk * 0.25);
-        effettiAttivi.nemico.bruciatura = { durata: 5, dannoFisso: dannoFuoco };
-        messaggio = `<br>🔥 <strong>Bruciatura applicata!</strong> ${dannoFuoco} danni/turno per 5 turni!`;
-    } else if (elem === "erba") {
-        const cura = Math.round(dannoBase * 0.15);
-        mioPokemon.hpAttuali = Math.min(mioPokemon.hpMax, mioPokemon.hpAttuali + cura);
-        messaggio = `<br>🌿 <strong>Rigenerazione!</strong> ${attaccante.nome} recupera ${cura} HP!`;
-    } else if (elem === "acqua") {
-        effettiAttivi.nemico.velRidotta = { durata: 3, percentuale: 0.15 };
-        messaggio = `<br>💧 <strong>Rallentamento!</strong> Velocità nemica -15% per 3 turni!`;
-    } else if (elem === "buio") {
-        if (Math.random() < 0.25) {
-            dannoFinale = dannoBase * 2;
-            messaggio   = `<br>🌑 <strong>COLPO CRITICO!</strong> Danno raddoppiato! (${dannoFinale} totali)`;
-        }
-    } else if (elem === "luce") {
-        effettiAttivi.nemico.defRidotta = { durata: 3, percentuale: 0.15 };
-        messaggio = `<br>✨ <strong>Difesa indebolita!</strong> Difesa nemica -15% per 3 turni!`;
-    }
 
-    return { dannoFinale, messaggio };
-}
 
-function applicaEffettoElementaleSuGiocatore(attaccante, dannoBase) {
-    let dannoFinale = dannoBase;
-    let messaggio   = "";
-    const elem = attaccante.elemento;
-
-    if (elem === "fuoco") {
-        const dannoFuoco = Math.round(attaccante.atk * 0.25);
-        effettiAttivi.giocatore.bruciatura = { durata: 5, dannoFisso: dannoFuoco };
-        messaggio = `<br>🔥 <strong>Bruciatura!</strong> Il tuo Pokémon perderà ${dannoFuoco} HP per 5 turni!`;
-    } else if (elem === "erba") {
-        const cura = Math.round(dannoBase * 0.15);
-        nemicoPokemon.hpAttuali = Math.min(nemicoPokemon.hpMax, nemicoPokemon.hpAttuali + cura);
-        messaggio = `<br>🌿 <strong>Rigenerazione!</strong> ${attaccante.nome} recupera ${cura} HP!`;
-    } else if (elem === "acqua") {
-        effettiAttivi.giocatore.velRidotta = { durata: 3, percentuale: 0.15 };
-        messaggio = `<br>💧 <strong>Rallentamento!</strong> La tua velocità è ridotta del 15%!`;
-    } else if (elem === "buio") {
-        if (Math.random() < 0.25) {
-            dannoFinale = dannoBase * 2;
-            messaggio   = `<br>🌑 <strong>COLPO CRITICO!</strong> Danno raddoppiato! (${dannoFinale} totali)`;
-        }
-    } else if (elem === "luce") {
-        effettiAttivi.giocatore.defRidotta = { durata: 3, percentuale: 0.15 };
-        messaggio = `<br>✨ <strong>Difesa indebolita!</strong> La tua difesa è ridotta del 15%!`;
-    }
-
-    return { dannoFinale, messaggio };
-}
 
 /** Applica il DOT bruciatura al target se attivo, decrementa la durata. */
-function applicaDotSeAttivo(target) {
-    const effetto = effettiAttivi[target].bruciatura;
-    if (!effetto || effetto.durata <= 0) return;
-
-    const pokemon = target === "nemico" ? nemicoPokemon : mioPokemon;
-    pokemon.hpAttuali = Math.max(0, pokemon.hpAttuali - effetto.dannoFisso);
-    effetto.durata--;
-
-    const msg = effetto.durata <= 0
-        ? `<br>🔥 Bruciatura: ${pokemon.nome} -${effetto.dannoFisso} HP (effetto terminato)`
-        : `<br>🔥 Bruciatura: ${pokemon.nome} -${effetto.dannoFisso} HP (${effetto.durata} turni)`;
-    document.getElementById("console-log").innerHTML += msg;
-
-    if (effetto.durata <= 0) effettiAttivi[target].bruciatura = null;
-    aggiornaGrafica();
-}
 
 /**
  * Calcola il valore effettivo di una stat con debuff/buff applicati.
@@ -916,11 +834,6 @@ function calcolaStatConEffetti(statBase, debuff, buff) {
 }
 
 /** Decrementa la durata dei debuff velocità e difesa su un target. */
-function decrementaDebuffTurno(target) {
-    const e = effettiAttivi[target];
-    if (e.velRidotta) { e.velRidotta.durata--; if (e.velRidotta.durata <= 0) e.velRidotta = null; }
-    if (e.defRidotta) { e.defRidotta.durata--; if (e.defRidotta.durata <= 0) e.defRidotta = null; }
-}
 
 
 // ----------------------------------------------------------
@@ -1014,3 +927,174 @@ function gestisciKONemico() {
     }, isSkipAttivo ? 1000 : 2000);
 }
 
+
+// ==========================================================
+// EFFETTI ELEMENTALI LIVELLO 3
+// ==========================================================
+function applicaEffettoElementaleLv3(attaccante, bersaglio, elemento) {
+    let targetId = (bersaglio === nemicoPokemon) ? "nemico" : "giocatore";
+    let attId = (attaccante === mioPokemon) ? "giocatore" : "nemico";
+    let msg = "";
+
+    switch(elemento.toUpperCase()) {
+        case "FUOCO":
+            // Bruciatura: 10% max HP per 3 turni
+            effettiAttivi[targetId].bruciatura = { durata: 3, dannoFisso: Math.max(1, Math.round(bersaglio.hpMax * 0.10)) };
+            msg = `<br>🔥 ${bersaglio.nome} ha subito una scottatura!`;
+            break;
+        case "ERBA":
+            // Seme Sanguisuga: Ruba 10% hp per 3 turni
+            effettiAttivi[targetId].semeSanguisuga = { durata: 3, drainFisso: Math.max(1, Math.round(bersaglio.hpMax * 0.10)), origin: attId };
+            msg = `<br>🌿 Piantato un seme sanguisuga su ${bersaglio.nome}!`;
+            break;
+        case "ACQUA":
+            // Bagnato: -20% velocità per 3 turni
+            effettiAttivi[targetId].velRidotta = { durata: 3, percentuale: 0.20 };
+            msg = `<br>💧 ${bersaglio.nome} è stato inzuppato! (Velocità ridotta)`;
+            break;
+        case "ELETTRO":
+            // Paralisi: 25% prob di saltare il turno per 3 turni
+            effettiAttivi[targetId].paralisi = { durata: 3 };
+            msg = `<br>⚡ ${bersaglio.nome} è paralizzato!`;
+            break;
+        case "GHIACCIO":
+            // Congelamento: 10% prob di saltare turno per 3 turni
+            effettiAttivi[targetId].congelamento = { durata: 3 };
+            msg = `<br>❄️ ${bersaglio.nome} sta congelando!`;
+            break;
+        case "TERRA":
+            // Cecità: 20% miss chance per 3 turni
+            effettiAttivi[targetId].cecita = { durata: 3 };
+            msg = `<br>🪨 ${bersaglio.nome} è stato accecato dalla sabbia!`;
+            break;
+        case "VOLANTE":
+            // Vento in coda: buff velocità 20% all'attaccante per 3 turni
+            effettiAttivi[attId].ventoInCoda = { durata: 3, percentuale: 0.20 };
+            msg = `<br>🌪️ Il vento soffia a favore di ${attaccante.nome}! (Velocità aumentata)`;
+            break;
+        case "VELENO":
+            // Avvelenamento: 15% max HP per 3 turni
+            effettiAttivi[targetId].veleno = { durata: 3, dannoFisso: Math.max(1, Math.round(bersaglio.hpBase * 0.15)) };
+            msg = `<br>☠️ ${bersaglio.nome} è stato avvelenato!`;
+            break;
+        case "LOTTA":
+            // Provocazione: bersaglio prende +15% danni per 3 turni
+            effettiAttivi[targetId].provocato = { durata: 3, percentuale: 0.15 };
+            msg = `<br>🥊 ${bersaglio.nome} è stato provocato! (Difese abbassate)`;
+            break;
+        case "LUCE":
+            // Difesa ridotta: bersaglio fa -15% danni per 3 turni
+            effettiAttivi[targetId].difesaRidotta = { durata: 3, percentuale: 0.15 };
+            msg = `<br>✨ ${bersaglio.nome} è stato accecato dalla luce! (Attacco ridotto)`;
+            break;
+        case "BUIO":
+            // Paura: bersaglio ha 15% prob di saltare turno per 3 turni
+            effettiAttivi[targetId].paura = { durata: 3 };
+            msg = `<br>🌑 ${bersaglio.nome} è terrorizzato!`;
+            break;
+        case "NORMALE":
+            // Nessun effetto speciale
+            break;
+    }
+    return msg;
+}
+
+function processaEffettiInizioTurno(pokemon, isNemico) {
+    let targetId = isNemico ? "nemico" : "giocatore";
+    let saltato = false;
+    let msg = "";
+
+    // Paralisi (25% di skip)
+    if (effettiAttivi[targetId].paralisi && effettiAttivi[targetId].paralisi.durata > 0) {
+        effettiAttivi[targetId].paralisi.durata--;
+        if (Math.random() < 0.25) {
+            msg += `<br>⚡ ${pokemon.nome} è paralizzato e non può muoversi!`;
+            saltato = true;
+        }
+        if (effettiAttivi[targetId].paralisi.durata === 0) effettiAttivi[targetId].paralisi = null;
+    }
+    
+    // Congelamento (10% di skip)
+    if (!saltato && effettiAttivi[targetId].congelamento && effettiAttivi[targetId].congelamento.durata > 0) {
+        effettiAttivi[targetId].congelamento.durata--;
+        if (Math.random() < 0.10) {
+            msg += `<br>❄️ ${pokemon.nome} è congelato solido!`;
+            saltato = true;
+        }
+        if (effettiAttivi[targetId].congelamento.durata === 0) effettiAttivi[targetId].congelamento = null;
+    }
+
+    // Paura (15% di skip)
+    if (!saltato && effettiAttivi[targetId].paura && effettiAttivi[targetId].paura.durata > 0) {
+        effettiAttivi[targetId].paura.durata--;
+        if (Math.random() < 0.15) {
+            msg += `<br>🌑 ${pokemon.nome} trema per la paura e non attacca!`;
+            saltato = true;
+        }
+        if (effettiAttivi[targetId].paura.durata === 0) effettiAttivi[targetId].paura = null;
+    }
+
+    // Cecità (20% miss) -> non salta il turno, ma facciamo finta missi l'attacco
+    if (!saltato && effettiAttivi[targetId].cecita && effettiAttivi[targetId].cecita.durata > 0) {
+        effettiAttivi[targetId].cecita.durata--;
+        if (Math.random() < 0.20) {
+            msg += `<br>🪨 A causa della sabbia negli occhi, l'attacco di ${pokemon.nome} fallisce!`;
+            saltato = true;
+        }
+        if (effettiAttivi[targetId].cecita.durata === 0) effettiAttivi[targetId].cecita = null;
+    }
+
+    if (msg !== "") {
+        document.getElementById("console-log").innerHTML += msg;
+        aggiornaGrafica();
+    }
+    return saltato;
+}
+
+function processaEffettiFineTurno(pokemon, isNemico) {
+    let targetId = isNemico ? "nemico" : "giocatore";
+    let msg = "";
+
+    if (effettiAttivi[targetId].bruciatura && effettiAttivi[targetId].bruciatura.durata > 0) {
+        let dmg = effettiAttivi[targetId].bruciatura.dannoFisso;
+        pokemon.hpAttuali = Math.max(0, pokemon.hpAttuali - dmg);
+        effettiAttivi[targetId].bruciatura.durata--;
+        msg += `<br>🔥 ${pokemon.nome} subisce ${dmg} danni da scottatura.`;
+        if (effettiAttivi[targetId].bruciatura.durata === 0) effettiAttivi[targetId].bruciatura = null;
+    }
+
+    if (effettiAttivi[targetId].veleno && effettiAttivi[targetId].veleno.durata > 0) {
+        let dmg = effettiAttivi[targetId].veleno.dannoFisso;
+        pokemon.hpAttuali = Math.max(0, pokemon.hpAttuali - dmg);
+        effettiAttivi[targetId].veleno.durata--;
+        msg += `<br>☠️ ${pokemon.nome} subisce ${dmg} danni da avvelenamento.`;
+        if (effettiAttivi[targetId].veleno.durata === 0) effettiAttivi[targetId].veleno = null;
+    }
+
+    if (effettiAttivi[targetId].semeSanguisuga && effettiAttivi[targetId].semeSanguisuga.durata > 0) {
+        let dmg = effettiAttivi[targetId].semeSanguisuga.drainFisso;
+        pokemon.hpAttuali = Math.max(0, pokemon.hpAttuali - dmg);
+        let origId = effettiAttivi[targetId].semeSanguisuga.origin;
+        let pkmOrig = origId === "giocatore" ? mioPokemon : nemicoPokemon;
+        if (pkmOrig && pkmOrig.hpAttuali > 0) {
+            pkmOrig.hpAttuali = Math.min(pkmOrig.hpMax, pkmOrig.hpAttuali + dmg);
+        }
+        effettiAttivi[targetId].semeSanguisuga.durata--;
+        msg += `<br>🌿 Le radici prosciugano ${dmg} HP da ${pokemon.nome}!`;
+        if (effettiAttivi[targetId].semeSanguisuga.durata === 0) effettiAttivi[targetId].semeSanguisuga = null;
+    }
+
+    // Decremento turni passivi (buff/debuff statici)
+    const statici = ["velRidotta", "ventoInCoda", "difesaRidotta", "provocato"];
+    statici.forEach(eff => {
+        if (effettiAttivi[targetId][eff] && effettiAttivi[targetId][eff].durata > 0) {
+            effettiAttivi[targetId][eff].durata--;
+            if (effettiAttivi[targetId][eff].durata === 0) effettiAttivi[targetId][eff] = null;
+        }
+    });
+
+    if (msg !== "") {
+        document.getElementById("console-log").innerHTML += msg;
+        aggiornaGrafica();
+    }
+}

@@ -18,7 +18,16 @@ const _cambiaSchermataBase = cambiaSchermata;
 cambiaSchermata = function(idNascondi, idMostra) {
     _cambiaSchermataBase(idNascondi, idMostra);
     if (idMostra === "schermata-start") riproduciMusica("lobby.mp3");
-    if (idMostra === "schermata-mappa") riproduciMusica("mappa.mp3");
+    if (idMostra === "schermata-mappa") {
+        riproduciMusica("mappa.mp3");
+        // Imposta sfondo mappa dinamicamente
+        const elm = document.getElementById("schermata-mappa");
+        if (elm && typeof ARCHIVIO_MAPPE !== "undefined" && ARCHIVIO_MAPPE[mappaAttuale]) {
+            elm.style.backgroundImage = `url('${ARCHIVIO_MAPPE[mappaAttuale].sfondoMappa}')`;
+            elm.style.backgroundSize = "cover";
+            elm.style.backgroundPosition = "center";
+        }
+    }
     if (idMostra === "schermata-gioco") {
         // Riproduce la musica normale SOLO se non è una Boss Fight
         if (!isBossFight) {
@@ -88,7 +97,12 @@ function generaOpzioniPokemon(quanti, isStarter) {
         nomiEstratti.push(infoBase.nome);
         
         let configGenerata = calcolaLivelloEMossaMappa(pianoAttuale);
-        let p = creaPokemon(infoBase, configGenerata.livello, configGenerata.livelloMossa);
+        
+        // Calcolo livello reclutamento: Math.min(Lvl_iniziale_mappa_del_pg_max_del_team, livello_max_lvl_team - 1)
+        let maxLvlTeam = miaSquadra.length > 0 ? Math.max(...miaSquadra.filter(m => m).map(m => m.livello)) : 1;
+        let lvlReclutamento = Math.min(maxLvlTeamInizioMappa, maxLvlTeam - 1);
+
+        let p = creaPokemon(infoBase, lvlReclutamento, configGenerata.livelloMossa);
 
         let colonna = document.createElement("div");
         colonna.className = "colonna-starter";
@@ -260,6 +274,48 @@ function aggiungiASquadra(pObiettivo) {
     };
     
     verificaPerkDopoEvento(pObiettivo, onFatto);
+}
+
+// Resetta la run corrente mantenendo il primo starter azzerato
+function resettaRunConStarter() {
+    if (!miaSquadra || miaSquadra.length === 0) return;
+    
+    
+    // Recupera l'infoBase del primo pokemon in squadra
+    const starterCorrente = miaSquadra[0].nome;
+    const infoBase = pokemonDatabase.find(p => p.nome === starterCorrente);
+    
+    if (!infoBase) return;
+    
+    // Reset variabili globali (stato.js e mappa.js)
+    miaSquadra = [];
+    let p = creaPokemon(infoBase, 5, 1);
+    miaSquadra.push(p);
+    
+    pianoAttuale = 0;
+    nodoSceltoAttuale = 0;
+    mappaAttuale = "mappa1";
+    monete = 0;
+    ZainoItems = [];
+    PerkAttivi = [];
+    isSkipAttivo = false;
+    
+    // Aggiorna UI
+    const moneteDispMappa = document.getElementById("monete-display-mappa");
+    if (moneteDispMappa) moneteDispMappa.innerText = `💰 ${monete}`;
+    const moneteDispGio = document.getElementById("monete-giocatore");
+    if (moneteDispGio) moneteDispGio.innerText = monete;
+    
+    // Rigenera mappa e ui
+    generaMappaProcedurale();
+    generaMappaAlbero();
+    aggiornaSquadraMappa();
+    
+    // Torna alla schermata mappa se non ci siamo (dovremmo esserci, ma per sicurezza)
+    const attive = document.querySelectorAll(".schermata.attiva");
+    if (attive.length > 0) {
+        cambiaSchermata(attive[0].id, "schermata-mappa");
+    }
 }
 
 // Aggiorna la griglia icone della squadra visibile sulla mappa
@@ -508,9 +564,17 @@ function apriSchermataDiscoMossa() {
         scheda.className = "scheda-disco-pokemon";
         scheda.style.backgroundColor = p.colore || "#ffffff";
 
-        scheda.onclick = function() {
-            potenziiaMossaPokemon(index); 
-        };
+        let btnText = lvlMossa >= 3 ? "MAX" : "POTENZIA";
+        let btnColor = lvlMossa >= 3 ? "#718093" : "#2f3640";
+        
+        if (lvlMossa >= 3) {
+            scheda.style.opacity = "0.6";
+            scheda.style.cursor = "not-allowed";
+        } else {
+            scheda.onclick = function() {
+                potenziiaMossaPokemon(index); 
+            };
+        }
 
         scheda.innerHTML = `
             <div class="foto-disco-pkm">
@@ -524,8 +588,8 @@ function apriSchermataDiscoMossa() {
                     <span style="color: #e67e22; font-size: 12px;">Mossa Lvl: ${lvlMossa}/3</span>
                 </div>
             </div>
-            <div style="font-size: 12px; font-weight: bold; background: #2f3640; color: #fff; padding: 4px 10px; border-radius: 20px; text-align: center; width: 80%;">
-                POTENZIA
+            <div style="font-size: 12px; font-weight: bold; background: ${btnColor}; color: #fff; padding: 4px 10px; border-radius: 20px; text-align: center; width: 80%;">
+                ${btnText}
             </div>
         `;
         contenitore.appendChild(scheda);

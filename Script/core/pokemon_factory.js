@@ -53,30 +53,54 @@ function calcolaHP(hpBase, livello, molElem, molRar) {
 }
 
 // Calcola il livello e il livello mossa appropriati per un nodo della mappa corrente
-function calcolaLivelloEMossaMappa(piano) {
+function calcolaLivelloEMossaMappa(piano, tipoEvento) {
     const configMappa = ARCHIVIO_MAPPE[mappaAttuale];
-    let metaMappa = Math.floor(schemaAlbero.length / 2);
-
-    let minLiv, maxLiv, minMossa, maxMossa;
-
-    if (piano <= metaMappa) {
-        // Prima metà della mappa: livelli e mosse più bassi
-        minLiv   = configMappa.livelloMin;
-        maxLiv   = configMappa.livelloMaxRelativo;
-        minMossa = configMappa.mossaMin;
-        maxMossa = configMappa.mossaMaxRel;
-    } else {
-        // Seconda metà: il livello max relativo diventa il nuovo minimo
-        minLiv   = configMappa.livelloMaxRelativo;
-        maxLiv   = configMappa.livelloMaxMassimo;
-        minMossa = configMappa.mossaMaxRel;
-        maxMossa = configMappa.mossaMaxMax;
+    
+    let indiceMappa = 1;
+    if (mappaAttuale && mappaAttuale.startsWith("mappa")) {
+        indiceMappa = parseInt(mappaAttuale.replace("mappa", "")) || 1;
     }
+    
+    // Per eventuali mappe non definite usa Mappa 1 come fallback
+    const configLivelli = CONFIG_LIVELLI_MAPPE[indiceMappa] || CONFIG_LIVELLI_MAPPE[1];
+    
+    let lvIngresso = configLivelli.ingresso;
+    let lvBoss = configLivelli.boss;
+    
+    let livelloGenerato = 1;
+    
+    if (tipoEvento === "boss") {
+        livelloGenerato = lvBoss;
+    } else if (tipoEvento === "npc" || tipoEvento === "allenatore") {
+        let randomOffset = Math.floor(Math.random() * 2); // 0 o +1
+        let baseCalc = lvIngresso + (((lvBoss - lvIngresso) / 6) * piano * 0.45);
+        let calc = Math.round(baseCalc) + randomOffset;
+        livelloGenerato = Math.min(lvBoss - 3, calc);
+    } else {
+        // Erba o default (cespuglio, ecc.)
+        let randomOffset = Math.floor(Math.random() * 2) - 1; // -1 o 0
+        let baseCalc = lvIngresso + (((lvBoss - lvIngresso) / 6) * piano * 0.15);
+        let calc = Math.round(baseCalc) + randomOffset;
+        livelloGenerato = Math.min(lvBoss - 5, calc);
+    }
+    
+    // Protezione per evitare livelli negativi o a zero
+    livelloGenerato = Math.max(1, livelloGenerato);
 
-    let livelloGenerato = Math.floor(Math.random() * (maxLiv - minLiv + 1)) + minLiv;
-    let mossaGenerata   = Math.floor(Math.random() * (maxMossa - minMossa + 1)) + minMossa;
-
-    // Protezione: mossa sempre nel range [1, 3]
+    // Calcolo Livello Mossa (invariato)
+    let minMossa = 1, maxMossa = 1;
+    if (configMappa) {
+        let metaMappa = Math.floor(schemaAlbero.length / 2);
+        if (piano <= metaMappa) {
+            minMossa = configMappa.mossaMin || 1;
+            maxMossa = configMappa.mossaMaxRel || 1;
+        } else {
+            minMossa = configMappa.mossaMaxRel || 1;
+            maxMossa = configMappa.mossaMaxMax || 2;
+        }
+    }
+    
+    let mossaGenerata = Math.floor(Math.random() * (maxMossa - minMossa + 1)) + minMossa;
     mossaGenerata = Math.max(1, Math.min(3, mossaGenerata));
 
     return { livello: livelloGenerato, livelloMossa: mossaGenerata };
@@ -108,13 +132,15 @@ function creaPokemon(infoBase, livello, livelloMossa = 1) {
     const elementoPkm = (infoBase.elemento || "fuoco").toLowerCase();
     const statsElem = CONFIG_STAT_ELEMENTO[elementoPkm] || { hp: 1, atk: 1, def: 1, vel: 1 };
 
+    const molEvo = infoBase.moltiplicatoreEvoluzione || 1.0;
+    
     // Calcolo statistiche con le formule definite sopra
-    const hpMax = calcolaHP(infoBase.hpBase,  livello, statsElem.hp,  molRar);
-    const atk   = calcolaStat(infoBase.atkBase, livello, statsElem.atk, molRar);
-    const def   = calcolaStat(infoBase.defBase, livello, statsElem.def, molRar);
-    const atkSpec = calcolaStat(infoBase.atkSpec || 1, livello, statsElem.atkSpec || 1, molRar);
-    const defSpec = calcolaStat(infoBase.defSpec || 1, livello, statsElem.defSpec || 1, molRar);
-    const vel   = calcolaStat(infoBase.velBase, livello, statsElem.vel, molRar);
+    const hpMax = calcolaHP(infoBase.hpBase,  livello, statsElem.hp,  molRar, molEvo);
+    const atk   = calcolaStat(infoBase.atkBase, livello, statsElem.atk, molRar, molEvo);
+    const def   = calcolaStat(infoBase.defBase, livello, statsElem.def, molRar, molEvo);
+    const atkSpec = calcolaStat(infoBase.atkSpec || infoBase.atkBase, livello, statsElem.atkSpec || statsElem.atk, molRar, molEvo);
+    const defSpec = calcolaStat(infoBase.defSpec || infoBase.defBase, livello, statsElem.defSpec || statsElem.def, molRar, molEvo);
+    const vel   = calcolaStat(infoBase.velBase, livello, statsElem.vel, molRar, molEvo);
 
     const p = {
         nome:         infoBase.nome,
@@ -352,14 +378,16 @@ function forzaLivello(p, nuovoLivello) {
     const elementoPkm = (p.elemento || "fuoco").toLowerCase();
     const statsElem = CONFIG_STAT_ELEMENTO[elementoPkm] || { hp: 1, atk: 1, def: 1, vel: 1 };
     
+    const molEvo = p.infoBase.moltiplicatoreEvoluzione || 1.0;
+
     // Ricalcola SEMPRE da zero, ignorando il livello corrente
     p.livello    = nuovoLivello;
-    p.baseHpMax  = calcolaHP   (p.infoBase.hpBase,  nuovoLivello, statsElem.hp,  molRar);
-    p.baseAtk    = calcolaStat (p.infoBase.atkBase, nuovoLivello, statsElem.atk, molRar);
-    p.baseDef    = calcolaStat (p.infoBase.defBase, nuovoLivello, statsElem.def, molRar);
-    p.baseAtkSpec = calcolaStat(p.infoBase.atkSpec || 1, nuovoLivello, statsElem.atkSpec || 1, molRar);
-    p.baseDefSpec = calcolaStat(p.infoBase.defSpec || 1, nuovoLivello, statsElem.defSpec || 1, molRar);
-    p.baseVel    = calcolaStat (p.infoBase.velBase, nuovoLivello, statsElem.vel, molRar);
+    p.baseHpMax  = calcolaHP   (p.infoBase.hpBase,  nuovoLivello, statsElem.hp,  molRar, molEvo);
+    p.baseAtk    = calcolaStat (p.infoBase.atkBase, nuovoLivello, statsElem.atk, molRar, molEvo);
+    p.baseDef    = calcolaStat (p.infoBase.defBase, nuovoLivello, statsElem.def, molRar, molEvo);
+    p.baseAtkSpec = calcolaStat(p.infoBase.atkSpec || p.infoBase.atkBase, nuovoLivello, statsElem.atkSpec || statsElem.atk, molRar, molEvo);
+    p.baseDefSpec = calcolaStat(p.infoBase.defSpec || p.infoBase.defBase, nuovoLivello, statsElem.defSpec || statsElem.def, molRar, molEvo);
+    p.baseVel    = calcolaStat (p.infoBase.velBase, nuovoLivello, statsElem.vel, molRar, molEvo);
     
     applicaBonusOggetti(p);
     p.hpAttuali  = p.hpMax;
@@ -462,11 +490,23 @@ function calcolaSchivata(p) {
 }
 
 // Pesca un Pokémon casuale dal database rispettando rarità e range della mappa corrente
-function pescaPokemonCasuale(esclusioniNomi = []) {
+function pescaPokemonCasuale(esclusioniNomi = [], elementoFiltro = null) {
     // Pesi base per rarità (più è raro, meno probabile è)
     const pesi = { "comune": 22, "non comune": 18, "raro": 16, "epico": 14, "leggendario": 12, "special": 10, "bombers": 8 };
 
-    let poolDisponibili = pokemonDatabase.filter(p => !p.boss && !esclusioniNomi.includes(p.nome));
+    let poolDisponibili = pokemonDatabase.filter(p => !p.boss && !p.isEvoluzione && !esclusioniNomi.includes(p.nome));
+
+    // Applica il filtro per elemento se specificato
+    if (elementoFiltro) {
+        let poolElemento = poolDisponibili.filter(p => p.elemento && p.elemento.toLowerCase() === elementoFiltro.toLowerCase());
+        if (poolElemento.length > 0) {
+            poolDisponibili = poolElemento;
+        } else {
+            // Paracadute: cerca in tutto il DB ignorando le esclusioni
+            poolElemento = pokemonDatabase.filter(p => p.elemento && p.elemento.toLowerCase() === elementoFiltro.toLowerCase());
+            if (poolElemento.length > 0) poolDisponibili = poolElemento;
+        }
+    }
 
     // Applica il filtro rarità della mappa corrente
     if (mappaAttuale && ARCHIVIO_MAPPE[mappaAttuale]) {
@@ -485,7 +525,7 @@ function pescaPokemonCasuale(esclusioniNomi = []) {
 
     // Paracadute: se il pool è ancora vuoto, usa tutti i non-boss
     if (poolDisponibili.length === 0) {
-        poolDisponibili = pokemonDatabase.filter(p => !p.boss);
+        poolDisponibili = pokemonDatabase.filter(p => !p.boss && !p.isEvoluzione);
     }
 
     // Selezione pesata: estrae un elemento rispettando i pesi di rarità

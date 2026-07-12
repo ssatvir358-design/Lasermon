@@ -19,6 +19,11 @@
 function generaMappaProcedurale() {
     alberoMappa = [];
     mappaEventi = {};
+    
+    // Salva il livello massimo del team all'inizio della mappa per i reclutamenti
+    maxLvlTeamInizioMappa = miaSquadra && miaSquadra.length > 0 
+        ? Math.max(...miaSquadra.filter(p => p).map(p => p.livello)) 
+        : 1;
 
     // Contatore di quante volte ogni tipo di evento è già stato piazzato in questa mappa
     const contatoreEventi = {};
@@ -51,10 +56,27 @@ function generaMappaProcedurale() {
                 tipoEvento = (i === indiceMedicoUnico) ? "centro-medico" : "npc";
                 contatoreEventi["npc"] = (contatoreEventi["npc"] || 0) + (tipoEvento === "npc" ? 1 : 0);
 
+            } else if (pianoIndex === 1) {
+                // Primo piano giocabile: estremo sinistro pokeball, estremo destro cespuglio, centro random
+                if (i === 0) {
+                    tipoEvento = "pokeball";
+                } else if (i === numNodi - 1 && numNodi > 1) {
+                    tipoEvento = "cespuglio";
+                } else {
+                    tipoEvento = selezionaEventoPerPiano(pianoIndex, contatoreEventi);
+                }
+                contatoreEventi[tipoEvento] = (contatoreEventi[tipoEvento] || 0) + 1;
+
             } else {
                 // Piani intermedi: usa il DB_EVENTI_NODI
                 tipoEvento = selezionaEventoPerPiano(pianoIndex, contatoreEventi);
                 contatoreEventi[tipoEvento] = (contatoreEventi[tipoEvento] || 0) + 1;
+            }
+
+            let elementoNpc = null;
+            if (tipoEvento === "npc") {
+                const elementiPossibili = ["fuoco", "acqua", "erba", "elettro", "ghiaccio", "normale"];
+                elementoNpc = elementiPossibili[Math.floor(Math.random() * elementiPossibili.length)];
             }
 
             mappaEventi[pianoIndex].push(tipoEvento);
@@ -63,6 +85,7 @@ function generaMappaProcedurale() {
                 piano: pianoIndex,
                 index: i,
                 tipo:  tipoEvento,
+                elementoNpc: elementoNpc,
                 figli: []
             });
         }
@@ -164,6 +187,13 @@ function generaMappaAlbero() {
                 const bottone = document.createElement("button");
                 bottone.id = `p${pianoIndex}-n${i}`;
                 bottone.className = `nodo-bottone evento-${tipoEvento}`;
+
+                if (tipoEvento === "npc") {
+                    const nodoObj = alberoMappa[pianoIndex][i];
+                    if (nodoObj && nodoObj.elementoNpc) {
+                        bottone.setAttribute("data-tooltip", `Tipo: ${nodoObj.elementoNpc}`);
+                    }
+                }
 
                 // Nodo boss: usa l'immagine chibi del boss corrente
                 if (tipoEvento === "boss") {
@@ -305,5 +335,11 @@ function avviaEvento(pianoSelezionato, indiceNodo, tipoEvento) {
     document.getElementById("titolo-incontro").innerText = tipoEvento === "cespuglio"
         ? `ERBA ALTA\n-- PIANO ${pianoAttuale} --`
         : `SFIDA ALLENATORE\n-- PIANO ${pianoAttuale} --`;
-    preparaIncontroBattaglia(tipoEvento);
+        
+    let elementoFiltro = null;
+    if (tipoEvento === "npc" && alberoMappa[pianoAttuale] && alberoMappa[pianoAttuale][nodoSceltoAttuale]) {
+        elementoFiltro = alberoMappa[pianoAttuale][nodoSceltoAttuale].elementoNpc;
+    }
+    
+    preparaIncontroBattaglia(tipoEvento, elementoFiltro);
 }

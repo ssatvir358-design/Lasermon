@@ -59,29 +59,42 @@ let itemUsatiQuestoTurno = false;
 // La durata è decrementata ogni turno; a 0 l'effetto scade.
 // ==========================================================
 let effettiAttivi = {
-    // Effetti che il NEMICO subisce
     nemico: {
-        bruciatura: null,   // DOT: { durata, dannoFisso } — da mossa FUOCO Lv3
-        velRidotta:  null,  // Debuff velocità: { durata, percentuale } — ACQUA Lv3
-        defRidotta:  null   // Debuff difesa: { durata, percentuale } — LUCE Lv3
+        bruciatura: null,       // FUOCO
+        semeSanguisuga: null,   // ERBA
+        velRidotta: null,       // ACQUA
+        paralisi: null,         // ELETTRO
+        congelamento: null,     // GHIACCIO
+        cecita: null,           // TERRA
+        paura: null,            // BUIO
+        veleno: null,           // VELENO
+        difesaRidotta: null,    // LUCE
+        provocato: null         // LOTTA
     },
-    // Effetti che il GIOCATORE subisce o possiede
     giocatore: {
-        bruciatura: null,   // DOT: { durata, dannoFisso } — da nemico FUOCO Lv3
-        velRidotta:  null,  // Debuff velocità: { durata, percentuale }
-        defRidotta:  null,  // Debuff difesa: { durata, percentuale }
-        atkBoost:    null   // Buff ATK: { durata, percentuale } — Contratto Determinato
-                            // Formato: { durata: 3, percentuale: 0.20 }
+        bruciatura: null,
+        semeSanguisuga: null,
+        velRidotta: null,
+        paralisi: null,
+        congelamento: null,
+        cecita: null,
+        paura: null,
+        veleno: null,
+        difesaRidotta: null,
+        provocato: null,
+        ventoInCoda: null,      // VOLANTE (buff)
+        atkBoost: null          // Altro
     }
 };
 
 // --- Mappa procedurale ---
-const schemaAlbero = [1, 3, 4, 5, 4, 5, 4, 3, 1]; // Nodi per piano
+const schemaAlbero = [1, 3, 4, 5, 4, 5, 4, 5, 4, 5, 4, 5, 4, 3, 1]; // Nodi per piano
 let alberoMappa = [];
 let pianoAttuale = 0;
 let nodoSceltoAttuale = 0;
 let mappaEventi = {};
 let mappaAttuale = "mappa1";
+let maxLvlTeamInizioMappa = 1;
 
 // --- UI / Impostazioni ---
 let isSkipAttivo         = false;
