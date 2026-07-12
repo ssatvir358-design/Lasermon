@@ -91,6 +91,61 @@
         <button id="btn-start" onclick="mostraSelezione()">START</button>
     </div>
 
+    <!-- ============= SCHERMATA SANDBOX ============= -->
+    <div id="schermata-sandbox" class="schermata" style="display:none;">
+    <h1>Configurazione Sandbox</h1>
+    <div style="display: flex; gap: 40px;">
+        
+        <!-- Blocco Giocatore -->
+        <fieldset>
+            <legend>Giocatore</legend>
+            Dipendente: <select id="sb-gio-nome"></select>
+            Livello: <input type="number" id="sb-gio-lvl" placeholder="Livello (1-100)" value="1" min="1">
+            <label>
+                Statistiche Manuali<input type="checkbox" id="sb-gio-manuale" onchange="toggleStats('gio')">
+            </label>
+            <div class="input-stats">
+                <input type="number" id="sb-gio-hp" placeholder="HP" min="1">
+                <input type="number" id="sb-gio-atk" placeholder="ATK" min="1">
+                <input type="number" id="sb-gio-def" placeholder="DEF" min="1">
+                <input type="number" id="sb-gio-vel" placeholder="VEL" min="1">
+            </div>
+            <div>
+                Perk: <select id="sb-gio-listaperk" onchange="toggleValore(this, 'sb-gio-val-perk'); aggiornaTooltip(this, 'perk')"></select>
+                <span class="info-icon" id="info-gio-perk" title="Seleziona un perk per vedere l'effetto">?</span>
+            </div>
+                <input type="number" class="val-perk" id="sb-gio-val-perk" placeholder="Valore Perk" min="1" oninput="aggiornaTooltip(document.getElementById('sb-gio-listaperk'), 'perk')">
+            <div>
+                Oggetto: <select id="sb-gio-item" onchange="toggleValore(this, 'sb-gio-val-item'); aggiornaTooltip(this, 'item')"></select>
+                <span class="info-icon" id="info-gio-item" title="Seleziona un oggetto per vedere l'effetto">?</span>
+            </div>
+            <input type="number" class="val-item" id="sb-gio-val-item" placeholder="Valore Item" min="1" oninput="aggiornaTooltip(document.getElementById('sb-gio-item'), 'item')">
+        </fieldset>
+
+        <!-- Blocco Nemico -->
+        <fieldset>
+            <legend>Nemico</legend>
+            Dipendente: <select id="sb-nem-nome"></select>
+            Livello: <input type="number" id="sb-nem-lvl" placeholder="Livello (1-100)" value="1" min="1">
+            <label>
+                Statistiche Manuali <input type="checkbox" id="sb-nem-manuale" onchange="toggleStats('nem')"> 
+            </label>
+            <div class="input-stats">
+                <input type="number" id="sb-nem-hp" placeholder="HP" min="1">
+                <input type="number" id="sb-nem-atk" placeholder="ATK" min="1">
+                <input type="number" id="sb-nem-def" placeholder="DEF" min="1">
+                <input type="number" id="sb-nem-vel" placeholder="VEL" min="1">
+            </div>
+            <div>
+                Perk: <select id="sb-nem-listaperk" onchange="toggleValore(this, 'sb-nem-val-perk'); aggiornaTooltip(this, 'perk')"></select>
+                <span class="info-icon" id="info-nem-perk" title="Seleziona un perk per vedere l'effetto">?</span>
+            </div>
+            <input type="number" class="val-perk" id="sb-nem-val-perk" placeholder="Valore Perk" min="1" oninput="aggiornaTooltip(document.getElementById('sb-nem-listaperk'), 'perk')">
+        </fieldset>
+    </div>
+    <button onclick="avviaSandbox()">Entra in Battaglia</button>
+</div>
+
     <!-- ============= SCHERMATA SELEZIONE STARTER E POKEBALL ============= -->
     <div id="schermata-selezione" class="schermata" style="background: #111 !important;">
         <h1 id="titolo-selezione" class="titolo-selezione">Scegli il tuo Pokémon</h1>
@@ -401,9 +456,9 @@
 
     <!-- 1. Dati statici -->
     <script src="../Script/data/config.js"></script>
+    <!-- Personaggi: un file per ciascuno (aggiungi qui nuovi personaggi) -->
     <script src="../Script/data/characters/fabio.js"></script>
     <script src="../Script/data/characters/falco.js"></script>
-    <script src="../Script/data/characters/arman.js"></script>
     <script src="../Script/data/characters/gian.js"></script>
     <script src="../Script/data/characters/monica.js"></script>
     <script src="../Script/data/characters/ruggiero.js"></script>
@@ -415,62 +470,19 @@
     <script src="../Script/data/characters/venturini.js"></script>
     <script src="../Script/data/characters/carra.js"></script>
     <script src="../Script/data/characters/giulio.js"></script>
-    <script src="../Script/data/characters/mattiaf1.js"></script>
+    <script src="../Script/data/characters/mattia.js"></script>
     <script src="../Script/data/characters/paolo.js"></script>
     <script src="../Script/data/characters/lanza.js"></script>
     <script src="../Script/data/characters/dinicola.js"></script>
     <script src="../Script/data/characters/filippo.js"></script>
     <script src="../Script/data/characters/nicolas.js"></script>
-    <script src="../Script/data/characters/tania.js"></script>
-    <script src="../Script/data/characters/altimani.js"></script>
-    <script src="../Script/data/characters/saad.js"></script>
-    <script src="../Script/data/characters/manuela.js"></script>
-    <script src="../Script/data/characters/maccionif1.js"></script>
-    <script src="../Script/data/characters/savinaf1.js"></script>
-    <script src="../Script/data/characters/bacchi.js"></script>
-    <script src="../Script/data/characters/mattiasped.js"></script>
-    <script src="../Script/data/characters/rauf.js"></script>
-    <script src="../Script/data/characters/telemaco.js"></script>
-    <script src="../Script/data/characters/danilof1.js"></script>
-    <script src="../Script/data/characters/salvatoreprog.js"></script>
-    <script src="../Script/data/characters/nicolo.js"></script>
-    <script src="../Script/data/characters/alexsped.js"></script>
-    <script src="../Script/data/characters/cammalleri.js"></script>
-    <script src="../Script/data/characters/bottura.js"></script>
-    <script src="../Script/data/characters/graziani.js"></script>
-    <script src="../Script/data/characters/lonconsole.js"></script>
-    <script src="../Script/data/characters/ghandu.js"></script>
-    <script src="../Script/data/characters/niconegri.js"></script>
-    <script src="../Script/data/characters/contini.js"></script>
-    <script src="../Script/data/characters/bottardi.js"></script>
-    <script src="../Script/data/characters/paola.js"></script>
-    <script src="../Script/data/characters/paroni.js"></script>
-    <script src="../Script/data/characters/carnevalifederica.js"></script>
-    <script src="../Script/data/characters/valentinafanti.js"></script>
-    <script src="../Script/data/characters/serghej.js"></script>
-    <script src="../Script/data/characters/babbonatale.js"></script>
-    <script src="../Script/data/characters/simonemenza.js"></script>
-    <script src="../Script/data/characters/reemerlino.js"></script>
-    <script src="../Script/data/characters/anselmo.js"></script>
-    <script src="../Script/data/characters/nonamedonna.js"></script>
-    <script src="../Script/data/characters/nonameuomo.js"></script>
-    <script src="../Script/data/characters/bonacina.js"></script>
-    <script src="../Script/data/characters/capiluppi.js"></script>
-    <script src="../Script/data/characters/danilof2.js"></script>
-    <script src="../Script/data/characters/maccionef2.js"></script>
-    <script src="../Script/data/characters/savinaf2.js"></script>
-    <script src="../Script/data/characters/mattiaf2.js"></script>
-    <script src="../Script/data/characters/giulia.js"></script>
+    <script src="../Script/data/characters/max.js"></script>
     <script src="../Script/data/characters/gio.js"></script>
     <script src="../Script/data/characters/sat.js"></script>
     <script src="../Script/data/characters/kul.js"></script>
     <script src="../Script/data/characters/edo.js"></script>
-    <script src="../Script/data/characters/maxf1.js"></script>
-    <script src="../Script/data/characters/maxf2.js"></script>
-    <script src="../Script/data/characters/maxf3.js"></script>
-    <script src="../Script/data/characters/index.js"></script>
-    <!-- Personaggi: un file per ciascuno (aggiungi qui nuovi personaggi) -->
     <!-- Index che assembla pokemonDatabase dai file sopra -->
+    <script src="../Script/data/characters/index.js"></script>
     <script src="../Script/data/mappe.js"></script>
     <script src="../Script/data/boss.js"></script>
     <script src="../Script/data/eventi_nodi.js"></script>
@@ -500,6 +512,9 @@
 
     <!-- 7. UI Eventi -->
     <script src="../Script/ui/eventi.js"></script>
+
+    <!-- 8. Sandbox mode -->
+    <script src="..\Script\sandbox\sandbox.js"></script>
 
 </body>
 </html>
