@@ -39,7 +39,7 @@ const PERK_DB = {
                     id: "salvavita",
                     nome: "SALVAVITA",
                     emoji: "🛡️",
-                    descrizione: "Per una volta per fight, quando il dipendente dovrebbe morire, sopravvivi con 1 HP invece di andare KO."
+                    descrizione: "Per una volta per fight, quando gli HP scendono a 0, sopravvivi con 1 HP invece di andare KO."
                 },
                 {
                     id: "rigenerazione",
@@ -55,7 +55,7 @@ const PERK_DB = {
                 id: "salvavita_2",
                 nome: "SALVAVITA+",
                 emoji: "🛡️✨",
-                descrizione: "SALVAVITA si attiva ora 2 volte per fight invece di una sola."
+                descrizione: "SALVAVITA si attiva ora DUE volte per fight invece di una sola."
             },
             // Evoluzione di RIGENERAZIONE
             rigenerazione: {
@@ -169,7 +169,7 @@ const PERK_DB = {
                     nome: "DOPPIO ATTACCO",
                     emoji: "⚡",
                     // 15% prob; il secondo colpo fa il 50% del danno base del turno
-                    descrizione: "Hai il 15% di probabilità di sferrare un secondo attacco nello stesso turno. Il secondo colpo infligge metà del danno base."
+                    descrizione: "Hai il 15% di probabilità di sferrare un secondo attacco nello stesso turno. Il secondo colpo infligge il 50% del danno base."
                 }
             ]
         },
@@ -186,7 +186,7 @@ const PERK_DB = {
                 nome: "DOPPIO ATTACCO+",
                 emoji: "⚡✨",
                 // 30% prob; il secondo colpo fa sempre il 50% del danno base
-                descrizione: "La probabilità del secondo attacco sale al 30%. Il secondo colpo infligge ancora metà del danno base."
+                descrizione: "La probabilità del secondo attacco sale al 30%. Il secondo colpo infligge ancora il 50% del danno base."
             }
         }
     }

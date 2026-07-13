@@ -86,6 +86,17 @@ let _ultimoScambiato = null;
 function eseguiScambioDiretto(indexDaScambiare) {
     let vecchioPkm = miaSquadra[indexDaScambiare];
 
+    // Restituisci gli oggetti equipaggiati allo zaino
+    if (vecchioPkm.oggetti && vecchioPkm.oggetti.length > 0) {
+        vecchioPkm.oggetti.forEach(ogg => {
+            if (typeof aggiungiAZaino === "function" && ogg.id) {
+                aggiungiAZaino(ogg.id);
+            } else {
+                zaino.push(ogg);
+            }
+        });
+    }
+
     let bonusLivelli = 2; // Il nuovo Pokémon riceve +2 livelli rispetto a quello ceduto
     let nuovoLivello = vecchioPkm.livello + bonusLivelli;
 
