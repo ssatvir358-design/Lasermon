@@ -5,7 +5,8 @@
 
 const ARCHIVIO_MAPPE = {
     "mappa1": {
-        sfondo: "../Sprite/mappe/1.png",
+        sfondoMappa: "../Sprite/mappe/1.png",
+        sfondoBattaglia: "../Sprite/UI/Combattimento/Combattimento1.png",
         livelloMin: 1,
         livelloMaxRelativo: 5,  // Massimo fino a metà mappa
         livelloMaxMassimo: 10,  // Massimo nella seconda metà
@@ -17,7 +18,8 @@ const ARCHIVIO_MAPPE = {
         RaritaMax: "non comune"
     },
     "mappa2": {
-        sfondo: "../Sprite/mappe/2.png",
+        sfondoMappa: "../Sprite/mappe/1.png",
+        sfondoBattaglia: "../Sprite/UI/Combattimento/Combattimento1.png",
         livelloMin: 10,
         livelloMaxRelativo: 15,
         livelloMaxMassimo: 20,
@@ -29,7 +31,8 @@ const ARCHIVIO_MAPPE = {
         RaritaMax: "raro"
     },
     "mappa3": {
-        sfondo: "../Sprite/mappe/3.png",
+        sfondoMappa: "../Sprite/mappe/1.png",
+        sfondoBattaglia: "../Sprite/UI/Combattimento/Combattimento1.png",
         livelloMin: 20,
         livelloMaxRelativo: 25,
         livelloMaxMassimo: 30,
@@ -41,7 +44,8 @@ const ARCHIVIO_MAPPE = {
         RaritaMax: "epico"
     },
     "mappa4": {
-        sfondo: "../Sprite/mappe/4.png",
+        sfondoMappa: "../Sprite/mappe/2.png",
+        sfondoBattaglia: "../Sprite/UI/Combattimento/Combattimento2.png",
         livelloMin: 20,
         livelloMaxRelativo: 25,
         livelloMaxMassimo: 30,
@@ -53,7 +57,8 @@ const ARCHIVIO_MAPPE = {
         RaritaMax: "epico"
     },
     "mappa5": {
-        sfondo: "../Sprite/mappe/5.png",
+        sfondoMappa: "../Sprite/mappe/2.png",
+        sfondoBattaglia: "../Sprite/UI/Combattimento/Combattimento2.png",
         livelloMin: 20,
         livelloMaxRelativo: 25,
         livelloMaxMassimo: 30,
@@ -65,7 +70,8 @@ const ARCHIVIO_MAPPE = {
         RaritaMax: "epico"
     },
     "mappa6": {
-        sfondo: "../Sprite/mappe/6.png",
+        sfondoMappa: "../Sprite/mappe/2.png",
+        sfondoBattaglia: "../Sprite/UI/Combattimento/Combattimento2.png",
         livelloMin: 20,
         livelloMaxRelativo: 25,
         livelloMaxMassimo: 30,
@@ -77,7 +83,8 @@ const ARCHIVIO_MAPPE = {
         RaritaMax: "leggendario"
     },
     "mappa7": {
-        sfondo: "../Sprite/mappe/7.png",
+        sfondoMappa: "../Sprite/mappe/3.png",
+        sfondoBattaglia: "../Sprite/UI/Combattimento/Combattimento3.png",
         livelloMin: 20,
         livelloMaxRelativo: 25,
         livelloMaxMassimo: 30,
@@ -89,7 +96,8 @@ const ARCHIVIO_MAPPE = {
         RaritaMax: "leggendario"
     },
     "mappa8": {
-        sfondo: "../Sprite/mappe/8.png",
+        sfondoMappa: "../Sprite/mappe/3.png",
+        sfondoBattaglia: "../Sprite/UI/Combattimento/Combattimento3.png",
         livelloMin: 20,
         livelloMaxRelativo: 25,
         livelloMaxMassimo: 30,
@@ -101,7 +109,8 @@ const ARCHIVIO_MAPPE = {
         RaritaMax: "leggendario"
     },
     "mappa9": {
-        sfondo: "../Sprite/mappe/9.png",
+        sfondoMappa: "../Sprite/mappe/4.png",
+        sfondoBattaglia: "../Sprite/UI/Combattimento/Combattimento4.png",
         livelloMin: 20,
         livelloMaxRelativo: 25,
         livelloMaxMassimo: 30,
@@ -110,6 +119,19 @@ const ARCHIVIO_MAPPE = {
         mossaMaxMax: 3,
         idBoss: "13",
         RaritaMin: "epico",
+        RaritaMax: "leggendario"
+    },
+    "mappa10": {
+        sfondoMappa: "../Sprite/mappe/5.png",
+        sfondoBattaglia: "../Sprite/UI/Combattimento/Combattimento5.png",
+        livelloMin: 100,
+        livelloMaxRelativo: 100,
+        livelloMaxMassimo: 100,
+        mossaMin: 3,
+        mossaMaxRel: 3,
+        mossaMaxMax: 3,
+        idBoss: "10",
+        RaritaMin: "leggendario",
         RaritaMax: "leggendario"
     }
 };

@@ -33,7 +33,7 @@ function verificaEAvviaPerk(livPreBattle, callbackFine) {
     _indiceCodaPerk = 0;
     _totaleCodaPerk  = 0;
 
-    const caps = [CONFIG_PERK_LEVEL_CAP.tier1, CONFIG_PERK_LEVEL_CAP.tier2];
+    const caps = []; // [CONFIG_PERK_LEVEL_CAP.tier1, CONFIG_PERK_LEVEL_CAP.tier2];
 
     livPreBattle.forEach(({ pokemon, livelloPre }) => {
         if (!pokemon || pokemon.hpAttuali <= 0) return;

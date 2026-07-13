@@ -41,29 +41,29 @@ const DB_EVENTI_NODI = {
     // ---- EVENTI LIMITATI ----
 
     "pokeball": {
-        PianoMin:          1,   // Disponibile da subito
+        PianoMin:          1,
         PianoMax:          99,
-        QuantitaMaxPerMappa: 3  // Al massimo 3 Pokéball per mappa
+        QuantitaMaxPerMappa: -1
     },
     "scambio": {
-        PianoMin:          2,   // Non appare al secondo piano
+        PianoMin:          1,
         PianoMax:          99,
-        QuantitaMaxPerMappa: 2  // Al massimo 2 zone scambio per mappa
+        QuantitaMaxPerMappa: -1
     },
     "disco": {
-        PianoMin:          2,   // Non appare subito (almeno piano 2)
+        PianoMin:          1,
         PianoMax:          99,
-        QuantitaMaxPerMappa: 1  // Al massimo 1 disco per mappa (raro e prezioso)
+        QuantitaMaxPerMappa: -1
     },
     "mistero": {
-        PianoMin:          3,   // Solo dalla metà mappa in poi
+        PianoMin:          1,
         PianoMax:          99,
-        QuantitaMaxPerMappa: 2  // Al massimo 2 eventi misteriosi per mappa
+        QuantitaMaxPerMappa: -1
     },
     "item": {
-        PianoMin:          2,   
+        PianoMin:          1,   
         PianoMax:          99,
-        QuantitaMaxPerMappa: 2  // Al massimo 2 drop item casuali per mappa
+        QuantitaMaxPerMappa: -1
     }
 
     // ---- TEMPLATE PER NUOVI EVENTI ----

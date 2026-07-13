@@ -183,6 +183,11 @@
             <div id="monete-display-mappa" style="background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 8px; border: 2px solid #f1c40f; color: white;">💰 0</div>
         </div>
 
+        <!-- Tasto Reset Run -->
+        <button onclick="resettaRunConStarter()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(231, 76, 60, 0.8); color: white; border: 2px solid white; border-radius: 8px; padding: 10px; cursor: pointer; font-size: 14px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.3); text-align: center;">
+            🔄<br>Reset<br>Run
+        </button>
+
         <div style="position: relative; width: 100%; flex-grow: 1;">
             <svg id="mappa-collegamenti" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2;"></svg>
             <div id="albero-container" style="z-index: 5;"></div>
@@ -272,7 +277,7 @@
                         <button id="btn-item" class="btn-action" onclick="apriPannelloItemBattaglia()" disabled>
                             <img src="../Sprite/UI/Combattimento/zaino.png" class="btn-icon"> ZAINO
                         </button>
-                        <button id="btn-pokemon" class="btn-action" onclick="" disabled>
+                        <button id="btn-pokemon" class="btn-action" onclick="apriSchermataPokemonBattaglia()" disabled>
                             <img src="../Sprite/UI/Combattimento/leone.png" class="btn-icon"> POKÉMON
                         </button>
                         <button id="btn-fuga" class="btn-action" onclick="fugaBattaglia()">
@@ -377,7 +382,11 @@
                     <select id="select-posizione" class="select-stile-retro" onchange="eseguiScambioPosizione()"></select>
                 </div>
 
-                <button class="btn-battle btn-win" onclick="cambiaSchermata('schermata-dettaglio', 'schermata-mappa')" style="margin-top: 15px; width: 100%;">CHIUDI</button>
+                <div id="blocco-cambio-in-battaglia" style="display:none; width: 100%; text-align: center; margin-top: 10px;">
+                    <button class="btn-battle" id="btn-esegui-cambio-battaglia" onclick="eseguiCambioInBattaglia()" style="background-color: #f39c12; width: 100%;">MANDA IN CAMPO</button>
+                </div>
+
+                <button class="btn-battle btn-win" onclick="chiudiDettaglio()" style="margin-top: 15px; width: 100%;">CHIUDI</button>
             </div>
         </div>
     </div>
@@ -390,6 +399,7 @@
                 Scegli quale Pokémon della tua squadra vuoi potenziare (Max Lvl 3):
             </p>
             <div id="contenitore-opzioni-disco" class="griglia-opzioni-disco"></div>
+            <button class="btn-battle" onclick="cambiaSchermata('schermata-disco', 'schermata-mappa'); aggiornaSquadraMappa();" style="background-color: #e74c3c; width: 100%; max-width: 300px; margin: 20px auto 0; display: block;">Lascia il disco (Indietro)</button>
         </div>
     </div>
 
@@ -456,6 +466,7 @@
 
     <!-- 1. Dati statici -->
     <script src="../Script/data/config.js"></script>
+<<<<<<< HEAD
     <!-- Personaggi: un file per ciascuno (aggiungi qui nuovi personaggi) -->
     <script src="../Script/data/characters/fabio.js"></script>
     <script src="../Script/data/characters/falco.js"></script>
@@ -477,10 +488,81 @@
     <script src="../Script/data/characters/filippo.js"></script>
     <script src="../Script/data/characters/nicolas.js"></script>
     <script src="../Script/data/characters/max.js"></script>
-    <script src="../Script/data/characters/gio.js"></script>
-    <script src="../Script/data/characters/sat.js"></script>
-    <script src="../Script/data/characters/kul.js"></script>
+=======
+    <script src="../Script/data/characters/alexsped.js"></script>
+    <script src="../Script/data/characters/altimani.js"></script>
+    <script src="../Script/data/characters/anselmo.js"></script>
+    <script src="../Script/data/characters/arman.js"></script>
+    <script src="../Script/data/characters/babbonatale.js"></script>
+    <script src="../Script/data/characters/bacchi.js"></script>
+    <script src="../Script/data/characters/bellini.js"></script>
+    <script src="../Script/data/characters/bonacina.js"></script>
+    <script src="../Script/data/characters/bottardi.js"></script>
+    <script src="../Script/data/characters/bottura.js"></script>
+    <script src="../Script/data/characters/bussolotti.js"></script>
+    <script src="../Script/data/characters/cammalleri.js"></script>
+    <script src="../Script/data/characters/capiluppi.js"></script>
+    <script src="../Script/data/characters/carnevalifederica.js"></script>
+    <script src="../Script/data/characters/carra.js"></script>
+    <script src="../Script/data/characters/contini.js"></script>
+    <script src="../Script/data/characters/danilo.js"></script>
+    <script src="../Script/data/characters/danilof2.js"></script>
+    <script src="../Script/data/characters/dinicola.js"></script>
+    <script src="../Script/data/characters/donato.js"></script>
     <script src="../Script/data/characters/edo.js"></script>
+    <script src="../Script/data/characters/fabio.js"></script>
+    <script src="../Script/data/characters/falco.js"></script>
+    <script src="../Script/data/characters/filippo.js"></script>
+    <script src="../Script/data/characters/ghandu.js"></script>
+    <script src="../Script/data/characters/gian.js"></script>
+>>>>>>> origin
+    <script src="../Script/data/characters/gio.js"></script>
+    <script src="../Script/data/characters/giulia.js"></script>
+    <script src="../Script/data/characters/giulio.js"></script>
+    <script src="../Script/data/characters/graziani.js"></script>
+    <script src="../Script/data/characters/kul.js"></script>
+<<<<<<< HEAD
+    <script src="../Script/data/characters/edo.js"></script>
+=======
+    <script src="../Script/data/characters/lanza.js"></script>
+    <script src="../Script/data/characters/lonconsole.js"></script>
+    <script src="../Script/data/characters/maccioni.js"></script>
+    <script src="../Script/data/characters/maccionif2.js"></script>
+    <script src="../Script/data/characters/manuela.js"></script>
+    <script src="../Script/data/characters/mattia.js"></script>
+    <script src="../Script/data/characters/mattiaf2.js"></script>
+    <script src="../Script/data/characters/mattiasped.js"></script>
+    <script src="../Script/data/characters/max.js"></script>
+    <script src="../Script/data/characters/maxf2.js"></script>
+    <script src="../Script/data/characters/maxf3.js"></script>
+    <script src="../Script/data/characters/monica.js"></script>
+    <script src="../Script/data/characters/nicolas.js"></script>
+    <script src="../Script/data/characters/nicolo.js"></script>
+    <script src="../Script/data/characters/niconegri.js"></script>
+    <script src="../Script/data/characters/nonamedonna.js"></script>
+    <script src="../Script/data/characters/nonameuomo.js"></script>
+    <script src="../Script/data/characters/paola.js"></script>
+    <script src="../Script/data/characters/paolo.js"></script>
+    <script src="../Script/data/characters/paroni.js"></script>
+    <script src="../Script/data/characters/rauf.js"></script>
+    <script src="../Script/data/characters/reemerlino.js"></script>
+    <script src="../Script/data/characters/ruggiero.js"></script>
+    <script src="../Script/data/characters/saad.js"></script>
+    <script src="../Script/data/characters/salvatoreprog.js"></script>
+    <script src="../Script/data/characters/sat.js"></script>
+    <script src="../Script/data/characters/savina.js"></script>
+    <script src="../Script/data/characters/savinaf2.js"></script>
+    <script src="../Script/data/characters/serghej.js"></script>
+    <script src="../Script/data/characters/simonemenza.js"></script>
+    <script src="../Script/data/characters/solieri.js"></script>
+    <script src="../Script/data/characters/tania.js"></script>
+    <script src="../Script/data/characters/telemaco.js"></script>
+    <script src="../Script/data/characters/tudor.js"></script>
+    <script src="../Script/data/characters/valentinafanti.js"></script>
+    <script src="../Script/data/characters/venturini.js"></script>
+    <script src="../Script/data/characters/index.js"></script>
+    <!-- Personaggi: un file per ciascuno (aggiungi qui nuovi personaggi) -->
+>>>>>>> origin
     <!-- Index che assembla pokemonDatabase dai file sopra -->
     <script src="../Script/data/characters/index.js"></script>
     <script src="../Script/data/mappe.js"></script>
