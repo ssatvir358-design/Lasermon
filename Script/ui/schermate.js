@@ -47,16 +47,9 @@ function mostraSelezione() {
     const contenitore = document.getElementById("contenitore-starter");
     contenitore.innerHTML = "";
     
-    // Cerca i personaggi definiti come starter in CONFIG_STARTER
-    let starerDisponibili = pokemonDatabase.filter(p => CONFIG_STARTER.map(n => n.toLowerCase()).includes(p.nome.toLowerCase()));
-    
-    // Per sicurezza, se non ne trova 3, prende i primi 3
-    if (starerDisponibili.length < 3) {
-        starerDisponibili = pokemonDatabase.slice(0, 3);
-    }
-    
+    // I primi 3 elementi del DB sono fissi come starter
     for (let i = 0; i < 3; i++) {
-        let infoBase = starerDisponibili[i];
+        let infoBase = pokemonDatabase[i]; 
         let p = creaPokemon(infoBase, 5, 1); // Starter: livello 5, mossa 1
 
         let colonna = document.createElement("div");
@@ -188,18 +181,12 @@ function apriPannelloZainoMappa() {
             divItem.className = "card-item-shop";
             divItem.style.cursor = "default";
             
-            const fullItem = item.dbId ? (typeof getOggettoDb === "function" ? getOggettoDb(item.dbId) : DB_OGGETTI.find(o => o.id === item.dbId)) : item;
-            const quantitaStr = item.quantita && item.quantita > 1 ? ` (x${item.quantita})` : "";
-            const itemNome = fullItem ? fullItem.nome : "Oggetto Sconosciuto";
-            const itemDesc = fullItem ? fullItem.descrizione : "Nessuna descrizione.";
-            const itemCat = fullItem ? fullItem.categoria : "";
-            
             let htmlInner = `
-                <div style="font-weight: bold; color: #f1c40f;">${itemNome}${quantitaStr}</div>
-                <div style="font-size: 12px; margin: 5px 0; color: #ddd;">${itemDesc}</div>
+                <div style="font-weight: bold; color: #f1c40f;">${item.nome}</div>
+                <div style="font-size: 12px; margin: 5px 0; color: #ddd;">${item.descrizione || "Nessuna descrizione."}</div>
             `;
             
-            if (itemCat === "equipaggiabile") {
+            if (item.categoria === "equipaggiabile") {
                 let opzioni = miaSquadra.map((p, i) => `<option value="${i}">${p.nome}</option>`).join("");
                 htmlInner += `
                     <div style="margin-top: 10px; display: flex; gap: 5px;">
@@ -230,8 +217,7 @@ function equipaggiaDaZaino(indexZaino) {
     
     let pIndex = parseInt(select.value);
     let p = miaSquadra[pIndex];
-    let itemInZaino = zaino[indexZaino];
-    let fullItem = itemInZaino.dbId ? (typeof getOggettoDb === "function" ? getOggettoDb(itemInZaino.dbId) : DB_OGGETTI.find(o => o.id === itemInZaino.dbId)) : itemInZaino;
+    let item = zaino[indexZaino];
     
     // Controlla se il pokemon ha già raggiunto il limite di oggetti
     if (p.oggetti && p.oggetti.length >= 1) {
@@ -241,14 +227,10 @@ function equipaggiaDaZaino(indexZaino) {
     }
     
     // Aggiungi l'item al pokemon
-    p.oggetti.push(fullItem);
+    p.oggetti.push(item);
     
     // Rimuovi l'item dallo zaino
-    if (itemInZaino.quantita && itemInZaino.quantita > 1) {
-        itemInZaino.quantita--;
-    } else {
-        zaino.splice(indexZaino, 1);
-    }
+    zaino.splice(indexZaino, 1);
     
     // Riapplica i bonus statistici
     if (typeof applicaBonusOggetti === "function") {
@@ -257,7 +239,7 @@ function equipaggiaDaZaino(indexZaino) {
     
     // Notifica visiva (opzionale)
     let log = document.getElementById("console-log");
-    if (log) log.innerHTML = `🛡️ ${fullItem.nome} equipaggiato a ${p.nome}!`;
+    if (log) log.innerHTML = `✅ ${item.nome} equipaggiato a ${p.nome}!`;
     
     // Ricarica la schermata
     aggiornaSquadraMappa();

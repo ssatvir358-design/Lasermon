@@ -400,12 +400,10 @@
     left: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    /*object-fit: cover !important;
-    */opacity: 0;
+    object-fit: cover !important;
+    opacity: 0;
     transform: scale(1.2);
     animation: comparsaBossSfondo 1.5s forwards ease-in-out;
-    object-fit: contain;
-    object-position: center bottom;
 }
 
 /* Contenitore sopraelevato per la scritta (spostato leggermente verso il basso) */
@@ -428,6 +426,14 @@
     animation: comparsaScrittaBoss 1s 0.8s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+/* GESTIONE DELLO ZOOM NELLA SCHERMATA INTRO DEL BOSS */
+.boss-bg-animato {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Sostituito cover con contain per non tagliare l'immagine */
+    object-position: center bottom; /* Tiene ancorata la base del boss in basso */
+}
 
 /* Keyframes Animazioni */
 @keyframes comparsaBossSfondo {

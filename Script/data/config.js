@@ -3,49 +3,34 @@
 // Estratto da script.js (righe 65-112 + 214-222)
 // ==========================================================
 
-const CONFIG_STARTER = ["Fabio", "Gian", "Arman"];
-
 // Moltiplicatore globale per rarità: più raro = cresce più in fretta per livello
 const CONFIG_MOLTIPLICATORE_RARITA = {
     "comune": 1.00,
     "non comune": 1.12,
-    "raro": 1.30,
+    "raro": 1.3,
     "epico": 1.55,
-    "leggendario": 1.80,
-    "bombers": 2.10,
-    "special": 2.30
+    "leggendario": 1.8,
+    "bombers": 2.1,      
+    "special": 2.3    
 };
 
 // Scaling delle statistiche base in funzione dell'elemento
 const CONFIG_STAT_ELEMENTO = {
-    "fuoco":  { hp: 1, atk: 1.05, def: 0.98, atkSpec: 1.05, defSpec: 0.98, vel: 1 },
-    "erba":  { hp: 1.04, atk: 1, def: 1, atkSpec: 1, defSpec: 1.04, vel: 0.98 },
-    "acqua":  { hp: 1, atk: 0.98, def: 1.05, atkSpec: 0.98, defSpec: 1.05, vel: 1 },
-    "ghiaccio":  { hp: 1, atk: 0.95, def: 0.95, atkSpec: 1.06, defSpec: 1.04, vel: 1 },
-    "volante":  { hp: 0.95, atk: 1.05, def: 0.98, atkSpec: 0.95, defSpec: 0.95, vel: 1.12 },
-    "veleno":  { hp: 1.04, atk: 0.96, def: 1, atkSpec: 1.02, defSpec: 1.02, vel: 0.96 },
-    "elettro":  { hp: 0.95, atk: 0.95, def: 0.94, atkSpec: 1.1, defSpec: 1, vel: 1.06 },
-    "terra":  { hp: 1.06, atk: 1.04, def: 1.12, atkSpec: 0.85, defSpec: 0.95, vel: 0.98 },
-    "lotta":  { hp: 1.04, atk: 1.12, def: 1, atkSpec: 0.85, defSpec: 0.95, vel: 1.04 },
-    "normale":  { hp: 1, atk: 1, def: 1, atkSpec: 1, defSpec: 1, vel: 1 },
-    "luce":  { hp: 1, atk: 1.1, def: 1, atkSpec: 1.1, defSpec: 1, vel: 1 },
-    "buio":  { hp: 1, atk: 1.1, def: 1, atkSpec: 1.1, defSpec: 1, vel: 1 }
+    "fuoco": { hp: 1.00,  atk: 1.05,  def: 0.98,  vel: 1.00 },
+    "erba":  { hp: 1.04,  atk: 1.00,  def: 1.00,  vel: 0.98 },
+    "acqua": { hp: 1.00,  atk: 0.98,  def: 1.05,  vel: 1.00 },
+    "luce":  { hp: 1.05,  atk: 0.95,  def: 1.05,  vel: 1.00 },
+    "buio":  { hp: 0.95,  atk: 1.04,  def: 0.94,  vel: 1.05 }
 };
 
 // Moltiplicatori di danno (Attaccante >> Difensore)
+// Se uno scontro non è in questa lista (es. Fuoco vs Fuoco), il moltiplicatore è 1.0 (Normale)
 const CONFIG_DEBOLEZZE = {
-    "fuoco": { "erba": 1.5, "acqua": 0.5, "terra": 0.5, "ghiaccio": 1.5, "luce": 0.75 },
-    "erba": { "fuoco": 0.5, "acqua": 1.5, "volante": 0.5, "terra": 1.5, "ghiaccio": 0.5, "luce": 0.75 },
-    "acqua": { "fuoco": 1.5, "erba": 0.5, "terra": 1.5, "elettro": 0.5, "luce": 0.75 },
-    "volante": { "erba": 1.5, "ghiaccio": 0.5, "elettro": 0.5, "lotta": 1.5, "luce": 0.75 },
-    "terra": { "fuoco": 1.5, "erba": 0.5, "acqua": 0.5, "volante": 0.25, "elettro": 1.5, "luce": 0.75 },
-    "ghiaccio": { "fuoco": 0.5, "erba": 1.5, "volante": 1.5, "lotta": 0.5, "luce": 0.75 },
-    "elettro": { "erba": 0.5, "acqua": 1.5, "volante": 1.5, "terra": 0.5, "ghiaccio": 0.25, "luce": 0.75 },
-    "veleno": { "erba": 1.5, "terra": 0.5, "ghiaccio": 0.25, "lotta": 1.5, "luce": 0.75 },
-    "lotta": { "volante": 0.5, "ghiaccio": 1.5, "veleno": 0.5, "normale": 1.5, "luce": 0.75 },
-    "normale": { "lotta": 0.5 },
-    "luce": { "buio": 1.5 },
-    "buio": { "luce": 1.5 }
+    "fuoco": { "erba": 1.5, "acqua": 0.5, "buio": 1.25, "luce": 0.5 },
+    "erba":  { "acqua": 1.5, "fuoco": 0.5, "buio": 1.25, "luce": 0.5 },
+    "acqua": { "fuoco": 1.5, "erba": 0.5, "buio": 1.25, "luce": 0.5 },
+    "buio":  { "luce": 1.5, "fuoco": 1.5, "erba": 1.5, "acqua": 1.5 },
+    "luce":  { "buio": 1.5, "fuoco": 0.75, "erba": 0.75, "acqua": 0.75 }
 };
 
 // Probabilità di spawn e colore badge per ogni rarità
