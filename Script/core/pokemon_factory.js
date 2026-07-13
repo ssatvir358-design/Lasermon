@@ -135,19 +135,12 @@ function creaPokemon(infoBase, livello, livelloMossa = 1) {
     const molEvo = infoBase.moltiplicatoreEvoluzione || 1.0;
     
     // Calcolo statistiche con le formule definite sopra
-<<<<<<< HEAD
-    const hpMax = calcolaHP(infoBase.hpBase,  livello, statsElem.hp,  molRar);
-    const atk   = calcolaStat(infoBase.atkBase, livello, statsElem.atk, molRar);
-    const def   = calcolaStat(infoBase.defBase, livello, statsElem.def, molRar);
-    const vel   = calcolaStat(infoBase.velBase, livello, statsElem.vel, molRar);
-=======
     const hpMax = calcolaHP(infoBase.hpBase,  livello, statsElem.hp,  molRar, molEvo);
     const atk   = calcolaStat(infoBase.atkBase, livello, statsElem.atk, molRar, molEvo);
     const def   = calcolaStat(infoBase.defBase, livello, statsElem.def, molRar, molEvo);
     const atkSpec = calcolaStat(infoBase.atkSpec || infoBase.atkBase, livello, statsElem.atkSpec || statsElem.atk, molRar, molEvo);
     const defSpec = calcolaStat(infoBase.defSpec || infoBase.defBase, livello, statsElem.defSpec || statsElem.def, molRar, molEvo);
     const vel   = calcolaStat(infoBase.velBase, livello, statsElem.vel, molRar, molEvo);
->>>>>>> origin
 
     const p = {
         nome:         infoBase.nome,
@@ -157,12 +150,16 @@ function creaPokemon(infoBase, livello, livelloMossa = 1) {
         baseHpMax:    hpMax,
         baseAtk:      atk,
         baseDef:      def,
+        baseAtkSpec:  atkSpec,
+        baseDefSpec:  defSpec,
         baseVel:      vel,
         // Valori finali (inizializzati con i base, aggiornati da applicaBonusOggetti)
         hpMax:        hpMax,
         hpAttuali:    hpMax, // Attenzione: applicaBonusOggetti potrebbe aumentare questo proporzionalmente
         atk:          atk,
         def:          def,
+        atkSpec:      atkSpec,
+        defSpec:      defSpec,
         vel:          vel,
         raritaTipo:   infoBase.raritaTipo,
         elemento:     elementoPkm,
@@ -199,9 +196,11 @@ function applicaBonusOggetti(p) {
     p.hpMax = p.baseHpMax;
     p.atk   = p.baseAtk;
     p.def   = p.baseDef;
+    p.atkSpec = p.baseAtkSpec || p.atk; // Fallback
+    p.defSpec = p.baseDefSpec || p.def; // Fallback
     p.vel   = p.baseVel;
     
-    p.bonus = { hp: 0, atk: 0, def: 0, vel: 0 };
+    p.bonus = { hp: 0, atk: 0, def: 0, atkSpec: 0, defSpec: 0, vel: 0 };
     
     if (!p.oggetti || p.oggetti.length === 0) return;
     
@@ -211,6 +210,8 @@ function applicaBonusOggetti(p) {
         if (statName === "hp") baseVal = p.baseHpMax;
         if (statName === "atk") baseVal = p.baseAtk;
         if (statName === "def") baseVal = p.baseDef;
+        if (statName === "atkSpec") baseVal = p.baseAtkSpec;
+        if (statName === "defSpec") baseVal = p.baseDefSpec;
         if (statName === "vel") baseVal = p.baseVel;
         
         let diff = 0;
@@ -223,6 +224,8 @@ function applicaBonusOggetti(p) {
         if (statName === "hp") p.bonus.hp += diff;
         if (statName === "atk") p.bonus.atk += diff;
         if (statName === "def") p.bonus.def += diff;
+        if (statName === "atkSpec") p.bonus.atkSpec += diff;
+        if (statName === "defSpec") p.bonus.defSpec += diff;
         if (statName === "vel") p.bonus.vel += diff;
     };
     
@@ -245,6 +248,8 @@ function applicaBonusOggetti(p) {
                 addStat("hp", obj.valoreType, obj.valore);
                 addStat("atk", obj.valoreType, obj.valore);
                 addStat("def", obj.valoreType, obj.valore);
+                addStat("atkSpec", obj.valoreType, obj.valore);
+                addStat("defSpec", obj.valoreType, obj.valore);
                 addStat("vel", obj.valoreType, obj.valore);
             }
             // Stat bonus extra
@@ -262,12 +267,16 @@ function applicaBonusOggetti(p) {
     p.hpMax += p.bonus.hp;
     p.atk   += p.bonus.atk;
     p.def   += p.bonus.def;
+    p.atkSpec += p.bonus.atkSpec;
+    p.defSpec += p.bonus.defSpec;
     p.vel   += p.bonus.vel;
     
     // Evita valori negativi o nulli per errore
     if (p.hpMax < 1) p.hpMax = 1;
     if (p.atk < 0) p.atk = 0;
     if (p.def < 0) p.def = 0;
+    if (p.atkSpec < 0) p.atkSpec = 0;
+    if (p.defSpec < 0) p.defSpec = 0;
     if (p.vel < 0) p.vel = 0;
     
     // Assicurati che gli HP attuali non superino il nuovo max
@@ -315,6 +324,8 @@ function aggiornaStatsLivello(p, nuoviLivelli) {
     const nuovoHpMax = calcolaHP(p.infoBase.hpBase,  nuovoLivello, statsElem.hp,  molRar);
     const nuovoAtk   = calcolaStat(p.infoBase.atkBase, nuovoLivello, statsElem.atk, molRar);
     const nuovoDef   = calcolaStat(p.infoBase.defBase, nuovoLivello, statsElem.def, molRar);
+    const nuovoAtkSpec = calcolaStat(p.infoBase.atkSpec || 1, nuovoLivello, statsElem.atkSpec || 1, molRar);
+    const nuovoDefSpec = calcolaStat(p.infoBase.defSpec || 1, nuovoLivello, statsElem.defSpec || 1, molRar);
     const nuovaVel   = calcolaStat(p.infoBase.velBase, nuovoLivello, statsElem.vel, molRar);
 
     // -------------------------------------------------------------------
@@ -340,6 +351,8 @@ function aggiornaStatsLivello(p, nuoviLivelli) {
     p.baseHpMax   = nuovoHpMax;
     p.baseAtk     = nuovoAtk;
     p.baseDef     = nuovoDef;
+    p.baseAtkSpec = nuovoAtkSpec;
+    p.baseDefSpec = nuovoDefSpec;
     p.baseVel     = nuovaVel;
     
     // Riapplica i bonus oggetti per calcolare le finali
@@ -369,19 +382,12 @@ function forzaLivello(p, nuovoLivello) {
 
     // Ricalcola SEMPRE da zero, ignorando il livello corrente
     p.livello    = nuovoLivello;
-<<<<<<< HEAD
-    p.baseHpMax  = calcolaHP   (p.infoBase.hpBase,  nuovoLivello, statsElem.hp,  molRar);
-    p.baseAtk    = calcolaStat (p.infoBase.atkBase, nuovoLivello, statsElem.atk, molRar);
-    p.baseDef    = calcolaStat (p.infoBase.defBase, nuovoLivello, statsElem.def, molRar);
-    p.baseVel    = calcolaStat (p.infoBase.velBase, nuovoLivello, statsElem.vel, molRar);
-=======
     p.baseHpMax  = calcolaHP   (p.infoBase.hpBase,  nuovoLivello, statsElem.hp,  molRar, molEvo);
     p.baseAtk    = calcolaStat (p.infoBase.atkBase, nuovoLivello, statsElem.atk, molRar, molEvo);
     p.baseDef    = calcolaStat (p.infoBase.defBase, nuovoLivello, statsElem.def, molRar, molEvo);
     p.baseAtkSpec = calcolaStat(p.infoBase.atkSpec || p.infoBase.atkBase, nuovoLivello, statsElem.atkSpec || statsElem.atk, molRar, molEvo);
     p.baseDefSpec = calcolaStat(p.infoBase.defSpec || p.infoBase.defBase, nuovoLivello, statsElem.defSpec || statsElem.def, molRar, molEvo);
     p.baseVel    = calcolaStat (p.infoBase.velBase, nuovoLivello, statsElem.vel, molRar, molEvo);
->>>>>>> origin
     
     applicaBonusOggetti(p);
     p.hpAttuali  = p.hpMax;
