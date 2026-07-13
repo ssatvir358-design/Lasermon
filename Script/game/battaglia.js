@@ -10,7 +10,7 @@
 const CONFIG_LEVEL_UP = {
     cespuglio: 1,  // +1 livello dopo erba alta
     npc:       2,  // +2 livelli dopo sfida allenatore
-    boss:      2   // +2 livelli dopo boss (separato da npc per futura personalizzazione)
+    boss:      3   // +3 livelli dopo boss
 };
 
 
@@ -114,6 +114,8 @@ function mandaInCampoMioPokemon() {
 // ----------------------------------------------------------
 function abilitaControlliGiocatore() {
     document.getElementById("btn-attacco").disabled = false;
+    document.getElementById("btn-pokemon").disabled = false;
+    document.getElementById("btn-fuga").disabled = false;
     resettaItemTurno();      // Resetta il flag "item già usato"
     aggiornaStatoBtnItem();  // Aggiorna stato bottone item
 }
@@ -194,6 +196,8 @@ function preparaIncontroBattaglia(tipoEvento, elementoFiltro = null) {
             document.getElementById("console-log").innerHTML =
                 `Il nemico è più veloce! ${nemicoPokemon.nome} attacca per primo!`;
             document.getElementById("btn-attacco").disabled = true;
+            document.getElementById("btn-pokemon").disabled = true;
+            document.getElementById("btn-fuga").disabled = true;
             aggiornaStatoBtnItem();
             setTimeout(turnoNemico, 1500);
         } else {
@@ -227,6 +231,8 @@ function turnoGiocatore() {
     }
     if (document.getElementById("btn-attacco").disabled) return;
     document.getElementById("btn-attacco").disabled = true;
+    document.getElementById("btn-pokemon").disabled = true;
+    document.getElementById("btn-fuga").disabled = true;
     aggiornaStatoBtnItem(); // Disabilita item button mentre attacca
 
     // Controlla ULT bombers (5% prob)
@@ -788,6 +794,8 @@ function avviaBossBattle(idBoss) {
                 document.getElementById("console-log").innerHTML =
                     `Il Boss <strong>${nemicoPokemon.nome}</strong> è più veloce e attacca per primo!`;
                 document.getElementById("btn-attacco").disabled = true;
+                document.getElementById("btn-pokemon").disabled = true;
+                document.getElementById("btn-fuga").disabled = true;
                 aggiornaStatoBtnItem();
                 setTimeout(turnoNemico, 1500);
             } else {
@@ -974,7 +982,7 @@ function applicaEffettoElementaleLv3(attaccante, bersaglio, elemento) {
             break;
         case "VELENO":
             // Avvelenamento: 15% max HP per 3 turni
-            effettiAttivi[targetId].veleno = { durata: 3, dannoFisso: Math.max(1, Math.round(bersaglio.hpBase * 0.15)) };
+            effettiAttivi[targetId].veleno = { durata: 3, dannoFisso: Math.max(1, Math.round(bersaglio.hpMax * 0.15)) };
             msg = `<br>☠️ ${bersaglio.nome} è stato avvelenato!`;
             break;
         case "LOTTA":

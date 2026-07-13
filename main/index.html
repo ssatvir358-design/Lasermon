@@ -222,7 +222,7 @@
                         <button id="btn-item" class="btn-action" onclick="apriPannelloItemBattaglia()" disabled>
                             <img src="../Sprite/UI/Combattimento/zaino.png" class="btn-icon"> ZAINO
                         </button>
-                        <button id="btn-pokemon" class="btn-action" onclick="" disabled>
+                        <button id="btn-pokemon" class="btn-action" onclick="apriSchermataPokemonBattaglia()" disabled>
                             <img src="../Sprite/UI/Combattimento/leone.png" class="btn-icon"> POKÉMON
                         </button>
                         <button id="btn-fuga" class="btn-action" onclick="fugaBattaglia()">
@@ -327,7 +327,11 @@
                     <select id="select-posizione" class="select-stile-retro" onchange="eseguiScambioPosizione()"></select>
                 </div>
 
-                <button class="btn-battle btn-win" onclick="cambiaSchermata('schermata-dettaglio', 'schermata-mappa')" style="margin-top: 15px; width: 100%;">CHIUDI</button>
+                <div id="blocco-cambio-in-battaglia" style="display:none; width: 100%; text-align: center; margin-top: 10px;">
+                    <button class="btn-battle" id="btn-esegui-cambio-battaglia" onclick="eseguiCambioInBattaglia()" style="background-color: #f39c12; width: 100%;">MANDA IN CAMPO</button>
+                </div>
+
+                <button class="btn-battle btn-win" onclick="chiudiDettaglio()" style="margin-top: 15px; width: 100%;">CHIUDI</button>
             </div>
         </div>
     </div>
@@ -340,6 +344,7 @@
                 Scegli quale Pokémon della tua squadra vuoi potenziare (Max Lvl 3):
             </p>
             <div id="contenitore-opzioni-disco" class="griglia-opzioni-disco"></div>
+            <button class="btn-battle" onclick="cambiaSchermata('schermata-disco', 'schermata-mappa'); aggiornaSquadraMappa();" style="background-color: #e74c3c; width: 100%; max-width: 300px; margin: 20px auto 0; display: block;">Lascia il disco (Indietro)</button>
         </div>
     </div>
 

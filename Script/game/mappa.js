@@ -192,6 +192,28 @@ function generaMappaAlbero() {
                     const nodoObj = alberoMappa[pianoIndex][i];
                     if (nodoObj && nodoObj.elementoNpc) {
                         bottone.setAttribute("data-tooltip", `Tipo: ${nodoObj.elementoNpc}`);
+                        
+                        // Rimuoviamo il background standard per non interferire
+                        bottone.style.setProperty('background-image', 'none', 'important');
+                        bottone.style.setProperty('background-color', 'transparent', 'important');
+                        bottone.style.position = 'relative';
+                        // Permettiamo al contenuto interno di fuoriuscire dai bordi 50x50
+                        bottone.style.overflow = 'visible';
+                        
+                        let imgChibi = document.createElement("img");
+                        imgChibi.src = `../Sprite/nodi/Chibi NPC/chibi_${nodoObj.elementoNpc.toLowerCase()}_1.png`;
+                        imgChibi.style.position = "absolute";
+                        imgChibi.style.width = "120px";
+                        imgChibi.style.height = "120px";
+                        // Centriamo l'immagine 80x80 nel bottone 50x50 ( (80-50)/2 = 15 )
+                        imgChibi.style.top = "-35px";
+                        imgChibi.style.left = "-35px";
+                        // Fondamentale: i click passano attraverso l'immagine fino al bottone
+                        imgChibi.style.pointerEvents = "none";
+                        // Aggiungiamo l'ombra per farla sembrare un nodo
+                        imgChibi.style.filter = "drop-shadow(0px 4px 6px rgba(0,0,0,0.5))";
+                        
+                        bottone.appendChild(imgChibi);
                     }
                 }
 
