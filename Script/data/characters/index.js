@@ -1,23 +1,70 @@
-// Script/data/characters/index.js
-
-// 1. Definiamo l'array inizialmente vuoto
-const pokemonDatabase = [];
-
-// 2. Usiamo una funzione per trovare tutti i personaggi caricati
-function inizializzaDatabaseDinamico() {
-    // Cicla tutte le proprietà dell'oggetto globale window
-    for (const key in window) {
-        // Controlla se la proprietà inizia con il prefisso dei tuoi personaggi
-        if (key.startsWith("CHAR_")) {
-            pokemonDatabase.push(window[key]);
-        }
-    }
-    
-    // Opzionale: puoi ordinarli per nome
-    pokemonDatabase.sort((a, b) => a.nome.localeCompare(b.nome));
-    
-    console.log("Database caricato, totale Pokémon:", pokemonDatabase.length);
-}
-
-// 3. Eseguiamo la funzione subito dopo il caricamento degli script
-inizializzaDatabaseDinamico();
+// characters/index.js
+const pokemonDatabase = [
+    CHAR_FABIO,
+    CHAR_FALCO,
+    CHAR_ARMAN,
+    CHAR_GIAN,
+    CHAR_MONICA,
+    CHAR_RUGGIERO,
+    CHAR_BUSSOLOTTI,
+    CHAR_BELLINI,
+    CHAR_TUDOR,
+    CHAR_SOLIERI,
+    CHAR_DONATO,
+    CHAR_VENTURINI,
+    CHAR_CARRA,
+    CHAR_GIULIO,
+    CHAR_MATTIAF1,
+    CHAR_PAOLO,
+    CHAR_LANZA,
+    CHAR_DINICOLA,
+    CHAR_FILIPPO,
+    CHAR_NICOLAS,
+    CHAR_TANIA,
+    CHAR_ALTIMANI,
+    CHAR_SAAD,
+    CHAR_MANUELA,
+    CHAR_MACCIONIF1,
+    CHAR_SAVINAF1,
+    CHAR_BACCHI,
+    CHAR_MATTIASPED,
+    CHAR_RAUF,
+    CHAR_TELEMACO,
+    CHAR_DANILOF1,
+    CHAR_SALVATOREPROG,
+    CHAR_NICOLÒ,
+    CHAR_ALEXSPED,
+    CHAR_CAMMALLERI,
+    CHAR_BOTTURA,
+    CHAR_GRAZIANI,
+    CHAR_LONCONSOLE,
+    CHAR_GHANDU,
+    CHAR_NICONEGRI,
+    CHAR_CONTINI,
+    CHAR_BOTTARDI,
+    CHAR_PAOLA,
+    CHAR_PARONI,
+    CHAR_CARNEVALIFEDERICA,
+    CHAR_VALENTINAFANTI,
+    CHAR_SERGHEJ,
+    CHAR_BABBONATALE,
+    CHAR_SIMONEMENZÀ,
+    CHAR_REEMERLINO,
+    CHAR_ANSELMO,
+    CHAR_NONAMEDONNA,
+    CHAR_NONAMEUOMO,
+    CHAR_BONACINA,
+    CHAR_CAPILUPPI,
+    CHAR_DANILOF2,
+    CHAR_MACCIONEF2,
+    CHAR_SAVINAF2,
+    CHAR_MATTIAF2,
+    CHAR_GIULIA,
+    CHAR_GIO,
+    CHAR_SAT,
+    CHAR_KUL,
+    CHAR_EDO,
+    CHAR_MAXF1,
+    CHAR_MAXF2,
+    CHAR_MAXF3
+];
