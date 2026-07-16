@@ -1,2 +1,2 @@
 // ===== RE E MERLINO =====
-const CHAR_REEMERLINO = { nome: "Re e Merlino", hpBase: 10, atkBase: 4, defBase: 5, atkSpec: 5, defSpec: 7, velBase: 5, raritaTipo: "epico", elemento: "terra", immagine: "../Sprite/personaggi/ReeMerlino/ReeMerlino.jpeg", immagineAtk: "../Sprite/personaggi/ReeMerlino/ReeMerlino_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "Attacco 3", boss: false };
+const CHAR_REEMERLINO = { nome: "Re e Merlino", hpBase: 10, atkBase: 4, defBase: 5, atkSpec: 5, defSpec: 7, velBase: 5, raritaTipo: "epico", elemento: "terra", immagine: "../Sprite/personaggi/ReeMerlino/ReeMerlino.jpeg", immagineAtk: "../Sprite/personaggi/ReeMerlino/ReeMerlino_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "|", boss: false };

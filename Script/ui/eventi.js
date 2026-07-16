@@ -1,12 +1,12 @@
 // ==========================================================
-// eventi.js — Gestione eventi speciali della mappa
+// eventi.js \u2014 Gestione eventi speciali della mappa
 // Estratto da script.js (righe 1820-2014)
 // Dipendenze: stato.js, pokemon_factory.js, schermate.js
 // ==========================================================
 
 // ================= EVENTO POKEBALL =================
 
-// Apre la schermata di selezione Pokéball (3 opzioni casuali)
+// Apre la schermata di selezione Pok\u{00e9ba}ll (3 opzioni casuali)
 function generaOpzioniPokeball() {
     cambiaSchermata("schermata-mappa", "schermata-selezione");
     
@@ -14,7 +14,7 @@ function generaOpzioniPokeball() {
     if (btnTornaLobby) btnTornaLobby.style.display = "none";
     
     let titolo = document.getElementById("titolo-selezione");
-    if (titolo) titolo.innerText = "Una Pokéball! Scegli chi unire alla squadra o prosegui.";
+    if (titolo) titolo.innerText = "Una Pok\u{00e9ba}ll! Scegli chi unire alla squadra o prosegui.";
     
     generaOpzioniPokemon(3, false);
 
@@ -49,7 +49,7 @@ function generaOpzioniPokeball() {
 
 // ================= EVENTO SCAMBIO =================
 
-// Avvia la schermata dello scambio Pokémon (mostra la squadra selezionabile)
+// Avvia la schermata dello scambio Pok\u00e9mon (mostra la squadra selezionabile)
 function avviaEventoScambio() {
     document.getElementById("scambio-fase-selezione").style.display = "block";
     document.getElementById("scambio-fase-risultato").style.display = "none";
@@ -68,9 +68,11 @@ function avviaEventoScambio() {
         
         scheda.innerHTML = `
             <div class="foto-disco-pkm"><img src="${p.immagine}"></div>
-            <div class="info-disco-pkm">
-                <div class="nome-disco-pkm" style="font-size: 16px;">${p.nome}</div>
-                <div style="font-family: monospace;">Lvl. ${p.livello}</div>
+            <div class="info-disco-pkm" style="width: 100%;">
+                <div class="nome-disco-pkm" style="font-size: 16px; margin-bottom: 5px;">${p.nome} <span style="font-size:12px">(${p.elemento.toUpperCase()})</span></div>
+                <div style="font-family: monospace; font-size: 12px; margin-bottom: 2px;">Lvl: ${p.livello} | HP: ${p.hpAttuali}/${p.hpMax}</div>
+                <div style="font-family: monospace; font-size: 12px;">ATK: ${p.atk} | DEF: ${p.def} | VEL: ${p.vel}</div>
+                <div style="font-family: monospace; font-size: 12px;">SP.ATK: ${p.atkSpec} | SP.DEF: ${p.defSpec}</div>
             </div>
         `;
         contenitoreSquadra.appendChild(scheda);
@@ -79,10 +81,10 @@ function avviaEventoScambio() {
     cambiaSchermata("schermata-mappa", "schermata-scambio");
 }
 
-// Variabile globale nel file per tracciare il pokémon ottenuto dallo scambio
+// Variabile globale nel file per tracciare il pok\u00e9mon ottenuto dallo scambio
 let _ultimoScambiato = null;
 
-// Esegue il cambio diretto: rimuove il Pokémon scelto e aggiunge uno casuale di livello superiore
+// Esegue il cambio diretto: rimuove il Pok\u00e9mon scelto e aggiunge uno casuale di livello superiore
 function eseguiScambioDiretto(indexDaScambiare) {
     let vecchioPkm = miaSquadra[indexDaScambiare];
 
@@ -97,7 +99,7 @@ function eseguiScambioDiretto(indexDaScambiare) {
         });
     }
 
-    let bonusLivelli = 2; // Il nuovo Pokémon riceve +2 livelli rispetto a quello ceduto
+    let bonusLivelli = 2; // Il nuovo Pok\u00e9mon riceve +2 livelli rispetto a quello ceduto
     let nuovoLivello = vecchioPkm.livello + bonusLivelli;
 
     let nuovoInfoBase = pescaPokemonCasuale([vecchioPkm.nome]); 
@@ -113,11 +115,13 @@ function eseguiScambioDiretto(indexDaScambiare) {
 
     let contenitoreCard = document.getElementById("card-nuovo-pokemon");
     contenitoreCard.innerHTML = `
-        <div class="scheda-disco-pokemon" style="background-color: ${nuovoPkm.colore}; cursor: default; transform: scale(0.9); height: auto;">
+        <div class="scheda-disco-pokemon" style="background-color: ${nuovoPkm.colore}; cursor: default; transform: scale(0.9); height: auto; flex-direction: column;">
             <div class="foto-disco-pkm"><img src="${nuovoPkm.immagine}"></div>
-            <div class="info-disco-pkm">
+            <div class="info-disco-pkm" style="text-align: center; width: 100%;">
                 <div class="nome-disco-pkm">${nuovoPkm.nome}</div>
-                <div style="font-family: monospace; font-size: 16px;">Lvl. ${nuovoPkm.livello}</div>
+                <div style="font-family: monospace; font-size: 14px; margin-top: 5px;">Lvl: ${nuovoPkm.livello} | HP: ${nuovoPkm.hpAttuali}/${nuovoPkm.hpMax}</div>
+                <div style="font-family: monospace; font-size: 14px;">ATK: ${nuovoPkm.atk} | DEF: ${nuovoPkm.def} | VEL: ${nuovoPkm.vel}</div>
+                <div style="font-family: monospace; font-size: 14px;">SP.ATK: ${nuovoPkm.atkSpec} | SP.DEF: ${nuovoPkm.defSpec}</div>
                 <div style="font-size: 13px; color: #27ae60; font-weight: bold; margin-top: 5px;">TIPO: ${nuovoPkm.elemento.toUpperCase()}</div>
             </div>
         </div>
@@ -131,9 +135,9 @@ function annullaScambio() {
 }
 
 // Chiude la schermata di scambio dopo aver confermato
-// Se il nuovo Pokémon ha superato un level cap, avvia la selezione perk prima di tornare alla mappa.
+// Se il nuovo Pok\u00e9mon ha superato un level cap, avvia la selezione perk prima di tornare alla mappa.
 function chiudiEventoScambio() {
-    // Trova il Pokémon appena aggiunto (l'ultimo modificato nella squadra).
+    // Trova il Pok\u00e9mon appena aggiunto (l'ultimo modificato nella squadra).
     // La funzione eseguiScambioDiretto salva il riferimento in _ultimoScambiato.
     const nuovoPkm = _ultimoScambiato;
     _ultimoScambiato = null;
@@ -146,7 +150,7 @@ function chiudiEventoScambio() {
     };
 
     if (nuovoPkm) {
-        // Controlla se il nuovo Pokémon supera un level cap → mostra perk se necessario
+        // Controlla se il nuovo Pok\u00e9mon supera un level cap \u2192 mostra perk se necessario
         verificaPerkDopoEvento(nuovoPkm, tornaAMappa);
     } else {
         tornaAMappa();
@@ -255,7 +259,7 @@ function avviaEventoItem() {
 function selezionaItemEvento(item) {
     // Aggiungiamo l'oggetto allo zaino globale
     zaino.push(item);
-    document.getElementById("console-log").innerHTML = `🎁 Hai trovato: ${item.nome}! Aggiunto allo zaino.`;
+    document.getElementById("console-log").innerHTML = `\u{1f381} Hai trovato: ${item.nome}! Aggiunto allo zaino.`;
     
     // Torna alla mappa e riavanza
     cambiaSchermata("schermata-evento-item", "schermata-mappa");

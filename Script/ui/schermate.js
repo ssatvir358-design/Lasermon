@@ -1,11 +1,14 @@
 // ==========================================================
-// schermate.js — Gestione navigazione tra schermate e UI generale
+// schermate.js \u2014 Gestione navigazione tra schermate e UI generale
 // Estratto da script.js (righe 466-503, 1256-1354, 1427-1438, 1481-1545)
 // Dipendenze: stato.js, pokemon_factory.js, audio.js
-// ==========================================================
+// Array globale per contenere temporaneamente i Pok\u00e9mon generati per la scelta
+let opzioniSceltaPokemon = [];
 
-// Cambia visibilità tra due schermate (aggiunge/rimuove classe "attiva")
-// Viene poi "wrappata" più in basso per agganciare la musica automatica
+
+
+// Cambia visibilit\u00e0 tra due schermate (aggiunge/rimuove classe "attiva")
+// Viene poi "wrappata" pi\u00f9 in basso per agganciare la musica automatica
 function cambiaSchermata(idNascondi, idMostra) {
     const elementoNascondi = document.getElementById(idNascondi);
     const elementoMostra = document.getElementById(idMostra);
@@ -29,17 +32,21 @@ cambiaSchermata = function(idNascondi, idMostra) {
         }
     }
     if (idMostra === "schermata-gioco") {
-        // Riproduce la musica normale SOLO se non è una Boss Fight
+        // Riproduce la musica normale SOLO se non \u00e8 una Boss Fight
         if (!isBossFight) {
             riproduciMusica("combattimento.mp3");
         }
     }
 };
 
-// Mostra la schermata di selezione starter (i primi 3 Pokémon del DB)
+// Mostra la schermata di selezione starter (i primi 3 Pok\u00e9mon del DB)
 function mostraSelezione() {
+    if (typeof miaSquadra !== "undefined" && miaSquadra.length > 0) {
+        cambiaSchermata("schermata-start", "schermata-mappa");
+        return;
+    }
     cambiaSchermata("schermata-start", "schermata-selezione");
-    document.getElementById("titolo-selezione").innerText = "Scegli il tuo Pokémon Iniziale";
+    document.getElementById("titolo-selezione").innerText = "Scegli il tuo Pok\u00e9mon Iniziale";
     
     let btnTornaLobby = document.getElementById("btn-torna-lobby");
     if (btnTornaLobby) btnTornaLobby.style.display = "block";
@@ -55,9 +62,11 @@ function mostraSelezione() {
         starerDisponibili = pokemonDatabase.slice(0, 3);
     }
     
+    opzioniSceltaPokemon = []; // Reset
     for (let i = 0; i < 3; i++) {
         let infoBase = starerDisponibili[i];
         let p = creaPokemon(infoBase, 5, 1); // Starter: livello 5, mossa 1
+        opzioniSceltaPokemon[i] = p;
 
         let colonna = document.createElement("div");
         colonna.className = "colonna-starter";
@@ -67,23 +76,23 @@ function mostraSelezione() {
             </div>
             <div class="blocco-stats">
                 <strong>${p.nome}</strong> (${p.raritaTipo.toUpperCase()})<br>
-                • Elemento: ${getHtmlElemento(p.elemento)}<br>
-                • Livello: ${p.livello}<br>
-                • HP: ${p.hpMax}<br>
-                • ATK: ${p.atk}<br>
-                • DEF: ${p.def}<br>
-                • VEL: ${p.vel}<br>
-                • Mossa: ${getNomeMossaAttuale(p)} (Lvl 1)
+                \u2022 Elemento: ${getHtmlElemento(p.elemento)}<br>
+                \u2022 Livello: ${p.livello}<br>
+                \u2022 HP: ${p.hpMax}<br>
+                \u2022 ATK: ${p.atk}<br>
+                \u2022 DEF: ${p.def}<br>
+                \u2022 VEL: ${p.vel}<br>
+                \u2022 Mossa: ${getNomeMossaAttuale(p)} (Lvl 1)
             </div>
             <div class="blocco-pulsante">
-                <button class="btn-scegli" onclick="aggiungiASquadra(${JSON.stringify(p).replace(/"/g, '&quot;')})">SCEGLI</button>
+                <button class="btn-scegli" onclick="aggiungiASquadraDaIndice(${i})">SCEGLI</button>
             </div>
         `;
         contenitore.appendChild(colonna);
     }
 }
 
-// Genera le opzioni Pokémon da scegliere (per Pokéball, non per starter)
+// Genera le opzioni Pok\u00e9mon da scegliere (per Pok\u{00e9ba}ll, non per starter)
 function generaOpzioniPokemon(quanti, isStarter) {
     if (isStarter) return;
 
@@ -91,6 +100,7 @@ function generaOpzioniPokemon(quanti, isStarter) {
     contenitore.innerHTML = "";
     
     let nomiEstratti = [];
+    opzioniSceltaPokemon = []; // Reset
 
     for (let i = 0; i < quanti; i++) {
         let infoBase = pescaPokemonCasuale(nomiEstratti); 
@@ -103,6 +113,7 @@ function generaOpzioniPokemon(quanti, isStarter) {
         let lvlReclutamento = Math.min(maxLvlTeamInizioMappa, maxLvlTeam - 1);
 
         let p = creaPokemon(infoBase, lvlReclutamento, configGenerata.livelloMossa);
+        opzioniSceltaPokemon[i] = p;
 
         let colonna = document.createElement("div");
         colonna.className = "colonna-starter";
@@ -110,20 +121,21 @@ function generaOpzioniPokemon(quanti, isStarter) {
         let bloccoAzioneHTML = "";
         if (miaSquadra.length >= 6) {
             // Squadra piena: mostra select per scegliere chi sostituire
-            let opzioniSostituzione = `<option value="keep">Lascia nella Pokéball (Tienilo così)</option>`;
+            let opzioniSostituzione = `<option value="keep">Lascia nella Pok\u{00e9ba}ll (Tienilo cos\u00ec)</option>`;
             miaSquadra.forEach((membro, idx) => {
-                opzioniSostituzione += `<option value="${idx}">Sostituisci ${membro.nome} (Lvl.${membro.livello})</option>`;
+                let elemento = membro.elemento ? membro.elemento.toUpperCase() : "FUOCO";
+                opzioniSostituzione += `<option value="${idx}">Sostituisci ${membro.nome} (${elemento}) | Lvl.${membro.livello} | HP:${membro.hpAttuali}/${membro.hpMax} | ATK:${membro.atk} DEF:${membro.def} VEL:${membro.vel} SP.ATK:${membro.atkSpec} SP.DEF:${membro.defSpec}</option>`;
             });
             
             bloccoAzioneHTML = `
                 <select id="select-sostituisci-${i}" style="margin-top: 10px; width: 100%; font-size: 14px; padding: 5px;">
                     ${opzioniSostituzione}
                 </select>
-                <button class="btn-scegli" style="margin-top: 5px; width: 100%;" onclick='confermaSceltaConSostituzione(${i}, ${JSON.stringify(p).replace(/'/g, "\\'")})'>CONFERMA</button>
+                <button class="btn-scegli" style="margin-top: 5px; width: 100%;" onclick="confermaSceltaConSostituzioneDaIndice(${i})">CONFERMA</button>
             `;
         } else {
-            // C'è spazio, semplice tasto Scegli
-            bloccoAzioneHTML = `<button class="btn-scegli" onclick='aggiungiASquadra(${JSON.stringify(p).replace(/'/g, "\\'")})'>Scegli</button>`;
+            // C'\u00e8 spazio, semplice tasto Scegli
+            bloccoAzioneHTML = `<button class="btn-scegli" onclick="aggiungiASquadraDaIndice(${i})">Scegli</button>`;
         }
 
         colonna.innerHTML = `
@@ -149,10 +161,22 @@ function generaOpzioniPokemon(quanti, isStarter) {
     }
 }
 
-// Conferma scelta con sostituzione (quando la squadra è piena)
-function confermaSceltaConSostituzione(indiceOpzione, nuovoPokemon) {
+// Aggiunge alla squadra da indice dell'array temporaneo
+function aggiungiASquadraDaIndice(idx) {
+    const p = opzioniSceltaPokemon[idx];
+    if (p) {
+        aggiungiASquadra(p);
+    }
+}
+
+// Conferma scelta con sostituzione da indice dell'array temporaneo
+function confermaSceltaConSostituzioneDaIndice(indiceOpzione) {
     const select = document.getElementById(`select-sostituisci-${indiceOpzione}`);
+    if (!select) return;
     const valoreScelto = select.value;
+    const nuovoPokemon = opzioniSceltaPokemon[indiceOpzione];
+    if (!nuovoPokemon) return;
+
     if (valoreScelto !== "keep") {
         let idxDaRimuovere = parseInt(valoreScelto);
         miaSquadra[idxDaRimuovere] = nuovoPokemon;
@@ -181,7 +205,7 @@ function apriPannelloZainoMappa() {
     contenitore.innerHTML = "";
     
     if (zaino.length === 0) {
-        contenitore.innerHTML = "<p style='color: white; width: 100%; text-align: center;'>Lo zaino è vuoto.</p>";
+        contenitore.innerHTML = "<p style='color: white; width: 100%; text-align: center;'>Lo zaino \u00e8 vuoto.</p>";
     } else {
         zaino.forEach((item, indexZaino) => {
             const divItem = document.createElement("div");
@@ -233,10 +257,10 @@ function equipaggiaDaZaino(indexZaino) {
     let itemInZaino = zaino[indexZaino];
     let fullItem = itemInZaino.dbId ? (typeof getOggettoDb === "function" ? getOggettoDb(itemInZaino.dbId) : DB_OGGETTI.find(o => o.id === itemInZaino.dbId)) : itemInZaino;
     
-    // Controlla se il pokemon ha già raggiunto il limite di oggetti
+    // Controlla se il pokemon ha gi\u00e0 raggiunto il limite di oggetti
     if (p.oggetti && p.oggetti.length >= 1) {
         let log = document.getElementById("console-log-zaino");
-        if (log) log.innerHTML = `<span style="color: #e74c3c;">${p.nome} ha già un oggetto equipaggiato!</span>`;
+        if (log) log.innerHTML = `<span style="color: #e74c3c;">${p.nome} ha gi\u00e0 un oggetto equipaggiato!</span>`;
         return;
     }
     
@@ -257,21 +281,26 @@ function equipaggiaDaZaino(indexZaino) {
     
     // Notifica visiva (opzionale)
     let log = document.getElementById("console-log");
-    if (log) log.innerHTML = `🛡️ ${fullItem.nome} equipaggiato a ${p.nome}!`;
+    if (log) log.innerHTML = `\u{1f6e1}\ufe0f ${fullItem.nome} equipaggiato a ${p.nome}!`;
     
     // Ricarica la schermata
     aggiornaSquadraMappa();
     apriPannelloZainoMappa();
 }
 
-// Aggiunge un Pokémon alla squadra e va alla mappa
+// Aggiunge un Pok\u00e9mon alla squadra e va alla mappa
+let nomeStarterOriginale = null;
+
 function aggiungiASquadra(pObiettivo) {
+    if (miaSquadra.length === 0) {
+        nomeStarterOriginale = pObiettivo.nome;
+    }
     miaSquadra.push(pObiettivo);
     
     const onFatto = () => {
         cambiaSchermata("schermata-selezione", "schermata-mappa");
         if (miaSquadra.length === 1) {
-            generaMappaProcedurale(); // Genera la mappa solo al primo Pokémon scelto
+            generaMappaProcedurale(); // Genera la mappa solo al primo Pok\u00e9mon scelto
         }
         generaMappaAlbero();
         aggiornaSquadraMappa();
@@ -285,8 +314,8 @@ function resettaRunConStarter() {
     if (!miaSquadra || miaSquadra.length === 0) return;
     
     
-    // Recupera l'infoBase del primo pokemon in squadra
-    const starterCorrente = miaSquadra[0].nome;
+    // Recupera l'infoBase dello starter originale, o in fallback del primo pokemon in squadra
+    const starterCorrente = nomeStarterOriginale || miaSquadra[0].nome;
     const infoBase = pokemonDatabase.find(p => p.nome === starterCorrente);
     
     if (!infoBase) return;
@@ -306,7 +335,7 @@ function resettaRunConStarter() {
     
     // Aggiorna UI
     const moneteDispMappa = document.getElementById("monete-display-mappa");
-    if (moneteDispMappa) moneteDispMappa.innerText = `💰 ${monete}`;
+    if (moneteDispMappa) moneteDispMappa.innerText = `\u{1f4b0} ${monete}`;
     const moneteDispGio = document.getElementById("monete-giocatore");
     if (moneteDispGio) moneteDispGio.innerText = monete;
     
@@ -329,9 +358,19 @@ function aggiornaSquadraMappa() {
     griglia.innerHTML = "";
     
     const mapElementoColore = {
+        "normale": "#a8a878",
         "fuoco": "#ff4d4d",
         "acqua": "#3498db",
         "erba": "#2ecc71",
+        "elettro": "#ffcc00",
+        "ghiaccio": "#98d8d8",
+        "lotta": "#c03028",
+        "veleno": "#a040a0",
+        "terra": "#e0c068",
+        "vento": "#a890f0",
+        "psico": "#f85888",
+        "drago": "#7038f8",
+        "folletto": "#ee99ac",
         "luce": "#f1c40f",
         "buio": "#9b59b6"
     };
@@ -350,12 +389,50 @@ function aggiornaSquadraMappa() {
         quadratino.style.backgroundImage = `url('${p.immagine}')`;
         quadratino.style.opacity = p.hpAttuali <= 0 ? "0.4" : "1"; 
         
+        // Rendi l'icona trascinabile (Drag & Drop)
+        quadratino.draggable = true;
+        
+        quadratino.addEventListener("dragstart", (e) => {
+            e.dataTransfer.setData("text/plain", index);
+            e.dataTransfer.effectAllowed = "move";
+            quadratino.style.opacity = "0.5";
+        });
+        
+        quadratino.addEventListener("dragend", (e) => {
+            quadratino.style.opacity = p.hpAttuali <= 0 ? "0.4" : "1";
+        });
+        
+        quadratino.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = "move";
+        });
+        
+        quadratino.addEventListener("drop", (e) => {
+            e.preventDefault();
+            const sourceIndex = parseInt(e.dataTransfer.getData("text/plain"), 10);
+            const targetIndex = index;
+            if (sourceIndex !== targetIndex && !isNaN(sourceIndex)) {
+                let temp = miaSquadra[sourceIndex];
+                miaSquadra[sourceIndex] = miaSquadra[targetIndex];
+                miaSquadra[targetIndex] = temp;
+                
+                // Aggiorna la squadra
+                aggiornaSquadraMappa();
+                
+                // Chiude dettaglio se \u00e8 aperto
+                let dettaglio = document.getElementById("schermata-dettaglio");
+                if (dettaglio && dettaglio.classList.contains("attiva")) {
+                    cambiaSchermata("schermata-dettaglio", "schermata-mappa");
+                }
+            }
+        });
+        
         quadratino.onclick = () => mostraDettaglioPokemon(index);
         
         // Se ha oggetti equipaggiati, mostra l'icona
         if (p.oggetti && p.oggetti.length > 0) {
             let zainetto = document.createElement("div");
-            zainetto.innerText = "🎒";
+            zainetto.innerText = "\u{1f392}";
             zainetto.style.position = "absolute";
             zainetto.style.bottom = "-5px";
             zainetto.style.right = "-5px";
@@ -369,7 +446,7 @@ function aggiornaSquadraMappa() {
     });
 }
 
-// Apre la schermata dettaglio di un Pokémon della squadra
+// Apre la schermata dettaglio di un Pok\u00e9mon della squadra
 function rimuoviOggettoDaPokemon(pIndex, indexOgg) {
     let p = miaSquadra[pIndex];
     if (!p || !p.oggetti || p.oggetti.length <= indexOgg) return;
@@ -475,30 +552,16 @@ function mostraDettaglioPokemon(index) {
             });
         }
     }
-    // Popola il select per cambiare la posizione in squadra
-    let select = document.getElementById("select-posizione");
-    if (select) {
-        select.innerHTML = "";
-        for (let i = 0; i < miaSquadra.length; i++) {
-            let pSquadra = miaSquadra[i];
-            let hasItem = (pSquadra.oggetti && pSquadra.oggetti.length > 0) ? " 🎒" : "";
-            let opzione = document.createElement("option");
-            opzione.value = i;
-            opzione.text = `Posizione ${i + 1} (${pSquadra.elemento ? pSquadra.elemento.toUpperCase() + " - " : ""}${pSquadra.nome}${hasItem})`;
-            if (i === index) opzione.selected = true;
-            select.appendChild(opzione);
-        }
-    }
-
+    
+    // Blocco cambio posizione rimosso in quanto sostituito dal drag-and-drop sulla mappa
     let bloccoMappa = document.querySelector(".blocco-cambio-posizione");
     let bloccoBattaglia = document.getElementById("blocco-cambio-in-battaglia");
+    if (bloccoMappa) bloccoMappa.style.display = "none";
     if (typeof inBattleSwapMode !== "undefined" && inBattleSwapMode) {
-        if(bloccoMappa) bloccoMappa.style.display = "none";
         if(bloccoBattaglia) bloccoBattaglia.style.display = "block";
         let btn = document.getElementById("btn-esegui-cambio-battaglia");
         if(btn) btn.disabled = (index === 0 || p.hpAttuali <= 0);
     } else {
-        if(bloccoMappa) bloccoMappa.style.display = "block";
         if(bloccoBattaglia) bloccoBattaglia.style.display = "none";
     }
 
@@ -511,53 +574,118 @@ function mostraDettaglioPokemon(index) {
 let inBattleSwapMode = false;
 
 function apriSchermataPokemonBattaglia() {
-    if (!turnoGiocatore) return;
-    inBattleSwapMode = true;
-    mostraDettaglioPokemon(0); 
+    if (document.getElementById("btn-pokemon").disabled) return;
+    document.getElementById("schermata-scambio-battaglia").style.display = "flex";
+    
+    // Popola lista sinistra
+    let contenitore = document.getElementById("scambio-battaglia-lista");
+    contenitore.innerHTML = "";
+    document.getElementById("scambio-battaglia-dettaglio").innerHTML = `<p style="color:#ccc; font-size:16px; text-align:center; margin-top:60px;">&#x2190; Seleziona un Pok\u00e9mon per i dettagli.</p>`;
+    
+    miaSquadra.forEach((p, index) => {
+        if (index === 0 || p.hpAttuali <= 0) return; // Salta il corrente e i morti
+
+        let riga = document.createElement("div");
+        riga.style.display = "flex";
+        riga.style.alignItems = "center";
+        riga.style.background = "#2c3e50";
+        riga.style.padding = "10px";
+        riga.style.borderRadius = "8px";
+        riga.style.cursor = "pointer";
+        riga.style.border = "2px solid transparent";
+        
+        let col = p.colore || "#ffffff";
+        
+        riga.innerHTML = `
+            <div style="width:50px; height:50px; border-radius:50%; background:url('${p.immagine}') center/cover; border:2px solid ${col}; margin-right:15px;"></div>
+            <div style="flex:1;">
+                <div style="color:white; font-size:16px; font-weight:bold;">${p.nome} <span style="font-size:12px; color:${col}">(${p.elemento.toUpperCase()})</span></div>
+                <div style="color:#bdc3c7; font-size:12px;">Lvl.${p.livello} | HP: ${p.hpAttuali}/${p.hpMax}</div>
+            </div>
+        `;
+        
+        riga.onclick = () => mostraDettaglioScambioBattaglia(index);
+        contenitore.appendChild(riga);
+    });
 }
 
-function eseguiCambioInBattaglia() {
-    if (indicePokemonInDettaglio === null || indicePokemonInDettaglio === 0) return;
-    let target = miaSquadra[indicePokemonInDettaglio];
-    if (target.hpAttuali <= 0) return;
+function chiudiScambioBattaglia() {
+    document.getElementById("schermata-scambio-battaglia").style.display = "none";
+}
 
-    // Swap
-    let temp = miaSquadra[0];
-    miaSquadra[0] = target;
-    miaSquadra[indicePokemonInDettaglio] = temp;
-
-    chiudiDettaglio();
-
-    let log = document.getElementById("console-log");
-    if(log) {
-        log.innerHTML += `<br>🔄 <strong>${temp.nome}</strong> torna indietro! Vai <strong>${target.nome}</strong>!`;
+function mostraDettaglioScambioBattaglia(index) {
+    let p = miaSquadra[index];
+    let dest = document.getElementById("scambio-battaglia-dettaglio");
+    let col = p.colore || "#fff";
+    
+    let htmlOggetti = "";
+    if (p.oggetti && p.oggetti.length > 0) {
+        htmlOggetti += `<div style="margin-top:10px; border-top:1px dashed #34495e; padding-top:10px;">`;
+        htmlOggetti += `<div style="color:#f1c40f; font-weight:bold; margin-bottom:5px; font-size:13px;">\u{1f392} Oggetti Equipaggiati:</div>`;
+        p.oggetti.forEach(ogg => {
+            htmlOggetti += `<div style="color:#ecf0f1; font-size:12px; margin-bottom:3px;">\u2022 ${ogg.nome}</div>`;
+        });
+        htmlOggetti += `</div>`;
     }
 
-    turnoGiocatore = false;
+    const folder = p.nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3');
+    const immagineVS = `../Sprite/personaggi/${folder}/${p.nome}VS.jpeg`;
+
+    dest.innerHTML = `
+        <div style="width:240px; height:240px; border-radius:50%; background:url('${immagineVS}') center/cover; border:6px solid ${col}; box-shadow:0 0 25px ${col}; margin-bottom:10px;"></div>
+        <h2 style="color:white; margin:0;">${p.nome}</h2>
+        <div style="color:${col}; font-weight:bold; margin-bottom:15px;">${p.elemento.toUpperCase()}</div>
+        
+        <div style="background:#1a1a2e; padding:15px; border-radius:8px; width:80%; text-align:left; color:#bdc3c7; font-size:14px; line-height:1.6;">
+            <div><strong>Lvl:</strong> ${p.livello}</div>
+            <div><strong>HP:</strong> ${p.hpAttuali}/${p.hpMax}</div>
+            <div style="margin-top:10px; display:flex; justify-content:space-between;">
+                <span><strong>ATK:</strong> ${p.atk}</span>
+                <span><strong>DEF:</strong> ${p.def}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+                <span><strong>SP.ATK:</strong> ${p.atkSpec}</span>
+                <span><strong>SP.DEF:</strong> ${p.defSpec}</span>
+            </div>
+            <div><strong>VEL:</strong> ${p.vel}</div>
+            <div style="margin-top:10px; color:#2ecc71;"><strong>Mossa:</strong> ${getNomeMossaAttuale(p)} (Lvl ${p.livelloMossa})</div>
+            ${htmlOggetti}
+        </div>
+        
+        <button onclick="eseguiCambioInBattagliaVero(${index})" style="background:#f39c12; color:white; border:none; border-radius:8px; padding:15px 30px; font-family:monospace; font-weight:bold; font-size:20px; cursor:pointer; margin-top:20px; box-shadow:0 4px 6px rgba(0,0,0,0.5); width:80%;">MANDA IN CAMPO</button>
+    `;
+}
+
+function eseguiCambioInBattagliaVero(index) {
+    let target = miaSquadra[index];
+    if (!target || target.hpAttuali <= 0) return;
+    
+    let temp = miaSquadra[0];
+    miaSquadra[0] = target;
+    miaSquadra[index] = temp;
+    
+    // Aggiorna il riferimento globale
+    if (typeof mioPokemon !== "undefined") {
+        mioPokemon = target;
+    }
+    
+    chiudiScambioBattaglia();
+    
+    let log = document.getElementById("console-log");
+    if(log) {
+        log.innerHTML += `<br>\u{1f504} <strong>${temp.nome}</strong> torna indietro! Vai <strong>${target.nome}</strong>!`;
+    }
+    
     document.getElementById("btn-attacco").disabled = true;
     document.getElementById("btn-item").disabled = true;
     document.getElementById("btn-pokemon").disabled = true;
     document.getElementById("btn-fuga").disabled = true;
-
+    
     if (typeof aggiornaGrafica === "function") aggiornaGrafica();
     setTimeout(turnoNemico, isSkipAttivo ? 500 : 1000);
 }
 
-// Esegue lo scambio di posizione in squadra scelto dal select
-function eseguiScambioPosizione() {
-    let selectPos = document.getElementById("select-posizione");
-    if (!selectPos || indicePokemonInDettaglio === null) return;
 
-    let nuovaPosizione = parseInt(selectPos.value);
-    if (nuovaPosizione === indicePokemonInDettaglio) return; 
-
-    let temp = miaSquadra[indicePokemonInDettaglio];
-    miaSquadra[indicePokemonInDettaglio] = miaSquadra[nuovaPosizione];
-    miaSquadra[nuovaPosizione] = temp;
-
-    if (typeof aggiornaSquadraMappa === "function") aggiornaSquadraMappa();
-    cambiaSchermata("schermata-dettaglio", "schermata-mappa");
-}
 
 // Chiude la schermata dettaglio e torna alla mappa/battaglia
 function chiudiDettaglio() { 
@@ -581,7 +709,7 @@ function tornaAllaMappa() {
     document.getElementById("btn-attacco").style.display = "flex";
     document.getElementById("btn-attacco").disabled = false;
     document.getElementById("btn-torna-mappa").style.display = "none";
-    // Ripristina btn-item visibile e disabilitato (sarà ri-abilitato a inizio prossimo incontro)
+    // Ripristina btn-item visibile e disabilitato (sar\u00e0 ri-abilitato a inizio prossimo incontro)
     const btnItem = document.getElementById("btn-item");
     if (btnItem) { btnItem.style.display = "flex"; btnItem.disabled = true; }
     const btnPokemon = document.getElementById("btn-pokemon");
@@ -657,7 +785,7 @@ function apriSchermataDiscoMossa() {
     cambiaSchermata("schermata-mappa", "schermata-disco");
 }
 
-// Aumenta il livello mossa di un Pokémon (max 3)
+// Aumenta il livello mossa di un Pok\u00e9mon (max 3)
 function potenziiaMossaPokemon(index) {
     let p = miaSquadra[index];
     if(p.livelloMossa < 3) {
@@ -666,15 +794,24 @@ function potenziiaMossaPokemon(index) {
     tornaAllaMappaDaDisco();
 }
 
-// Apre il modal info con il Pokédex completo
+let filtroRaritaPokedex = "tutti";
+let filtroElementoPokedex = "tutti";
+
+// Apre il modal info con il Pok\u{00e9de}x completo
 function apriModalInfo() {
     const modal = document.getElementById("modal-info");
     const header = document.getElementById("info-header");
-    const griglia = document.getElementById("info-griglia-schede");
     
-    if (!modal || !header || !griglia) return;
+    if (!modal || !header) return;
 
-    // Intestazione con le probabilità di rarità
+    // Reset filtri all'apertura
+    filtroRaritaPokedex = "tutti";
+    filtroElementoPokedex = "tutti";
+    
+    const selectElem = document.getElementById("filtro-elemento-pokedex");
+    if (selectElem) selectElem.value = "tutti";
+
+    // Intestazione con probabilit\u00e0 di rarit\u00e0
     let stringaRarita = "";
     Object.keys(CONFIG_RARITA).forEach((chiave, index) => {
         let info = CONFIG_RARITA[chiave];
@@ -686,17 +823,99 @@ function apriModalInfo() {
     });
     header.innerHTML = stringaRarita;
 
+    aggiornaTabsRaritaPokedex();
+    applicaFiltriPokedex();
+
+    modal.style.display = "flex";
+}
+
+// Chiude il modal info Pok\u{00e9de}x
+function chiudiModalInfo() {
+    document.getElementById("modal-info").style.display = "none";
+}
+
+function cambiaElementoPokedex(val) {
+    filtroElementoPokedex = val;
+    applicaFiltriPokedex();
+}
+
+function cambiaRaritaPokedex(val) {
+    filtroRaritaPokedex = val;
+    aggiornaTabsRaritaPokedex();
+    applicaFiltriPokedex();
+}
+
+function aggiornaTabsRaritaPokedex() {
+    const container = document.getElementById("pokedex-rarita-tabs");
+    if (!container) return;
+    container.innerHTML = "";
+
+    const listRarita = [
+        { id: "tutti", label: "TUTTI", colore: "#3498db" },
+        { id: "comune", label: "COMUNI", colore: CONFIG_RARITA["comune"].colore },
+        { id: "non comune", label: "NON COMUNI", colore: CONFIG_RARITA["non comune"].colore },
+        { id: "raro", label: "RARI", colore: CONFIG_RARITA["raro"].colore },
+        { id: "epico", label: "EPICI", colore: CONFIG_RARITA["epico"].colore },
+        { id: "leggendario", label: "LEGGENDARI", colore: CONFIG_RARITA["leggendario"].colore },
+        { id: "bombers", label: "BOMBERS", colore: CONFIG_RARITA["bombers"].colore },
+        { id: "special", label: "SPECIALI", colore: CONFIG_RARITA["special"].colore }
+    ];
+
+    listRarita.forEach(item => {
+        const btn = document.createElement("button");
+        btn.className = "btn-rarita-tab";
+        btn.textContent = item.label;
+        
+        if (filtroRaritaPokedex === item.id) {
+            btn.classList.add("attivo");
+            btn.style.backgroundColor = item.colore;
+        }
+        
+        btn.onclick = () => cambiaRaritaPokedex(item.id);
+        container.appendChild(btn);
+    });
+}
+
+function applicaFiltriPokedex() {
+    const griglia = document.getElementById("info-griglia-schede");
+    if (!griglia) return;
     griglia.innerHTML = "";
-    pokemonDatabase.forEach(pBase => {
+
+    const pDatabaseFiltrato = pokemonDatabase
+        .filter(p => !p.isEvoluzione)
+        .filter(p => {
+            if (filtroRaritaPokedex !== "tutti" && p.raritaTipo.toLowerCase() !== filtroRaritaPokedex) {
+                return false;
+            }
+            if (filtroElementoPokedex !== "tutti" && p.elemento.toLowerCase() !== filtroElementoPokedex) {
+                return false;
+            }
+            return true;
+        })
+        .sort((a, b) => {
+            const valA = (typeof SCALA_RARITA_MAPPA !== "undefined" && SCALA_RARITA_MAPPA[a.raritaTipo.toLowerCase()]) || 0;
+            const valB = (typeof SCALA_RARITA_MAPPA !== "undefined" && SCALA_RARITA_MAPPA[b.raritaTipo.toLowerCase()]) || 0;
+            return valA - valB;
+        });
+
+    if (pDatabaseFiltrato.length === 0) {
+        griglia.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: #bdc3c7; font-size: 16px; padding: 40px;">Nessun personaggio corrisponde ai filtri selezionati.</div>`;
+        return;
+    }
+
+    pDatabaseFiltrato.forEach(pBase => {
         let coloreRarita = CONFIG_RARITA[pBase.raritaTipo]?.colore || "#ffe066";
         
+        const folder = pBase.nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3');
+        const immagineVS = `../Sprite/personaggi/${folder}/${pBase.nome}VS.jpeg`;
+
         let scheda = document.createElement("div");
         scheda.className = "scheda-info-pokedex";
         scheda.style.backgroundColor = coloreRarita;
 
         scheda.innerHTML = `
             <div class="blocco-foto-pokedex">
-                <img src="${pBase.immagine}" alt="${pBase.nome}">
+                <img src="${immagineVS}" alt="${pBase.nome}">
             </div>
             <div class="blocco-stats-pokedex">
                 <div class="info-titolo">
@@ -705,33 +924,11 @@ function apriModalInfo() {
                     <div style="margin-top:2px;">${getHtmlElemento(pBase.elemento)}</div>
                 </div>
                 <hr class="separatore-pkm">
-                <div class="valori-stats">
-                    • HP Base: ${pBase.hpBase}<br>
-                    • ATK Base: ${pBase.atkBase}<br>
-                    • DEF Base: ${pBase.defBase}<br>
-                    • VEL Base: ${pBase.velBase}<br>
-                </div>
-                <hr class="separatore-pkm" style="border-top: 1px dashed rgba(0,0,0,0.2); margin: 5px 0;">
-                <div class="valori-mosse" style="font-size: 15px; line-height: 1.3; font-family: monospace; color: #2f3640;">
-                    <strong style="font-size: 10px; display: block; margin-bottom: 2px; color: #111;">MOSSE DISPONIBILI:</strong>
-                    • M1: ${pBase.mossaLvl1 || 'Nessuna'}<br>
-                    • M2: ${pBase.mossaLvl2 || 'Nessuna'}<br>
-                    • M3: ${pBase.mossaLvl3 || 'Nessuna'}
+                <div class="pokedex-lore" style="font-size:12px; line-height:1.4; font-family:sans-serif; color:#1e272e; flex-grow:1; overflow-y:auto; text-align:left; padding:8px; background:rgba(255,255,255,0.5); border-radius:4px; box-sizing:border-box; border:1px solid rgba(0,0,0,0.1); margin-top:5px;">
+                    ${pBase.lore || '<em>Nessuna lore disponibile per questo personaggio.</em>'}
                 </div>
             </div>
         `;
         griglia.appendChild(scheda);
     });
-    modal.style.display = "block";
 }
-
-// Chiude il modal info Pokédex
-function chiudiModalInfo() {
-    document.getElementById("modal-info").style.display = "none";
-}
-
-// Scroll orizzontale nella griglia info con la rotella del mouse
-document.getElementById("info-griglia-schede").addEventListener("wheel", (evt) => {
-    evt.preventDefault();
-    document.getElementById("info-griglia-schede").scrollLeft += evt.deltaY;
-});

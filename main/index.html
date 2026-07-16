@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini Poke-Clone Roguelike v4</title>
     <link rel="stylesheet" href="../style/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- ============= OVERLAY GLOBALI (sopra tutto) ============= -->
@@ -21,13 +24,20 @@
 
     <!-- Schermata VS pre-battaglia -->
     <div id="intro-vs" style="display: none;">
-        <div class="sfondo-vs-split">
-            <div class="lato-giocatore">
-                <img id="img-vs-giocatore" src="" alt="Giocatore">
+        <div class="sfondo-vs-custom">
+            <!-- Blocco Blu (Left) + Player Pokemon -->
+            <div class="blocco-vs blocco-vs-blu lato-giocatore">
+                <img id="img-vs-giocatore" src="" alt="Giocatore" class="vs-sprite-pokemon">
             </div>
-            <div class="scritta-vs">VS</div>
-            <div class="lato-nemico">
-                <img id="img-vs-nemico" src="" alt="Nemico">
+            
+            <!-- Blocco Rosso (Right) + Enemy Pokemon -->
+            <div class="blocco-vs blocco-vs-rosso lato-nemico">
+                <img id="img-vs-nemico" src="" alt="Nemico" class="vs-sprite-pokemon">
+            </div>
+            
+            <!-- Center VS Logo -->
+            <div class="logo-vs-container scritta-vs">
+                <img src="../Sprite/UI/Combattimento/VS.png" alt="VS" class="logo-vs-image">
             </div>
         </div>
     </div>
@@ -50,45 +60,128 @@
 
     <!-- ============= SCHERMATA START ============= -->
     <div id="schermata-start" class="schermata attiva">
+        <!-- Floating Stars Background -->
+        <div class="stars-container">
+            <div class="star s1"></div>
+            <div class="star s2"></div>
+            <div class="star s3"></div>
+            <div class="star s4"></div>
+            <div class="star s5"></div>
+            <div class="star s6"></div>
+            <div class="star s7"></div>
+            <div class="star s8"></div>
+        </div>
+
+        <!-- Top Left Menu Buttons -->
         <div style="position: absolute; top: 20px; left: 20px; display: flex; gap: 15px; z-index: 20;">
-            <button onclick="apriModalImpostazioni()" style="background: none; border: none; cursor: pointer; padding: 0;">
-                <img src="../Sprite/UI/Lobby/impostazioni.jpg" alt="Impostazioni" style="width: 45px; height: 45px; object-fit: contain;">
+            <button class="lobby-menu-btn" onclick="apriModalImpostazioni()" title="Impostazioni">
+                <img src="../Sprite/UI/Lobby/impostazioni.png" alt="Impostazioni">
             </button>
-            <button onclick="apriModalInfo()" style="background: none; border: none; cursor: pointer; padding: 0;">
-                <img src="../Sprite/UI/Lobby/info.jpg" alt="Info DB" style="width: 45px; height: 45px; object-fit: contain;">
+            <button class="lobby-menu-btn" onclick="apriModalInfo()" title="Pokedex">
+                <img src="../Sprite/UI/Lobby/info.png" alt="Info DB">
             </button>
         </div>
 
         <!-- Modal Pokédex -->
-        <div id="modal-info" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85vw; height: 80vh; background: rgba(10, 10, 10, 0.95); border: 3px solid #444; border-radius: 16px; z-index: 110; color: white; font-family: monospace; padding: 20px; box-sizing: border-box;">
-            <div id="info-header" style="text-align: center; margin-bottom: 20px; font-size: 14px; line-height: 1.6;"></div>
-            <div id="info-griglia-schede" style="display: flex; flex-wrap: nowrap; gap: 20px; overflow-x: auto; overflow-y: hidden; padding-bottom: 15px; height: calc(100% - 120px); scroll-behavior: smooth;"></div>
-            <button onclick="chiudiModalInfo()" style="position: absolute; bottom: 15px; right: 20px; padding: 10px 25px; background: #c62828; color: white; border: none; border-radius: 6px; cursor: pointer; font-family: monospace; font-weight: bold;">CHIUDI</button>
+        <div id="modal-info" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85vw; height: 85vh; background: rgba(15, 15, 20, 0.98); border: 4px solid #3498db; box-shadow: 0 0 30px rgba(52, 152, 219, 0.5); border-radius: 20px; z-index: 20000; color: white; font-family: monospace; padding: 25px; box-sizing: border-box; flex-direction: column;">
+            <!-- X Close Button -->
+            <button onclick="chiudiModalInfo()" style="position: absolute; top: 15px; right: 20px; background: none; border: none; color: #e74c3c; font-size: 36px; font-weight: bold; cursor: pointer; transition: transform 0.2s, color 0.2s; z-index: 120;" onmouseover="this.style.transform='scale(1.2)'; this.style.color='#f39c12';" onmouseout="this.style.transform='scale(1)'; this.style.color='#e74c3c';">&times;</button>
+            
+            <!-- Title and Probabilities -->
+            <div style="text-align: center; margin-bottom: 15px;">
+                <h1 style="margin: 0 0 8px 0; color: #f1c40f; font-size: 28px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); font-weight: bold; letter-spacing: 2px;">📖 POKÉDEX</h1>
+                <div id="info-header" style="font-size: 13px; line-height: 1.6; color: #bdc3c7;"></div>
+            </div>
+
+            <!-- Filter Controls Bar -->
+            <div id="controlli-filtro-pokedex" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: space-between; margin-bottom: 20px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                <!-- Rarity Tabs -->
+                <div id="pokedex-rarita-tabs" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                
+                <!-- Element Dropdown -->
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-weight: bold; color: #3498db; font-size: 14px;">ELEMENTO:</span>
+                    <select id="filtro-elemento-pokedex" onchange="cambiaElementoPokedex(this.value)" style="background: #1a1a2e; color: white; border: 2px solid #3498db; border-radius: 8px; padding: 6px 12px; font-family: monospace; font-size: 14px; cursor: pointer; outline: none;">
+                        <option value="tutti">Tutti</option>
+                        <option value="normale">Normale</option>
+                        <option value="fuoco">Fuoco</option>
+                        <option value="acqua">Acqua</option>
+                        <option value="erba">Erba</option>
+                        <option value="elettro">Elettro</option>
+                        <option value="ghiaccio">Ghiaccio</option>
+                        <option value="lotta">Lotta</option>
+                        <option value="veleno">Veleno</option>
+                        <option value="terra">Terra</option>
+                        <option value="vento">Vento</option>
+                        <option value="psico">Psico</option>
+                        <option value="drago">Drago</option>
+                        <option value="folletto">Folletto</option>
+                        <option value="luce">Luce</option>
+                        <option value="buio">Buio</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Cards Container -->
+            <div id="info-griglia-schede" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; overflow-y: auto; flex: 1; padding-right: 8px; scroll-behavior: smooth;"></div>
         </div>
 
         <!-- Modal Impostazioni -->
-        <div id="modal-impostazioni" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); border: 3px solid #333; padding: 20px; border-radius: 12px; z-index: 100; color: white; font-family: monospace;">
-            <h3 style="margin-top: 0; text-align: center;">IMPOSTAZIONI</h3>
-            <hr>
-            <div style="margin: 15px 0;">
-                <label>Volume Musica:</label>
-                <input type="range" id="slider-volume" min="0" max="1" step="0.1" value="0.5" oninput="regolaVolume(this.value)">
+        <div id="modal-impostazioni" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 360px; background: rgba(15, 15, 20, 0.98); border: 4px solid #3498db; box-shadow: 0 0 30px rgba(52, 152, 219, 0.5); border-radius: 20px; z-index: 20000; color: white; font-family: monospace; padding: 25px; box-sizing: border-box; flex-direction: column;">
+            <!-- X Close Button -->
+            <button onclick="chiudiModalImpostazioni()" style="position: absolute; top: 12px; right: 18px; background: none; border: none; color: #e74c3c; font-size: 30px; font-weight: bold; cursor: pointer; transition: transform 0.2s, color 0.2s; z-index: 120;" onmouseover="this.style.transform='scale(1.2)'; this.style.color='#f39c12';" onmouseout="this.style.transform='scale(1)'; this.style.color='#e74c3c';">&times;</button>
+            
+            <h3 style="margin: 0 0 20px 0; text-align: center; color: #f1c40f; font-size: 22px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); font-weight: bold; letter-spacing: 1px;">⚙️ IMPOSTAZIONI</h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 20px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <label style="font-weight: bold; color: #3498db; font-size: 14px;">Volume Musica:</label>
+                    <input type="range" id="slider-volume" min="0" max="1" step="0.1" value="0.5" oninput="regolaVolume(this.value)" style="width: 100%; cursor: pointer; accent-color: #3498db;">
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 5px;">
+                    <label style="display: flex; align-items: center; gap: 10px; font-size: 15px; cursor: pointer; user-select: none;">
+                        <input type="checkbox" id="chk-muto" onchange="toggleMuto(this.checked)" style="width: 18px; height: 18px; cursor: pointer; accent-color: #3498db;"> Muta Audio
+                    </label>
+                    
+                    <label style="display: flex; align-items: center; gap: 10px; font-size: 15px; cursor: pointer; user-select: none;">
+                        <input type="checkbox" id="chk-autoskip" onchange="toggleAutoskip(this.checked)" style="width: 18px; height: 18px; cursor: pointer; accent-color: #3498db;"> 2x Auto
+                    </label>
+                </div>
             </div>
-            <div style="margin: 15px 0;">
-                <label>
-                    <input type="checkbox" id="chk-muto" onchange="toggleMuto(this.checked)"> Muta Audio
-                </label>
-            </div>
-            <div style="margin: 15px 0;">
-                <label>
-                    <input type="checkbox" id="chk-autoskip" onchange="toggleAutoskip(this.checked)"> Autoskip Combattimento
-                </label>
-            </div>
-            <hr>
-            <button onclick="chiudiModalImpostazioni()" style="width: 100%; padding: 8px; background: #333; color: white; border: none; cursor: pointer; font-family: monospace;">CHIUDI</button>
         </div>
 
-        <button id="btn-start" onclick="mostraSelezione()">START</button>
+        <!-- Main Content Wrapper -->
+        <div class="lobby-content">
+            <!-- Floating Logo -->
+            <img src="../Sprite/UI/Lobby/Logo.png" alt="Laser Poke Logo" class="lobby-logo">
+
+            <!-- Character Showcase row (starters) -->
+            <div class="lobby-showcase">
+                <!-- Character 1 (Left) -->
+                <div class="showcase-card left-card">
+                    <img src="../Sprite/personaggi/Gian/Gian.jpeg" alt="Gian" class="showcase-img">
+                    <span class="showcase-name">GIAN</span>
+                </div>
+
+                <!-- Central Action Area -->
+                <div class="lobby-action-area">
+                    <button id="btn-start" onclick="mostraSelezione()">PLAY NOW</button>
+                    <div class="lobby-subtitle">AUTOBATTLER ROGUELIKE</div>
+                </div>
+
+                <!-- Character 2 (Right) -->
+                <div class="showcase-card right-card">
+                    <img src="../Sprite/personaggi/Arman/Arman.jpeg" alt="Arman" class="showcase-img">
+                    <span class="showcase-name">ARMAN</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Footer -->
+        <div class="lobby-footer">
+            <span>LASER POKE &copy; 2026</span>
+        </div>
     </div>
 
     <!-- ============= SCHERMATA SELEZIONE STARTER E POKEBALL ============= -->
@@ -161,8 +254,8 @@
             <img src="../Sprite/UI/Combattimento/pokeball.png" class="banner-pokeball">
         </div>
 
-        <!-- Pulsante SKIP — fisso in alto a sinistra, toggle (⏩ attivo / ⏸ pausa) -->
-        <button id="btn-skip-fixed" onclick="attivaSkip()" title="Attiva/disattiva Skip animazioni">&#9654;&#9654; SKIP</button>
+        <!-- Pulsante SKIP - fisso in alto a sinistra, toggle (? attivo / ? pausa) -->
+        <button id="btn-skip-fixed" onclick="attivaSkip()" title="Attiva/disattiva Skip animazioni">&#9654;&#9654; 2X Speed</button>
 
         <div id="gioco-container-arena">
 
@@ -229,8 +322,7 @@
                             <img src="../Sprite/UI/Combattimento/fuga.png" class="btn-icon"> FUGA
                         </button>
 
-                        <!-- TORNA ALLA MAPPA: appare dopo la vittoria -->
-                        <button id="btn-torna-mappa" class="btn-battle btn-win" onclick="tornaAllaMappa()" style="display: none; grid-column: 1 / 3; grid-row: 1 / 3; width: 100%; height: 100%; z-index: 10; background: #4cd137; font-size: 24px;">TORNA ALLA MAPPA</button>
+                        <!-- TORNA ALLA MAPPA: rimosso perché ridondante -->
                     </div>
                 </div>
 
@@ -295,6 +387,23 @@
         </div>
     </div>
 
+    <!-- ============= SCHERMATA SCAMBIO IN BATTAGLIA ============= -->
+    <div id="schermata-scambio-battaglia"
+         style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:20000; flex-direction:column; background:#1a1a2e; font-family:monospace; overflow:hidden;">
+        <div id="scambio-battaglia-header" style="padding:15px 30px; display:flex; justify-content:space-between; align-items:center; background:#0f0f1a; border-bottom:4px solid #3498db; flex-shrink:0;">
+            <h1 style="color:#3498db; font-size:24px; text-shadow:2px 2px 0px #000; margin:0;">&#x1F504; SOSTITUISCI POKÉMON</h1>
+        </div>
+        <div id="scambio-battaglia-layout" style="display:flex; flex:1; overflow:hidden;">
+            <div id="scambio-battaglia-lista" style="flex:1; background:#1a1a2e; border-right:4px solid #0f0f1a; padding:15px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;"></div>
+            <div id="scambio-battaglia-dettaglio" style="flex:1; background:#2c3e50; padding:20px; overflow-y:auto; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:15px;">
+                <p style="color:#ccc; font-size:16px; text-align:center; margin-top:60px;">&#x2190; Seleziona un Pokémon per i dettagli.</p>
+            </div>
+        </div>
+        <div id="scambio-battaglia-footer" style="padding:15px; background:#0f0f1a; border-top:4px solid #3498db; text-align:center; flex-shrink:0;">
+            <button onclick="chiudiScambioBattaglia()" style="background:#e74c3c; color:white; border:2px solid #fff; border-radius:8px; padding:10px 20px; font-family:monospace; font-weight:bold; font-size:18px; cursor:pointer; text-transform:uppercase; box-shadow:0 4px 6px rgba(0,0,0,0.5);">&#x2715; Annulla</button>
+        </div>
+    </div>
+
     <!-- ============= SCHERMATA DETTAGLIO POKÉMON ============= -->
     <div id="schermata-dettaglio" class="schermata">
         <div class="contenitore-dettaglio-scheda">
@@ -322,11 +431,6 @@
                     </div>
                 </div>
 
-                <div class="blocco-cambio-posizione" style="width: 100%; text-align: center; margin-top: 10px;">
-                    <label for="select-posizione" style="font-family: monospace; font-weight: bold; color: #2f3640; font-size: 13px; display: block; margin-bottom: 5px;">CAMBIA POSIZIONE SQUADRA:</label>
-                    <select id="select-posizione" class="select-stile-retro" onchange="eseguiScambioPosizione()"></select>
-                </div>
-
                 <div id="blocco-cambio-in-battaglia" style="display:none; width: 100%; text-align: center; margin-top: 10px;">
                     <button class="btn-battle" id="btn-esegui-cambio-battaglia" onclick="eseguiCambioInBattaglia()" style="background-color: #f39c12; width: 100%;">MANDA IN CAMPO</button>
                 </div>
@@ -344,7 +448,7 @@
                 Scegli quale Pokémon della tua squadra vuoi potenziare (Max Lvl 3):
             </p>
             <div id="contenitore-opzioni-disco" class="griglia-opzioni-disco"></div>
-            <button class="btn-battle" onclick="cambiaSchermata('schermata-disco', 'schermata-mappa'); aggiornaSquadraMappa();" style="background-color: #e74c3c; width: 100%; max-width: 300px; margin: 20px auto 0; display: block;">Lascia il disco (Indietro)</button>
+            <button class="btn-battle" onclick="tornaAllaMappaDaDisco()" style="background-color: #e74c3c; width: 100%; max-width: 300px; margin: 20px auto 0; display: block;">Lascia il disco (Indietro)</button>
         </div>
     </div>
 

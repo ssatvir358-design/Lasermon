@@ -1,5 +1,5 @@
 // ==========================================================
-// mappa.js — Generazione e rendering della mappa procedurale
+// mappa.js \u2014 Generazione e rendering della mappa procedurale
 // Dipendenze: stato.js, pokemon_factory.js, schermate.js, audio.js,
 //             eventi_nodi.js (DB_EVENTI_NODI)
 // ==========================================================
@@ -10,7 +10,7 @@
 // Algoritmo:
 //   1. Per ogni piano (riga), si costruisce un pool di eventi eligibili
 //      leggendo DB_EVENTI_NODI (PianoMin <= piano <= PianoMax).
-//   2. Gli eventi che hanno già raggiunto QuantitaMaxPerMappa vengono esclusi.
+//   2. Gli eventi che hanno gi\u00e0 raggiunto QuantitaMaxPerMappa vengono esclusi.
 //   3. Se il pool risulta vuoto (tutti i limitati sono esauriti), usa solo
 //      gli eventi con QuantitaMaxPerMappa === -1 come fallback garantito.
 //   4. Ultimi due piani: penultimo fisso (centro-medico + npc), ultimo fisso (boss).
@@ -25,7 +25,7 @@ function generaMappaProcedurale() {
         ? Math.max(...miaSquadra.filter(p => p).map(p => p.livello)) 
         : 1;
 
-    // Contatore di quante volte ogni tipo di evento è già stato piazzato in questa mappa
+    // Contatore di quante volte ogni tipo di evento \u00e8 gi\u00e0 stato piazzato in questa mappa
     const contatoreEventi = {};
     Object.keys(DB_EVENTI_NODI).forEach(tipo => contatoreEventi[tipo] = 0);
 
@@ -79,6 +79,14 @@ function generaMappaProcedurale() {
                 elementoNpc = elementiPossibili[Math.floor(Math.random() * elementiPossibili.length)];
             }
 
+            let livello = 1;
+            let livelloMossa = 1;
+            if (tipoEvento === "npc" || tipoEvento === "cespuglio") {
+                const configGen = calcolaLivelloEMossaMappa(pianoIndex, tipoEvento);
+                livello = configGen.livello;
+                livelloMossa = configGen.livelloMossa;
+            }
+
             mappaEventi[pianoIndex].push(tipoEvento);
             nodiDelPiano.push({
                 id:    `p${pianoIndex}-n${i}`,
@@ -86,6 +94,8 @@ function generaMappaProcedurale() {
                 index: i,
                 tipo:  tipoEvento,
                 elementoNpc: elementoNpc,
+                livello: livello,
+                livelloMossa: livelloMossa,
                 figli: []
             });
         }
@@ -93,7 +103,7 @@ function generaMappaProcedurale() {
         alberoMappa.push(nodiDelPiano);
     }
 
-    // Costruzione connessioni padre → figlio tra piani adiacenti
+    // Costruzione connessioni padre \u2192 figlio tra piani adiacenti
     for (let p = 0; p < alberoMappa.length - 1; p++) {
         const pianoCorr = alberoMappa[p];
         const pianoSucc = alberoMappa[p + 1];
@@ -108,11 +118,11 @@ function generaMappaProcedurale() {
                 // Piano successivo singolo: tutti si collegano a lui
                 nodo.figli.push(pianoSucc[0].id);
             } else if (numSucc === numAttuale + 1) {
-                // Piano successivo più largo: ogni nodo prende i due adiacenti
+                // Piano successivo pi\u00f9 largo: ogni nodo prende i due adiacenti
                 nodo.figli.push(pianoSucc[i].id);
                 nodo.figli.push(pianoSucc[i + 1].id);
             } else if (numSucc === numAttuale - 1) {
-                // Piano successivo più stretto: condivisione dei nodi
+                // Piano successivo pi\u00f9 stretto: condivisione dei nodi
                 if (i > 0)       nodo.figli.push(pianoSucc[i - 1].id);
                 if (i < numSucc) nodo.figli.push(pianoSucc[i].id);
             } else {
@@ -124,10 +134,10 @@ function generaMappaProcedurale() {
 }
 
 /**
- * Seleziona il tipo di evento più appropriato per un dato piano,
+ * Seleziona il tipo di evento pi\u00f9 appropriato per un dato piano,
  * rispettando i limiti del DB_EVENTI_NODI.
  * @param {number} pianoIndex       - Il piano corrente (1-based logicamente)
- * @param {object} contatoreEventi  - Quante volte ogni evento è già comparso
+ * @param {object} contatoreEventi  - Quante volte ogni evento \u00e8 gi\u00e0 comparso
  * @returns {string}                - Il tipo di evento scelto
  */
 function selezionaEventoPerPiano(pianoIndex, contatoreEventi) {
@@ -136,19 +146,19 @@ function selezionaEventoPerPiano(pianoIndex, contatoreEventi) {
         const cfg = DB_EVENTI_NODI[tipo];
         // Deve rientrare nel range di piani
         if (pianoIndex < cfg.PianoMin || pianoIndex > cfg.PianoMax) return false;
-        // Deve non aver ancora raggiunto il limite (se -1 è sempre ok)
+        // Deve non aver ancora raggiunto il limite (se -1 \u00e8 sempre ok)
         if (cfg.QuantitaMaxPerMappa !== -1 && contatoreEventi[tipo] >= cfg.QuantitaMaxPerMappa) return false;
         return true;
     });
 
-    // 2. Se il pool è vuoto, fallback agli eventi infiniti (QuantitaMaxPerMappa === -1)
+    // 2. Se il pool \u00e8 vuoto, fallback agli eventi infiniti (QuantitaMaxPerMappa === -1)
     if (poolEligibili.length === 0) {
         const fallback = Object.keys(DB_EVENTI_NODI).filter(tipo =>
             DB_EVENTI_NODI[tipo].QuantitaMaxPerMappa === -1 &&
             pianoIndex >= DB_EVENTI_NODI[tipo].PianoMin &&
             pianoIndex <= DB_EVENTI_NODI[tipo].PianoMax
         );
-        // Se anche il fallback è vuoto (configurazione errata), usa cespuglio
+        // Se anche il fallback \u00e8 vuoto (configurazione errata), usa cespuglio
         return fallback.length > 0
             ? fallback[Math.floor(Math.random() * fallback.length)]
             : "cespuglio";
@@ -158,7 +168,7 @@ function selezionaEventoPerPiano(pianoIndex, contatoreEventi) {
     return poolEligibili[Math.floor(Math.random() * poolEligibili.length)];
 }
 
-// Controlla se il nodo B (piano+1, indiceB) è figlio registrato del nodo A
+// Controlla se il nodo B (piano+1, indiceB) \u00e8 figlio registrato del nodo A
 function isFiglioValido(pianoIndex, indiceA, indiceB) {
     const nodoA = alberoMappa[pianoIndex][indiceA];
     const idFiglioDesiderato = `p${pianoIndex + 1}-n${indiceB}`;
@@ -191,7 +201,7 @@ function generaMappaAlbero() {
                 if (tipoEvento === "npc") {
                     const nodoObj = alberoMappa[pianoIndex][i];
                     if (nodoObj && nodoObj.elementoNpc) {
-                        bottone.setAttribute("data-tooltip", `Tipo: ${nodoObj.elementoNpc}`);
+                        bottone.setAttribute("data-tooltip", `Tipo: ${nodoObj.elementoNpc.toUpperCase()}\n+2 Lvl`);
                         
                         // Rimuoviamo il background standard per non interferire
                         bottone.style.setProperty('background-image', 'none', 'important');
@@ -217,8 +227,16 @@ function generaMappaAlbero() {
                     }
                 }
 
+                if (tipoEvento === "cespuglio") {
+                    const nodoObj = alberoMappa[pianoIndex][i];
+                    if (nodoObj) {
+                        bottone.setAttribute("data-tooltip", "+1 Lvl");
+                    }
+                }
+
                 // Nodo boss: usa l'immagine chibi del boss corrente
                 if (tipoEvento === "boss") {
+                    bottone.setAttribute("data-tooltip", "+3 Lvl");
                     const idBossCorrente = ARCHIVIO_MAPPE[mappaAttuale].idBoss;
                     let imgChibi = ARCHIVIO_BOSS[idBossCorrente].iconaChibi;
                     if (mappaAttuale === "mappa9") {
@@ -299,7 +317,7 @@ function disegnaLineeMappa() {
     });
 }
 
-// Ridisegna le linee al resize della finestra (solo se la mappa è visibile)
+// Ridisegna le linee al resize della finestra (solo se la mappa \u00e8 visibile)
 window.addEventListener("resize", () => {
     const mappaElement = document.getElementById("schermata-mappa");
     if (mappaElement && mappaElement.classList.contains("attiva")) {

@@ -1,12 +1,12 @@
 // ==========================================================
-// stato.js — Stato globale del gioco (variabili mutabili)
+// stato.js \u2014 Stato globale del gioco (variabili mutabili)
 // NOTA: caricare DOPO i file data/, PRIMA di tutto il resto.
 // ==========================================================
 
 // ----------------------------------------------------------
-// CONFIGURAZIONE SLOT ITEM PER POKÉMON
+// CONFIGURAZIONE SLOT ITEM PER POK\u00c9MON
 // Cambia questo numero per variare gli slot item equipaggiabili
-// disponibili su ogni singolo Pokémon della squadra.
+// disponibili su ogni singolo Pok\u00e9mon della squadra.
 // ----------------------------------------------------------
 const CONFIG_SLOT_ITEM_PER_POKEMON = 1;
 
@@ -16,22 +16,22 @@ const CONFIG_SLOT_ITEM_PER_POKEMON = 1;
 // I valori "min"/"max" generano un numero casuale nel range [min, max].
 // ----------------------------------------------------------
 const CONFIG_MONETE_GUADAGNO = {
-    cespuglio: { min: 1, max: 3  },  // Erba alta: 1–3 monete
-    npc:       { min: 3, max: 6  },  // Allenatore: 3–6 monete
+    cespuglio: { min: 1, max: 3  },  // Erba alta: 1\u{20133} monete
+    npc:       { min: 3, max: 6  },  // Allenatore: 3\u{20136} monete
     boss:      { fisso: 15        }  // Boss: sempre 15 monete
 };
 
 // --- Squadra e combattimento ---
 let miaSquadra = [];
-let mioPokemon;           // Il Pokémon attualmente in campo (giocatore)
+let mioPokemon;           // Il Pok\u00e9mon attualmente in campo (giocatore)
 let nemiciIncontro = [];  // Nemici ancora in coda nello scontro corrente
-let nemicoPokemon;        // Il Pokémon nemico attualmente in campo
+let nemicoPokemon;        // Il Pok\u00e9mon nemico attualmente in campo
 let isBossFight = false;
 let haUsatoUltGiocatore = false;
 let haUsatoUltNemico    = false;
 let chiAttaccaPerPrimo  = "giocatore";
 
-// Tipo dell'evento in corso — usato da gestisciVittoriaIncontro per level-up e monete
+// Tipo dell'evento in corso \u2014 usato da gestisciVittoriaIncontro per level-up e monete
 let tipoEventoAttuale = "cespuglio";
 
 // --- Economia ---
@@ -40,23 +40,23 @@ let monete = 0;
 
 // Zaino: array di { dbId: string, quantita: number }
 // Un entry per tipo di oggetto; quantita = quante copie possiede il giocatore.
-// Per futuri oggetti equipaggiabili si estenderà con { dbId, quantita, equipaggiatoDa }
+// Per futuri oggetti equipaggiabili si estender\u00e0 con { dbId, quantita, equipaggiatoDa }
 let zaino = [];
 
 // --- Item in battaglia ---
-// Quante volte ogni item è stato usato nello scontro corrente.
-// Struttura: { [dbId]: N } — confrontato con limiteUtilizziPerFight del DB_OGGETTI.
+// Quante volte ogni item \u00e8 stato usato nello scontro corrente.
+// Struttura: { [dbId]: N } \u2014 confrontato con limiteUtilizziPerFight del DB_OGGETTI.
 // Viene azzerato da resettaItemFight() all'inizio di ogni nuovo scontro.
 let itemUsatiInFight = {};
 
-// true = il giocatore ha già usato un item in questo turno (limite: 1 per turno).
+// true = il giocatore ha gi\u00e0 usato un item in questo turno (limite: 1 per turno).
 // Viene resettato a false ogni volta che ritorna il turno del giocatore.
 let itemUsatiQuestoTurno = false;
 
 // ==========================================================
 // EFFETTI DI STATO TEMPORANEI ATTIVI IN BATTAGLIA
 // Ogni slot ha la forma: { durata: N, valore: X }
-// La durata è decrementata ogni turno; a 0 l'effetto scade.
+// La durata \u00e8 decrementata ogni turno; a 0 l'effetto scade.
 // ==========================================================
 let effettiAttivi = {
     nemico: {
@@ -128,7 +128,7 @@ function resettaEffettiAttivi() {
     };
 }
 
-// Azzera gli effetti su un singolo target (es. quando cambia Pokémon)
+// Azzera gli effetti su un singolo target (es. quando cambia Pok\u00e9mon)
 function resettaEffettiSuTarget(target) {
     if (target === "nemico") {
         effettiAttivi.nemico = { bruciatura: null, velRidotta: null, defRidotta: null };
@@ -145,12 +145,12 @@ function resettaItemFight() {
 
 // ----------------------------------------------------------
 // TRACKING PERK IN BATTAGLIA
-// Stato del Pokémon giocatore attivo per i Perk che hanno
+// Stato del Pok\u00e9mon giocatore attivo per i Perk che hanno
 // un contatore o un limite per fight/turno.
 // Viene resettato all'inizio di ogni scontro.
 // ----------------------------------------------------------
 let perkBattagliaGiocatore = {
-    // SALVAVITA: quante volte è già scattato in questo fight
+    // SALVAVITA: quante volte \u00e8 gi\u00e0 scattato in questo fight
     // (confrontato con CONFIG_PERK.salvavitaUsiTier1/Tier2)
     salvavitaUsati: 0,
 
@@ -159,7 +159,7 @@ let perkBattagliaGiocatore = {
     scudoTurniPassati: 0,
 };
 
-/** Resetta il tracking dei perk — chiamare a inizio di ogni scontro. */
+/** Resetta il tracking dei perk \u2014 chiamare a inizio di ogni scontro. */
 function resettaPerkFight() {
     perkBattagliaGiocatore = {
         salvavitaUsati:   0,
@@ -167,7 +167,7 @@ function resettaPerkFight() {
     };
 }
 
-// Resetta il flag "item già usato questo turno" — chiamare quando torna il turno giocatore
+// Resetta il flag "item gi\u00e0 usato questo turno" \u2014 chiamare quando torna il turno giocatore
 function resettaItemTurno() {
     itemUsatiQuestoTurno = false;
 }

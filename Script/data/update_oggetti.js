@@ -28,7 +28,7 @@ Cuscino Lombare	AUMENTA TUTTE LE STAT +5%	NO
 Badge Vip	AUMENTA TUTTE LE STAT +20	NO
 Distintivo dell'Impiegato del Mese	AUMENTA TUTTE LE STAT +10%	NO
 Stampante Inceppata	AUMENTA ATK +50 MA DIMINUISCE LA VEL -20	SI
-Caffè Sbagliato	AUMENTA VEL +50 MA DIMINUISCE LA DEF -20	SI
+Caff\u00e8 Sbagliato	AUMENTA VEL +50 MA DIMINUISCE LA DEF -20	SI
 Monitor Sfarfallante	AUMENTA DEF +50 MA DIMINUISCE L'ATK -20	SI
 Update di Windows Improvviso	AUMENTA ATK +30% MA RADDOPPIA I DANNI SUBITI	SI
 `.trim();
@@ -47,7 +47,7 @@ itemComprabiliStr.split('\n').forEach((line, i) => {
         id: "cons_${i}",
         nome: "${nome}",
         icona: "../Sprite/item/placeholder.png",
-        iconaFallback: "💊",
+        iconaFallback: "\u{1f48a}",
         mappeAbilitate: [${parseMappe(mappe).join(', ')}],
         descrizione: "${effetto}",
         categoria: "consumabile",
@@ -69,7 +69,7 @@ itemTerraStr.split('\n').forEach((line, i) => {
         id: "equip_${i}",
         nome: "${nome}",
         icona: "../Sprite/nodi/item.png",
-        iconaFallback: "🎒",
+        iconaFallback: "\u{1f392}",
         mappeAbilitate: [],
         descrizione: "${effetto}",
         categoria: "equipaggiabile",
@@ -85,7 +85,7 @@ itemTerraStr.split('\n').forEach((line, i) => {
 });
 
 const fileContent = \`// ==========================================================
-// oggetti.js — Database completo di tutti gli oggetti del gioco
+// oggetti.js \u2014 Database completo di tutti gli oggetti del gioco
 // ==========================================================
 
 const DB_OGGETTI = [

@@ -1,24 +1,39 @@
 // ==========================================================
-// audio.js — Gestione audio e impostazioni sonore
+// audio.js \u2014 Gestione audio e impostazioni sonore
 // Estratto da script.js (righe 1418-1479)
 // Dipendenze: stato.js (volumePrecedente, isAutoskipAbilitato, isSkipAttivo)
 // ==========================================================
 
-// Cambia la traccia musicale corrente (evita di riavviarla se è già in riproduzione)
+// Cambia la traccia musicale corrente (evita di riavviarla se \u00e8 gi\u00e0 in riproduzione)
 function riproduciMusica(nomeFile) {
     const audio = document.getElementById("musica-gioco");
     if (!audio) return;
     
     const urlCorretto = "../Audio/" + nomeFile;
-    if (audio.src.includes(nomeFile)) return;
+    if (audio.src.includes(nomeFile)) {
+        if (audio.paused) {
+            audio.play().catch(e => console.log("Audio in attesa di sblocco:", e));
+        }
+        return;
+    }
     
     audio.src = urlCorretto;
-    audio.play().catch(e => console.log("Audio in attesa di sblocco interazione utente."));
+    audio.play().catch(e => console.log("Audio in attesa di sblocco:", e));
 }
 
 // Apre il pannello impostazioni
 function apriModalImpostazioni() {
-    document.getElementById("modal-impostazioni").style.display = "block";
+    const audio = document.getElementById("musica-gioco");
+    if (audio) {
+        const slider = document.getElementById("slider-volume");
+        if (slider) slider.value = audio.volume;
+        const chkMuto = document.getElementById("chk-muto");
+        if (chkMuto) chkMuto.checked = (audio.volume === 0);
+    }
+    const chkAutoskip = document.getElementById("chk-autoskip");
+    if (chkAutoskip) chkAutoskip.checked = isAutoskipAbilitato;
+
+    document.getElementById("modal-impostazioni").style.display = "flex";
 }
 
 // Chiude il pannello impostazioni
@@ -26,7 +41,7 @@ function chiudiModalImpostazioni() {
     document.getElementById("modal-impostazioni").style.display = "none";
 }
 
-// Callback del cursore volume: aggiorna il volume e deseleziona "muto" se il volume è > 0
+// Callback del cursore volume: aggiorna il volume e deseleziona "muto" se il volume \u00e8 > 0
 function regolaVolume(valore) {
     const audio = document.getElementById("musica-gioco");
     if (audio) {
@@ -56,9 +71,12 @@ function toggleMuto(isMuto) {
 // Callback checkbox autoskip
 function toggleAutoskip(valore) {
     isAutoskipAbilitato = valore;
+    isSkipAttivo = valore;
+    const btn = document.getElementById("btn-skip-fixed");
+    if (btn) btn.classList.toggle("attivo", valore);
 }
 
-// Abilita la modalità skip rapido per il combattimento corrente
+// Abilita la modalit\u00e0 skip rapido per il combattimento corrente
 function attivaSkip() {
     isSkipAttivo = true;
     const btnSkip = document.getElementById("btn-skip");
@@ -68,7 +86,7 @@ function attivaSkip() {
 // Sblocca retroattivo audio (alcuni browser richiedono interazione utente prima del play)
 document.addEventListener("click", function() {
     const audio = document.getElementById("musica-gioco");
-    if (audio && (!audio.src || audio.paused) && document.getElementById("schermata-start").classList.contains("attiva")) {
-        riproduciMusica("lobby.mp3");
+    if (audio && audio.paused) {
+        audio.play().catch(e => {});
     }
 }, { once: true });

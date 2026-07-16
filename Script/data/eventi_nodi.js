@@ -1,26 +1,26 @@
 // ==========================================================
-// eventi_nodi.js — Database dei tipi di evento spawnable sui nodi mappa
+// eventi_nodi.js \u2014 Database dei tipi di evento spawnable sui nodi mappa
 //
 // Ogni evento ha tre parametri:
-//   PianoMin         → dal quale piano (incluso) può comparire questo evento.
+//   PianoMin         \u2192 dal quale piano (incluso) pu\u00f2 comparire questo evento.
 //                      1 = primo piano giocabile (dopo START).
-//   PianoMax         → fino a quale piano (incluso) può comparire.
+//   PianoMax         \u2192 fino a quale piano (incluso) pu\u00f2 comparire.
 //                      Usa 99 come "infinito" (nessun limite superiore).
-//   QuantitaMaxPerMappa → quante volte al massimo può apparire in una singola mappa.
+//   QuantitaMaxPerMappa \u2192 quante volte al massimo pu\u00f2 apparire in una singola mappa.
 //                         -1 = nessun limite (funziona anche da "riempitivo" se
 //                              tutti gli altri eventi limitati sono esauriti).
 //
 // REGOLE DI GENERAZIONE (vedi mappa.js > generaMappaProcedurale):
 //   1. Per ogni nodo, viene costruito un pool di eventi "eligibili" per quel piano.
-//   2. Dal pool vengono esclusi gli eventi che hanno già raggiunto QuantitaMaxPerMappa.
-//   3. Se il pool risultante è vuoto, il generatore cade sul fallback: usa solo
+//   2. Dal pool vengono esclusi gli eventi che hanno gi\u00e0 raggiunto QuantitaMaxPerMappa.
+//   3. Se il pool risultante \u00e8 vuoto, il generatore cade sul fallback: usa solo
 //      gli eventi con QuantitaMaxPerMappa === -1 (garantiti infiniti).
 //
 // COME MODIFICARE:
-//   • Per aggiungere un nuovo tipo di evento, aggiungi una chiave qui sotto
+//   \u2022 Per aggiungere un nuovo tipo di evento, aggiungi una chiave qui sotto
 //     e assicurati di gestirla in avviaEvento() (mappa.js).
-//   • Per cambiare quando appare un evento, basta modificare PianoMin/PianoMax.
-//   • Per renderlo più o meno raro, abbassa/alza QuantitaMaxPerMappa.
+//   \u2022 Per cambiare quando appare un evento, basta modificare PianoMin/PianoMax.
+//   \u2022 Per renderlo pi\u00f9 o meno raro, abbassa/alza QuantitaMaxPerMappa.
 // ==========================================================
 
 const DB_EVENTI_NODI = {
@@ -30,12 +30,12 @@ const DB_EVENTI_NODI = {
     "cespuglio": {
         PianoMin:          1,   // Appare dal primo piano
         PianoMax:          99,  // Senza limite superiore
-        QuantitaMaxPerMappa: -1 // Nessun limite: è l'evento di default
+        QuantitaMaxPerMappa: -1 // Nessun limite: \u00e8 l'evento di default
     },
     "npc": {
         PianoMin:          1,
         PianoMax:          99,
-        QuantitaMaxPerMappa: -1 // Nessun limite: è un evento di default
+        QuantitaMaxPerMappa: -1 // Nessun limite: \u00e8 un evento di default
     },
 
     // ---- EVENTI LIMITATI ----

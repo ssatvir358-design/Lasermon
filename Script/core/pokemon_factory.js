@@ -1,5 +1,5 @@
 // ==========================================================
-// pokemon_factory.js — Funzioni pure per creare e manipolare Pokémon
+// pokemon_factory.js \u2014 Funzioni pure per creare e manipolare Pok\u00e9mon
 // Dipendenze: config.js, stato.js
 // ==========================================================
 
@@ -8,31 +8,31 @@
 // ----------------------------------------------------------
 // Tutte le stat (tranne HP) usano questa formula:
 //
-//   ROUND( statBase + (livello × moltiplicatoreElemento × moltiplicatoreRarità) / 0.75 )
+//   ROUND( statBase + (livello \u00d7 moltiplicatoreElemento \u00d7 moltiplicatoreRarit\u00e0) / 0.75 )
 //
 // Gli HP usano invece:
 //
-//   ROUND( hpBase + (livello × moltiplicatoreElemento_hp × moltiplicatoreRarità) / 0.25 ) + livello
+//   ROUND( hpBase + (livello \u00d7 moltiplicatoreElemento_hp \u00d7 moltiplicatoreRarit\u00e0) / 0.25 ) + livello
 //
 // Per modificare il bilanciamento in futuro:
-//   • Cambia 0.75 (divisore stat normali) per scalare più o meno rapidamente ATK/DEF/VEL
-//   • Cambia 0.25 (divisore HP) per scalare più o meno rapidamente gli HP
-//   • Il "+ livello" finale sugli HP aggiunge un bonus lineare al crescere del livello
-//   • I valori base si trovano in pokemonDatabase (hpBase, atkBase, defBase, velBase)
-//   • I moltiplicatori per elemento sono in CONFIG_STAT_ELEMENTO (config.js)
-//   • I moltiplicatori per rarità sono in CONFIG_MOLTIPLICATORE_RARITA (config.js)
+//   \u2022 Cambia 0.75 (divisore stat normali) per scalare pi\u00f9 o meno rapidamente ATK/DEF/VEL
+//   \u2022 Cambia 0.25 (divisore HP) per scalare pi\u00f9 o meno rapidamente gli HP
+//   \u2022 Il "+ livello" finale sugli HP aggiunge un bonus lineare al crescere del livello
+//   \u2022 I valori base si trovano in pokemonDatabase (hpBase, atkBase, defBase, velBase)
+//   \u2022 I moltiplicatori per elemento sono in CONFIG_STAT_ELEMENTO (config.js)
+//   \u2022 I moltiplicatori per rarit\u00e0 sono in CONFIG_MOLTIPLICATORE_RARITA (config.js)
 // ----------------------------------------------------------
 
 /**
  * Calcola una singola statistica (non HP) dal livello con la formula attuale.
  * @param {number} statBase  - Valore base della stat nel DB
- * @param {number} livello   - Livello del Pokémon
+ * @param {number} livello   - Livello del Pok\u00e9mon
  * @param {number} molElem   - Moltiplicatore elemento (CONFIG_STAT_ELEMENTO)
- * @param {number} molRar    - Moltiplicatore rarità (CONFIG_MOLTIPLICATORE_RARITA)
+ * @param {number} molRar    - Moltiplicatore rarit\u00e0 (CONFIG_MOLTIPLICATORE_RARITA)
  * @returns {number}         - Valore arrotondato della stat
  */
 function calcolaStat(statBase, livello, molElem, molRar) {
-    // Formula: ROUND(statBase + (livello × molElem × molRar) / 0.75)
+    // Formula: ROUND(statBase + (livello \u00d7 molElem \u00d7 molRar) / 0.75)
     // Modifica il divisore 0.75 per cambiare lo scaling di ATK/DEF/VEL
     return Math.round(statBase + (livello * molElem * molRar) / 0.75);
 }
@@ -40,13 +40,13 @@ function calcolaStat(statBase, livello, molElem, molRar) {
 /**
  * Calcola gli HP dal livello con la formula attuale.
  * @param {number} hpBase  - HP base nel DB
- * @param {number} livello - Livello del Pokémon
+ * @param {number} livello - Livello del Pok\u00e9mon
  * @param {number} molElem - Moltiplicatore elemento HP (CONFIG_STAT_ELEMENTO.hp)
- * @param {number} molRar  - Moltiplicatore rarità (CONFIG_MOLTIPLICATORE_RARITA)
+ * @param {number} molRar  - Moltiplicatore rarit\u00e0 (CONFIG_MOLTIPLICATORE_RARITA)
  * @returns {number}       - Valore arrotondato degli HP
  */
 function calcolaHP(hpBase, livello, molElem, molRar) {
-    // Formula: ROUND(hpBase + (livello × molElem × molRar) / 0.25) + livello
+    // Formula: ROUND(hpBase + (livello \u00d7 molElem \u00d7 molRar) / 0.25) + livello
     // Modifica il divisore 0.25 per cambiare lo scaling degli HP
     // Il "+ livello" aggiunge un bonus lineare per livello
     return Math.round(hpBase + (livello * molElem * molRar) / 0.25) + livello;
@@ -120,12 +120,12 @@ function getHtmlElemento(elementoNome, isGrande = false) {
 }
 
 /**
- * Crea un'istanza di Pokémon con tutte le statistiche calcolate dal livello.
+ * Crea un'istanza di Pok\u00e9mon con tutte le statistiche calcolate dal livello.
  * Usa la formula definita nelle funzioni calcolaStat() e calcolaHP() qui sopra.
  * @param {object} infoBase     - Record dal pokemonDatabase
- * @param {number} livello      - Livello da assegnare al Pokémon
+ * @param {number} livello      - Livello da assegnare al Pok\u00e9mon
  * @param {number} livelloMossa - Livello della mossa (1, 2 o 3)
- * @returns {object}            - Istanza Pokémon pronta all'uso
+ * @returns {object}            - Istanza Pok\u00e9mon pronta all'uso
  */
 function creaPokemon(infoBase, livello, livelloMossa = 1) {
     const molRar    = CONFIG_MOLTIPLICATORE_RARITA[infoBase.raritaTipo.toLowerCase()] || 1.0;
@@ -192,6 +192,12 @@ function creaPokemon(infoBase, livello, livelloMossa = 1) {
 function applicaBonusOggetti(p) {
     if (!p) return;
     
+    // Salva la percentuale degli HP attuali prima del ricalcolo
+    let pctHp = 1;
+    if (p.hpMax && p.hpAttuali !== undefined) {
+        pctHp = p.hpAttuali / p.hpMax;
+    }
+    
     // 1. Ripristina statistiche ai valori base (dal livello)
     p.hpMax = p.baseHpMax;
     p.atk   = p.baseAtk;
@@ -202,7 +208,14 @@ function applicaBonusOggetti(p) {
     
     p.bonus = { hp: 0, atk: 0, def: 0, atkSpec: 0, defSpec: 0, vel: 0 };
     
-    if (!p.oggetti || p.oggetti.length === 0) return;
+    if (!p.oggetti || p.oggetti.length === 0) {
+        // Se non ci sono oggetti, scala comunque gli HP (potrebbe aver rimosso un oggetto)
+        if (p.hpAttuali !== undefined) {
+            p.hpAttuali = Math.round(p.hpMax * pctHp);
+            if (p.hpAttuali > p.hpMax) p.hpAttuali = p.hpMax;
+        }
+        return;
+    }
     
     // Helper per sommare flat/percent
     const addStat = (statName, valType, val) => {
@@ -258,7 +271,7 @@ function applicaBonusOggetti(p) {
             }
             // Malus (oggetti maledetti)
             if (obj.malusStatistica) {
-                addStat(obj.malusStatistica, obj.malusValoreType, obj.malusValore); // malusValore è già negativo nel DB
+                addStat(obj.malusStatistica, obj.malusValoreType, obj.malusValore); // malusValore \u00e8 gi\u00e0 negativo nel DB
             }
         }
     });
@@ -278,23 +291,24 @@ function applicaBonusOggetti(p) {
     if (p.atkSpec < 0) p.atkSpec = 0;
     if (p.defSpec < 0) p.defSpec = 0;
     if (p.vel < 0) p.vel = 0;
-    
-    // Assicurati che gli HP attuali non superino il nuovo max
-    if (p.hpAttuali > p.hpMax) {
-        p.hpAttuali = p.hpMax;
+
+    // Ricalcola hpAttuali in base alla percentuale salvata
+    if (p.hpAttuali !== undefined) {
+        p.hpAttuali = Math.round(p.hpMax * pctHp);
+        if (p.hpAttuali > p.hpMax) p.hpAttuali = p.hpMax;
     }
 }
 
 /**
- * Ricalcola e aggiorna le statistiche di un Pokémon esistente dopo N level-up.
- * Ricalcola dall'inizio con la nuova formula (non accumula), quindi è immune
+ * Ricalcola e aggiorna le statistiche di un Pok\u00e9mon esistente dopo N level-up.
+ * Ricalcola dall'inizio con la nuova formula (non accumula), quindi \u00e8 immune
  * a errori di arrotondamento multipli.
- * @param {object} p            - L'istanza Pokémon da aggiornare (modificata in-place)
+ * @param {object} p            - L'istanza Pok\u00e9mon da aggiornare (modificata in-place)
  * @param {number} nuoviLivelli - Quanti livelli aggiungere
  */
 
 // ============================================================
-// CONFIG — Comportamento HP al level-up
+// CONFIG \u2014 Comportamento HP al level-up
 // Cambia questi valori per modificare come funziona il level-up.
 // ============================================================
 const CONFIG_LEVEL_UP_CURA = {
@@ -328,23 +342,11 @@ function aggiornaStatsLivello(p, nuoviLivelli) {
     const nuovoDefSpec = calcolaStat(p.infoBase.defSpec || 1, nuovoLivello, statsElem.defSpec || 1, molRar);
     const nuovaVel   = calcolaStat(p.infoBase.velBase, nuovoLivello, statsElem.vel, molRar);
 
-    // -------------------------------------------------------------------
-    // Gestione HP attuali al level-up.
-    // Il comportamento dipende da CONFIG_LEVEL_UP_CURA (vedi sopra).
-    // -------------------------------------------------------------------
-    if (p.hpAttuali <= 0) {
-        // PG attualmente KO
-        if (CONFIG_LEVEL_UP_CURA.revivaKO) {
-            // Reviva con 1 HP (comportamento opzionale)
-            p.hpAttuali = 1;
-        }
-        // else: resta KO (hpAttuali rimane 0 o negativo)
-    } else if (CONFIG_LEVEL_UP_CURA.curaAlLevelUp) {
-        // PG vivo: applica il guadagno HP proporzionalmente
-        const guadagnoHp = nuovoHpMax - p.hpMax;
-        p.hpAttuali = Math.min(nuovoHpMax, p.hpAttuali + guadagnoHp);
+    // Gestione HP attuali al level-up gestita direttamente da applicaBonusOggetti()
+    // per mantenere le proporzioni corrette anche con gli item equipaggiati.
+    if (p.hpAttuali <= 0 && CONFIG_LEVEL_UP_CURA.revivaKO) {
+        p.hpAttuali = 1;
     }
-    // else: hpAttuali rimane invariato (nessuna cura, nessun reviva)
 
     // Aggiorna tutte le stat base
     p.livello = nuovoLivello;
@@ -360,12 +362,12 @@ function aggiornaStatsLivello(p, nuoviLivelli) {
 }
 
 /**
- * [DevTool] Forza il livello di un Pokémon ricalcolando tutte le statistiche da zero.
- * Funziona anche se il livello era già stato modificato manualmente.
+ * [DevTool] Forza il livello di un Pok\u00e9mon ricalcolando tutte le statistiche da zero.
+ * Funziona anche se il livello era gi\u00e0 stato modificato manualmente.
  * Uso in console: forzaLivello(miaSquadra[0], 44)
  */
 function forzaLivello(p, nuovoLivello) {
-    if (!p || !p.infoBase) { console.error("[forzaLivello] Pokémon non valido"); return; }
+    if (!p || !p.infoBase) { console.error("[forzaLivello] Pok\u00e9mon non valido"); return; }
     
     // Applica il Level Cap Globale (100)
     const MAX_LEVEL = typeof CONFIG_PERK_LEVEL_CAP !== "undefined" ? CONFIG_PERK_LEVEL_CAP.tier2 : 100;
@@ -391,7 +393,7 @@ function forzaLivello(p, nuovoLivello) {
     
     applicaBonusOggetti(p);
     p.hpAttuali  = p.hpMax;
-    console.log(`[DevTool] ${p.nome} → Lv.${p.livello} | HP:${p.hpMax} ATK:${p.atk} DEF:${p.def} VEL:${p.vel}`);
+    console.log(`[DevTool] ${p.nome} \u2192 Lv.${p.livello} | HP:${p.hpMax} ATK:${p.atk} DEF:${p.def} VEL:${p.vel}`);
 }
 
 // Restituisce il nome della mossa attiva in base al livello mossa corrente
@@ -406,12 +408,12 @@ function getNomeMossaAttuale(p) {
 // ----------------------------------------------------------
 
 /**
- * Calcola quale statistica è la più alta in gioco per un Pokémon.
+ * Calcola quale statistica \u00e8 la pi\u00f9 alta in gioco per un Pok\u00e9mon.
  * Confronta i valori reali (hpMax, atk, def, vel).
  * Restituisce la chiave della categoria perk corrispondente:
  * "vita" | "attacco" | "difesa" | "velocita"
  *
- * @param {object} p - Istanza Pokémon
+ * @param {object} p - Istanza Pok\u00e9mon
  * @returns {string}
  */
 function calcolaStatDominante(p) {
@@ -458,15 +460,15 @@ function calcolaStatDominante(p) {
 }
 
 /**
- * Calcola la percentuale di schivata base di un Pokémon
- * in base alla sua velocità e al suo elemento.
+ * Calcola la percentuale di schivata base di un Pok\u00e9mon
+ * in base alla sua velocit\u00e0 e al suo elemento.
  * Se ha il Perk "schivata_aumentata" applica il moltiplicatore Tier 1.
  * Se ha il Perk "schivata_aumentata_2" applica anche il moltiplicatore Tier 2.
  *
  * Formula base: Math.floor( (Vel * moltiplicatoreElemento) / (Vel + 60) )
  * I moltiplicatori per elemento sono in CONFIG_SCHIVATA_ELEMENTO (perks.js).
  *
- * @param {object} p - Istanza Pokémon
+ * @param {object} p - Istanza Pok\u00e9mon
  * @returns {number} - Percentuale schivata (intero, es. 23 = 23%)
  */
 function calcolaSchivata(p) {
@@ -477,11 +479,11 @@ function calcolaSchivata(p) {
     // Formula base: arrotondamento al difetto (Math.floor)
     let schivata = Math.floor((vel * mult) / (vel + 60));
 
-    // Perk Tier 1: SCHIVATA AUMENTATA (×1.35)
+    // Perk Tier 1: SCHIVATA AUMENTATA (\u{00d71}.35)
     if (p.perkId === "schivata_aumentata" || p.perkId === "schivata_aumentata_2") {
         schivata = Math.floor(schivata * CONFIG_PERK.schivataAumentataMultTier1);
     }
-    // Perk Tier 2: SCHIVATA AUMENTATA+ (ulteriore ×1.45 sul valore già aumentato)
+    // Perk Tier 2: SCHIVATA AUMENTATA+ (ulteriore \u{00d71}.45 sul valore gi\u00e0 aumentato)
     if (p.perkId === "schivata_aumentata_2") {
         schivata = Math.floor(schivata * CONFIG_PERK.schivataAumentataMultTier2);
     }
@@ -489,9 +491,9 @@ function calcolaSchivata(p) {
     return schivata;
 }
 
-// Pesca un Pokémon casuale dal database rispettando rarità e range della mappa corrente
+// Pesca un Pok\u00e9mon casuale dal database rispettando rarit\u00e0 e range della mappa corrente
 function pescaPokemonCasuale(esclusioniNomi = [], elementoFiltro = null) {
-    // Pesi base per rarità (più è raro, meno probabile è)
+    // Pesi base per rarit\u00e0 (pi\u00f9 \u00e8 raro, meno probabile \u00e8)
     const pesi = { "comune": 22, "non comune": 18, "raro": 16, "epico": 14, "leggendario": 12, "special": 10, "bombers": 8 };
 
     let poolDisponibili = pokemonDatabase.filter(p => !p.boss && !p.isEvoluzione && !esclusioniNomi.includes(p.nome));
@@ -508,7 +510,7 @@ function pescaPokemonCasuale(esclusioniNomi = [], elementoFiltro = null) {
         }
     }
 
-    // Applica il filtro rarità della mappa corrente
+    // Applica il filtro rarit\u00e0 della mappa corrente
     if (mappaAttuale && ARCHIVIO_MAPPE[mappaAttuale]) {
         const mappaConfig = ARCHIVIO_MAPPE[mappaAttuale];
         if (mappaConfig.RaritaMin && mappaConfig.RaritaMax) {
@@ -518,17 +520,17 @@ function pescaPokemonCasuale(esclusioniNomi = [], elementoFiltro = null) {
                 const pVal = SCALA_RARITA_MAPPA[p.raritaTipo.toLowerCase()] || 1;
                 return pVal >= minVal && pVal <= maxVal;
             });
-            // Usa il pool filtrato solo se non è vuoto
+            // Usa il pool filtrato solo se non \u00e8 vuoto
             if (poolFiltrato.length > 0) poolDisponibili = poolFiltrato;
         }
     }
 
-    // Paracadute: se il pool è ancora vuoto, usa tutti i non-boss
+    // Paracadute: se il pool \u00e8 ancora vuoto, usa tutti i non-boss
     if (poolDisponibili.length === 0) {
         poolDisponibili = pokemonDatabase.filter(p => !p.boss && !p.isEvoluzione);
     }
 
-    // Selezione pesata: estrae un elemento rispettando i pesi di rarità
+    // Selezione pesata: estrae un elemento rispettando i pesi di rarit\u00e0
     let pesoTotale = 0;
     poolDisponibili.forEach(p => pesoTotale += pesi[p.raritaTipo] || 1);
     let random = Math.random() * pesoTotale;
@@ -542,7 +544,7 @@ function pescaPokemonCasuale(esclusioniNomi = [], elementoFiltro = null) {
     return poolDisponibili[0];
 }
 
-// Genera HTML compatto di una card Pokémon (usata in vari punti della UI)
+// Genera HTML compatto di una card Pok\u00e9mon (usata in vari punti della UI)
 function generaHtmlCard(pokemon) {
     return `
         <div class="card-pokemon" style="background-color: ${pokemon.colore}; border: 2px solid #333; padding: 10px; border-radius: 8px;">

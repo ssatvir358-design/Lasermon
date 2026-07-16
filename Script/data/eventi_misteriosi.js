@@ -1,5 +1,5 @@
 // ==========================================================
-// eventi_misteriosi.js — Database degli eventi misteriosi (nodi speciali sulla mappa)
+// eventi_misteriosi.js \u2014 Database degli eventi misteriosi (nodi speciali sulla mappa)
 // ==========================================================
 
 const DB_EVENTI_MISTERIOSI = [
@@ -16,7 +16,7 @@ const DB_EVENTI_MISTERIOSI = [
     },
     {
         nome: "Il Ladro di Monete",
-        descrizione: "Un bizzarro figuro sbuca dalle ombre e ti regala un boost di potenza per il tuo primo Pokémon!",
+        descrizione: "Un bizzarro figuro sbuca dalle ombre e ti regala un boost di potenza per il tuo primo Pok\u00e9mon!",
         mappeAbilitate: [1, 2],
         percentuale: 35,
         azione: () => {

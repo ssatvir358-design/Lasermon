@@ -7,18 +7,225 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-image: url("../../Sprite/UI/Lobby/Sfondo.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: 10; /* Tiene lo start sopra tutto finché è attivo */
+    background: radial-gradient(circle at center, #181530 0%, #08060f 100%) !important;
+    overflow: hidden !important;
+    z-index: 10;
+}
+
+#schermata-start.attiva {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+/* Scanline / Grid effect for CRT screen vibe */
+#schermata-start::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06)) !important;
+    background-size: 100% 4px, 6px 100% !important;
+    pointer-events: none !important;
+    z-index: 11 !important;
+}
+
+/* Starry background animations */
+.stars-container {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
+}
+.star {
+    position: absolute !important;
+    background-color: #fff !important;
+    width: 3px !important;
+    height: 3px !important;
+    border-radius: 50% !important;
+    opacity: 0.8 !important;
+    box-shadow: 0 0 8px #fff !important;
+}
+.s1 { top: 15%; left: 10%; animation: pulseStar 3s infinite alternate; }
+.s2 { top: 25%; left: 80%; animation: pulseStar 4s infinite alternate; }
+.s3 { top: 65%; left: 15%; animation: pulseStar 2.5s infinite alternate; }
+.s4 { top: 75%; left: 85%; animation: pulseStar 3.5s infinite alternate; }
+.s5 { top: 10%; left: 50%; animation: pulseStar 5s infinite alternate; }
+.s6 { top: 85%; left: 45%; animation: pulseStar 4.5s infinite alternate; }
+.s7 { top: 40%; left: 5%; animation: pulseStar 3.2s infinite alternate; }
+.s8 { top: 50%; left: 95%; animation: pulseStar 2.8s infinite alternate; }
+
+@keyframes pulseStar {
+    0% { transform: scale(0.6); opacity: 0.3; }
+    100% { transform: scale(1.3); opacity: 1; filter: brightness(1.5); }
+}
+
+/* Premium Top Left Lobby Buttons */
+.lobby-menu-btn {
+    background: rgba(22, 22, 37, 0.8) !important;
+    border: 2px solid #3498db !important;
+    border-radius: 12px !important;
+    cursor: pointer !important;
+    padding: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4) !important;
+}
+.lobby-menu-btn img {
+    width: 36px !important;
+    height: 36px !important;
+    object-fit: contain !important;
+}
+.lobby-menu-btn:hover {
+    transform: scale(1.1) !important;
+    border-color: #f1c40f !important;
+    box-shadow: 0 0 15px rgba(241, 196, 15, 0.4) !important;
+}
+
+/* Main Content elements */
+.lobby-content {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 12 !important;
+}
+
+/* Floating animation for Title Logo */
+@keyframes floatLogo {
+    0% { transform: translateY(0px); filter: drop-shadow(0 0 15px rgba(52, 152, 219, 0.5)); }
+    50% { transform: translateY(-12px); filter: drop-shadow(0 0 25px rgba(52, 152, 219, 0.8)); }
+    100% { transform: translateY(0px); filter: drop-shadow(0 0 15px rgba(52, 152, 219, 0.5)); }
+}
+.lobby-logo {
+    max-width: 520px !important;
+    width: 75vw !important;
+    height: auto !important;
+    margin-bottom: 2vh !important;
+    animation: floatLogo 4s ease-in-out infinite !important;
+    user-select: none !important;
+}
+
+/* Starters Showcase Showcase styling */
+.lobby-showcase {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5vw !important;
+    width: 90vw !important;
+    max-width: 1100px !important;
+    margin-top: 2vh !important;
+}
+
+.showcase-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    background: rgba(22, 22, 37, 0.85) !important;
+    border: 4px solid #3498db !important;
+    border-radius: 16px !important;
+    padding: 15px !important;
+    width: 150px !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+}
+.showcase-card:hover {
+    transform: translateY(-8px) scale(1.05) !important;
+    border-color: #f1c40f !important;
+    box-shadow: 0 12px 30px rgba(241, 196, 15, 0.3) !important;
+}
+
+.showcase-img {
+    width: 120px !important;
+    height: 120px !important;
+    object-fit: cover !important;
+    border-radius: 12px !important;
+    border: 3px solid #1a1a2e !important;
+    margin-bottom: 10px !important;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5) !important;
+}
+
+.showcase-name {
+    font-family: 'Press Start 2P', monospace !important;
+    font-size: 11px !important;
+    color: #fff !important;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+    letter-spacing: 1px !important;
+}
+
+/* Action central Area & button */
+.lobby-action-area {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 15px !important;
 }
 
 #btn-start {
-    padding: 20px 50px; font-size: 32px; font-weight: bold; background-color: #ffcc00;
-    border: 4px solid #333; border-radius: 10px; cursor: pointer; box-shadow: 0px 6px 0px #b38f00;
+    font-family: 'Press Start 2P', monospace !important;
+    font-size: 26px !important;
+    font-weight: bold !important;
+    color: #0f0b1e !important;
+    background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%) !important;
+    border: 4px solid #fff !important;
+    border-radius: 16px !important;
+    padding: 18px 45px !important;
+    cursor: pointer !important;
+    box-shadow: 0 0 20px rgba(241, 196, 15, 0.6), inset 0 -4px 0 rgba(0,0,0,0.2) !important;
+    transition: all 0.15s ease !important;
+    animation: pulseButton 2s infinite alternate !important;
+    text-shadow: 1px 1px 0px rgba(255,255,255,0.4) !important;
 }
-#btn-start:active { transform: translateY(6px); box-shadow: none; }
+
+#btn-start:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 30px rgba(241, 196, 15, 0.9), inset 0 -4px 0 rgba(0,0,0,0.2) !important;
+    background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%) !important;
+}
+
+#btn-start:active {
+    transform: scale(0.95) !important;
+    box-shadow: 0 0 10px rgba(241, 196, 15, 0.4) !important;
+}
+
+@keyframes pulseButton {
+    0% { transform: scale(1); filter: brightness(1); }
+    100% { transform: scale(1.03); filter: brightness(1.1) drop-shadow(0 0 8px rgba(241, 196, 15, 0.4)); }
+}
+
+.lobby-subtitle {
+    font-family: 'Press Start 2P', monospace !important;
+    font-size: 10px !important;
+    color: #3498db !important;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+    letter-spacing: 1px !important;
+    margin-top: 5px !important;
+}
+
+/* Footer elements */
+.lobby-footer {
+    position: absolute !important;
+    bottom: 20px !important;
+    font-family: 'Press Start 2P', monospace !important;
+    font-size: 9px !important;
+    color: #7f8c8d !important;
+    letter-spacing: 1px !important;
+    z-index: 12 !important;
+    pointer-events: none !important;
+}
 
 
 /* ==========================================================
@@ -148,61 +355,85 @@
 .btn-scegli:hover { background-color: #45a049; }
 
 /* ==========================================================
-   COMPORTAMENTO DEL POKEDEX (SCHEDE GIGANTI: 3 PER VOLTA A SCHERMO)
+   COMPORTAMENTO DEL POKEDEX (GRIGLIA VERTICALE RESPONSIVE)
    ========================================================== */
 #info-griglia-schede {
-    display: flex !important;
-    flex-direction: row !important;   /* La griglia scorre in ORIZZONTALE */
-    overflow-x: auto !important;       /* Attiva lo scroll con rotellina */
-    overflow-y: hidden !important;     /* Blocca categoricamente lo scroll verticale */
-    flex-wrap: nowrap !important;      /* Impedisce alle schede di andare a capo */
-    gap: 20px !important;              /* Spazio fisso tra una scheda e l'altra */
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important; /* Griglia responsive */
+    gap: 20px !important;              /* Spazio fisso tra le schede */
     padding: 10px 15px !important;
     width: 100% !important;
-    height: calc(100% - 70px) !important; /* Sfrutta tutta l'altezza sotto l'header delle rarità */
+    height: 100% !important;           
     box-sizing: border-box !important;
-    align-items: center !important;
+    overflow-y: auto !important;       /* Attiva lo scroll verticale */
+    overflow-x: hidden !important;     /* Blocca lo scroll orizzontale */
 }
 
-/* La singola scheda del Pokedex: Si allarga e si alza per riempire il div */
+/* La singola scheda del Pokedex: Altezza fissa, animata all'hover */
 .scheda-info-pokedex {
-    /* MATH: (100% del div - 40px di spazio totale dei due gap) diviso 3 schede esatte */
-    flex: 0 0 calc((100% - 40px) / 3) !important; 
-    height: 98% !important;            /* Riempie verticalmente tutto il div info-griglia-schede */
+    height: 420px !important;          /* Altezza fissa per consistenza nella griglia */
     display: flex !important; 
-    flex-direction: column !important; /* Layout verticale: immagine sopra, statistiche sotto */
+    flex-direction: column !important; /* Immagine sopra, lore sotto */
     justify-content: space-between !important;
     align-items: center !important;
     overflow: hidden !important; 
-    padding: 20px !important;          /* Più spazio interno dato che ora sono giganti */
+    padding: 15px !important;          
     border: 4px solid #222 !important; 
     border-radius: 16px !important;
     box-shadow: 0 6px 12px rgba(0,0,0,0.35) !important;
     box-sizing: border-box !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.scheda-info-pokedex:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 10px 20px rgba(52, 152, 219, 0.4) !important;
 }
 
-/* Il riquadro nero/grigio della foto (In alto) - Diventa proporzionalmente enorme */
+/* Il riquadro della foto */
 .blocco-foto-pokedex { 
     width: 100% !important;
-    height: 55% !important;            /* Prende il 55% dell'altezza totale della scheda */
+    height: 48% !important;            /* Ridotto per dare più spazio alla lore */
     display: flex !important; 
     justify-content: center !important; 
     align-items: center !important; 
     border: 3px solid #333 !important;
     border-radius: 10px !important;
     background: rgba(0, 0, 0, 0.12) !important;
-    margin-bottom: 10px !important;
+    margin-bottom: 8px !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
 }
 
-/* L'immagine all'interno del riquadro */
 .blocco-foto-pokedex img {
-    width: 100% !important;    
-    height: 100% !important;  
-    object-fit: contain !important;    /* Mantiene le proporzioni perfette senza tagliare i Pokémon */
-    padding: 10px !important;
-    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;     /* Riempie il riquadro senza lasciare vuoti */
+}
+
+/* Bottone Tab Rari/Comuni del Pokedex */
+.btn-rarita-tab {
+    background: #161625;
+    color: #bdc3c7;
+    border: 2px solid #2c3e50;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-family: monospace;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+}
+.btn-rarita-tab:hover {
+    background: #2c3e50;
+    color: white;
+    border-color: #3498db;
+}
+.btn-rarita-tab.attivo {
+    background: #3498db;
+    color: white;
+    border-color: white;
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
 }
 
 /* Il riquadro inferiore contenente i testi (In basso) */
@@ -210,7 +441,7 @@
     display: flex !important;
     flex-direction: column !important; 
     width: 100% !important;
-    height: 42% !important;            /* Prende il restante spazio sotto la foto */
+    height: 48% !important;            
     color: #000 !important;
     font-weight: bold !important;
     text-shadow: 0px 1px 0px rgba(255,255,255,0.3) !important;

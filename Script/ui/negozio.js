@@ -1,21 +1,21 @@
 // ==========================================================
-// negozio.js — Logica negozio, zaino e uso item in battaglia
+// negozio.js \u2014 Logica negozio, zaino e uso item in battaglia
 // Dipendenze: stato.js, oggetti.js, pokemon_factory.js, schermate.js
 // ==========================================================
 
 // ==========================================================
 // HELPERS ZAINO
 // Funzioni per gestire l'inventario del giocatore.
-// Il zaino è un array di { dbId: string, quantita: number }.
+// Il zaino \u00e8 un array di { dbId: string, quantita: number }.
 // ==========================================================
 
-/** Restituisce la quantità posseduta di un item nello zaino (0 se assente). */
+/** Restituisce la quantit\u00e0 posseduta di un item nello zaino (0 se assente). */
 function getQuantitaZaino(dbId) {
     const entry = zaino.find(e => e.dbId === dbId);
     return entry ? entry.quantita : 0;
 }
 
-/** Aggiunge 1 unità di un item allo zaino (raggruppa con eventuali esistenti). */
+/** Aggiunge 1 unit\u00e0 di un item allo zaino (raggruppa con eventuali esistenti). */
 function aggiungiAZaino(dbId) {
     const entry = zaino.find(e => e.dbId === dbId);
     if (entry) {
@@ -26,8 +26,8 @@ function aggiungiAZaino(dbId) {
 }
 
 /**
- * Rimuove 1 unità di un item dallo zaino.
- * Se la quantità arriva a 0, rimuove l'entry completamente.
+ * Rimuove 1 unit\u00e0 di un item dallo zaino.
+ * Se la quantit\u00e0 arriva a 0, rimuove l'entry completamente.
  * @returns {boolean} true se la rimozione ha avuto successo
  */
 function rimuoviDaZaino(dbId) {
@@ -55,15 +55,15 @@ function getOggettoDb(dbId) {
 function aggiornaDisplayMonete() {
     // Display sulla mappa
     const elMappa = document.getElementById("monete-display-mappa");
-    if (elMappa) elMappa.innerText = `💰 ${monete}`;
+    if (elMappa) elMappa.innerText = `\u{1f4b0} ${monete}`;
 
     // Display nell'header del negozio
     const elNegozio = document.getElementById("negozio-monete-header");
-    if (elNegozio) elNegozio.innerText = `💰 ${monete}`;
+    if (elNegozio) elNegozio.innerText = `\u{1f4b0} ${monete}`;
 }
 
 // ==========================================================
-// CENTRO MEDICO — Logica scelta iniziale
+// CENTRO MEDICO \u2014 Logica scelta iniziale
 // ==========================================================
 
 /** Mostra la fase di scelta del Centro Medico (cura vs negozio).
@@ -125,13 +125,13 @@ function tornaAllaMappaDaCentro() {
 }
 
 // ==========================================================
-// NEGOZIO — Apertura e rendering
+// NEGOZIO \u2014 Apertura e rendering
 // ==========================================================
 
 const CONFIG_NEGOZIO = {
     // Numero massimo di acquisti consentiti in una singola visita al centro medico
     maxAcquistiPerVisita: 1, 
-    // Se true, mostra i pulsanti + e - per comprare più item alla volta
+    // Se true, mostra i pulsanti + e - per comprare pi\u00f9 item alla volta
     abilitaQuantitaMultipla: false,
     // Se true, il semplice fatto di chiudere il negozio rimanda alla mappa,
     // chiudendo definitivamente il nodo del centro medico (impedendo la cura).
@@ -149,7 +149,7 @@ function apriNegozio() {
     _acquistiFattiInVisita = 0;
     _quantitaSelezionataNegozio = 1;
 
-    // Calcola il numero mappa corrente (es. "mappa3" → 3)
+    // Calcola il numero mappa corrente (es. "mappa3" \u2192 3)
     const numMappa = parseInt(mappaAttuale.replace("mappa", "")) || 1;
 
     // Filtra gli item acquistabili e disponibili in questa mappa
@@ -200,7 +200,7 @@ function _popolaListaNegozio(items) {
             ${iconaHtml}
             <span class="item-nome">${item.nome}</span>
             <span class="item-costo ${puoAcquistare ? '' : 'non-acquistabile'}">
-                ${item.costo} 💰
+                ${item.costo} \u{1f4b0}
             </span>
         `;
         row.onclick = () => _mostraDettaglioItem(item.id, items);
@@ -214,12 +214,12 @@ function _popolaListaNegozio(items) {
  */
 function _mostraDettaglioItem(dbId, itemsDisponibili) {
     _itemSelezionatoNegozio = dbId;
-    _quantitaSelezionataNegozio = 1; // Resetta la quantità
+    _quantitaSelezionataNegozio = 1; // Resetta la quantit\u00e0
     
     _aggiornaDettaglioNegozio();
 }
 
-/** Cambia la quantità selezionata dal selettore + / - */
+/** Cambia la quantit\u00e0 selezionata dal selettore + / - */
 function _cambiaQuantitaItem(delta) {
     const nuovaQuantita = _quantitaSelezionataNegozio + delta;
     if (nuovaQuantita >= 1) {
@@ -228,7 +228,7 @@ function _cambiaQuantitaItem(delta) {
     }
 }
 
-/** Aggiorna il pannello di dettaglio (utile se cambia l'item o la quantità) */
+/** Aggiorna il pannello di dettaglio (utile se cambia l'item o la quantit\u00e0) */
 function _aggiornaDettaglioNegozio() {
     const item = getOggettoDb(_itemSelezionatoNegozio);
     if (!item) return;
@@ -260,12 +260,12 @@ function _aggiornaDettaglioNegozio() {
                 <span>${_quantitaSelezionataNegozio}</span>
                 <button onclick="_cambiaQuantitaItem(1)" style="padding: 5px 15px; cursor: pointer; background: #333; color: white; border: 2px solid #555; border-radius: 5px;">+</button>
             </div>
-            <div id="negozio-dettaglio-costo">${costoTotale} 💰</div>
+            <div id="negozio-dettaglio-costo">${costoTotale} \u{1f4b0}</div>
             <button id="btn-acquista"
                     onclick="acquistaItem('${item.id}', ${_quantitaSelezionataNegozio})"
                     ${puoAcquistare ? '' : 'disabled'}
                     style="width: 100%;">
-                ${puoAcquistare ? '✅ ACQUISTA' : (acquistiRimasti < _quantitaSelezionataNegozio ? '❌ Limite Max Raggiunto' : '❌ Monete insufficienti')}
+                ${puoAcquistare ? '\u2705 ACQUISTA' : (acquistiRimasti < _quantitaSelezionataNegozio ? '\u274c Limite Max Raggiunto' : '\u274c Monete insufficienti')}
             </button>
         </div>
     `;
@@ -280,7 +280,7 @@ function _svuotaDettaglioNegozio() {
 }
 
 // ==========================================================
-// NEGOZIO — Acquisto
+// NEGOZIO \u2014 Acquisto
 // ==========================================================
 
 /**
@@ -316,7 +316,7 @@ function acquistaItem(dbId, quantita = 1) {
     if (det) {
         const feedback = document.createElement("div");
         feedback.style.cssText = "color:#2ecc71; font-family:monospace; font-weight:bold; font-size:14px; margin-top:8px; text-align: center;";
-        feedback.innerText     = `✅ ${quantita > 1 ? quantita + 'x ' : ''}${item.nome} aggiunto allo zaino!`;
+        feedback.innerText     = `\u2705 ${quantita > 1 ? quantita + 'x ' : ''}${item.nome} aggiunto allo zaino!`;
         det.appendChild(feedback);
         setTimeout(() => { if(feedback.parentNode) feedback.remove() }, 2000);
     }
@@ -329,7 +329,7 @@ function acquistaItem(dbId, quantita = 1) {
         return;
     }
 
-    // Ricalcola se ora si può ancora acquistare (aggiorna bottone)
+    // Ricalcola se ora si pu\u00f2 ancora acquistare (aggiorna bottone)
     const numMappa = parseInt(mappaAttuale.replace("mappa", "")) || 1;
     const itemsDisponibili = DB_OGGETTI.filter(o =>
         o.acquistabile && o.mappeAbilitate.includes(numMappa)
@@ -356,19 +356,19 @@ function chiudiNegozio() {
 }
 
 // ==========================================================
-// ITEM IN BATTAGLIA — Pannello e utilizzo
+// ITEM IN BATTAGLIA \u2014 Pannello e utilizzo
 // ==========================================================
 
 /** Apre il pannello item durante il combattimento (turno giocatore). */
 function apriPannelloItemBattaglia() {
-    // Sicurezza: apri solo se è il turno del giocatore e non ha già usato un item
+    // Sicurezza: apri solo se \u00e8 il turno del giocatore e non ha gi\u00e0 usato un item
     if (itemUsatiQuestoTurno) return;
     if (document.getElementById("btn-attacco")?.disabled) return;
 
     const pannello = document.getElementById("pannello-item-battaglia");
     if (!pannello) return;
 
-    // Toggle: se già aperto, chiudi
+    // Toggle: se gi\u00e0 aperto, chiudi
     if (pannello.style.display === "block") {
         chiudiPannelloItemBattaglia();
         return;
@@ -407,8 +407,8 @@ function _renderPannelloItemBattaglia() {
 
     let contenuto = `
         <div class="pannello-item-titolo">
-            🎒 ZAINO
-            <span onclick="chiudiPannelloItemBattaglia()" style="cursor:pointer; font-size:14px; color:#aaa;">✕</span>
+            \u{1f392} ZAINO
+            <span onclick="chiudiPannelloItemBattaglia()" style="cursor:pointer; font-size:14px; color:#aaa;">\u2715</span>
         </div>
     `;
 
@@ -425,7 +425,7 @@ function _renderPannelloItemBattaglia() {
                          alt="${cfg.nome}">
                     <span class="p-icona-fb" style="display:none; font-size:20px;">${cfg.iconaFallback}</span>
                     <span class="p-nome">${cfg.nome}</span>
-                    <span class="p-qty">×${entry.quantita}</span>
+                    <span class="p-qty">\u00d7${entry.quantita}</span>
                 </div>
             `;
         });
@@ -457,7 +457,7 @@ function usaItemInBattaglia(dbId) {
     // Messaggio in console-log
     const logEl = document.getElementById("console-log");
     if (logEl) {
-        logEl.innerHTML += `<br>🎒 <strong>${cfg.nome}</strong> usato! ${msg}`;
+        logEl.innerHTML += `<br>\u{1f392} <strong>${cfg.nome}</strong> usato! ${msg}`;
     }
 
     aggiornaGrafica();
@@ -467,7 +467,7 @@ function usaItemInBattaglia(dbId) {
 /**
  * Applica un bonus (o malus) a una statistica specifica (atk, def, vel).
  * Usato internamente da applicaEffettoItem.
- * @param {object} target   - Istanza Pokémon
+ * @param {object} target   - Istanza Pok\u00e9mon
  * @param {string} stat     - "atk" | "def" | "vel"
  * @param {number} valore   - Valore del bonus (positivo = bonus, negativo = malus)
  * @param {string} type     - "flat" | "percent"
@@ -486,9 +486,9 @@ function _applicaBonusStatistica(target, stat, valore, type) {
 }
 
 /**
- * Applica l'effetto di un oggetto consumabile a un Pokémon target.
+ * Applica l'effetto di un oggetto consumabile a un Pok\u00e9mon target.
  * @param {object} cfg - Record del DB_OGGETTI
- * @param {object} target - Il Pokémon su cui applicare l'effetto
+ * @param {object} target - Il Pok\u00e9mon su cui applicare l'effetto
  * @returns {string} Messaggio descrittivo dell'effetto applicato
  */
 function applicaEffettoItem(cfg, target) {
@@ -548,7 +548,7 @@ function applicaEffettoItem(cfg, target) {
             break;
 
         case "rimuovi_debuff":
-            // Rimuove velocità ridotta e difesa ridotta sul giocatore
+            // Rimuove velocit\u00e0 ridotta e difesa ridotta sul giocatore
             effettiAttivi.giocatore.velRidotta = null;
             effettiAttivi.giocatore.defRidotta = null;
             msg += "Tutti i debuff rimossi! ";
@@ -564,7 +564,7 @@ function applicaEffettoItem(cfg, target) {
 
         case "atk_boost_temporaneo":
             // Applica boost ATK temporaneo (Contratto Determinato)
-            // Sovrascrive un eventuale boost già attivo
+            // Sovrascrive un eventuale boost gi\u00e0 attivo
             effettiAttivi.giocatore.atkBoost = {
                 durata:     cfg.durataInTurni || 3,
                 percentuale: cfg.valore        // es. 0.20 = +20%
@@ -573,11 +573,11 @@ function applicaEffettoItem(cfg, target) {
             break;
 
         // ----------------------------------------------------------
-        // EQUIPAGGIABILI — Bonus su seconda statistica
+        // EQUIPAGGIABILI \u2014 Bonus su seconda statistica
         // ----------------------------------------------------------
 
         case "bonus_aggiuntivo_def_percent":
-            // Tessera del Sindacato: +20% HP (già applicato sopra) + +20% DEF
+            // Tessera del Sindacato: +20% HP (gi\u00e0 applicato sopra) + +20% DEF
             if (cfg.bonusStatistica && cfg.bonusValore) {
                 _applicaBonusStatistica(target, cfg.bonusStatistica, cfg.bonusValore, cfg.bonusValoreType);
                 msg += `DEF aumentata del ${Math.round(cfg.bonusValore * 100)}%! `;
@@ -585,7 +585,7 @@ function applicaEffettoItem(cfg, target) {
             break;
 
         case "bonus_aggiuntivo_vel_percent":
-            // Contratto Indeterminato: +25% ATK (già applicato sopra) + +25% VEL
+            // Contratto Indeterminato: +25% ATK (gi\u00e0 applicato sopra) + +25% VEL
             if (cfg.bonusStatistica && cfg.bonusValore) {
                 _applicaBonusStatistica(target, cfg.bonusStatistica, cfg.bonusValore, cfg.bonusValoreType);
                 msg += `VEL aumentata del ${Math.round(cfg.bonusValore * 100)}%! `;
@@ -593,30 +593,30 @@ function applicaEffettoItem(cfg, target) {
             break;
 
         // ----------------------------------------------------------
-        // EQUIPAGGIABILI MALEDETTI — Malus su statistica secondaria
+        // EQUIPAGGIABILI MALEDETTI \u2014 Malus su statistica secondaria
         // ----------------------------------------------------------
 
         case "malus_vel_flat":
-            // Cornetto della Reception: +20 HP (già applicato) -15 VEL fisso
+            // Cornetto della Reception: +20 HP (gi\u00e0 applicato) -15 VEL fisso
             target.vel = Math.max(0, target.vel + (cfg.malusValore || -15));
-            msg += `⚠️ VEL ridotta di ${Math.abs(cfg.malusValore || 15)}! `;
+            msg += `\u26a0\ufe0f VEL ridotta di ${Math.abs(cfg.malusValore || 15)}! `;
             break;
 
         case "malus_vel_percent":
-            // Sedia Ergonomica: +30% DEF (già applicato) -20% VEL
+            // Sedia Ergonomica: +30% DEF (gi\u00e0 applicato) -20% VEL
             if (cfg.malusValore) {
                 const ridVel = Math.round(target.vel * Math.abs(cfg.malusValore));
                 target.vel  = Math.max(0, target.vel - ridVel);
-                msg += `⚠️ VEL ridotta del ${Math.round(Math.abs(cfg.malusValore) * 100)}%! `;
+                msg += `\u26a0\ufe0f VEL ridotta del ${Math.round(Math.abs(cfg.malusValore) * 100)}%! `;
             }
             break;
 
         case "malus_def_percent":
-            // Bonus Straordinario: +30% ATK (già applicato) -20% DEF
+            // Bonus Straordinario: +30% ATK (gi\u00e0 applicato) -20% DEF
             if (cfg.malusValore) {
                 const ridDef = Math.round(target.def * Math.abs(cfg.malusValore));
                 target.def  = Math.max(0, target.def - ridDef);
-                msg += `⚠️ DEF ridotta del ${Math.round(Math.abs(cfg.malusValore) * 100)}%! `;
+                msg += `\u26a0\ufe0f DEF ridotta del ${Math.round(Math.abs(cfg.malusValore) * 100)}%! `;
             }
             break;
     }
@@ -645,7 +645,7 @@ function aggiornaStatoBtnItem() {
         return cfg && cfg.usabileInBattaglia;
     });
 
-    // Disabilitato se: non è il turno del giocatore, già usato item questo turno, zaino vuoto
+    // Disabilitato se: non \u00e8 il turno del giocatore, gi\u00e0 usato item questo turno, zaino vuoto
     btn.disabled = !turnoGiocatore || itemUsatiQuestoTurno || !haItemUsabili;
 
     // Stile visivo per evidenziare lo stato

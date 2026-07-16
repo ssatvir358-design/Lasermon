@@ -1,5 +1,5 @@
 // ==========================================================
-// boss.js — Archivio dei boss (dati statici)
+// boss.js \u2014 Archivio dei boss (dati statici)
 // Estratto da script.js (righe 114-208)
 // ==========================================================
 

@@ -56,12 +56,21 @@ img {
 /* ==========================================================
    STILI DEI CODICI COLORE ELEMENTI E ICONE
    ========================================================== */
+.testo-normale { color: #a8a878 !important; font-weight: bold; }
 .testo-fuoco { color: #ff4d4d !important; font-weight: bold; }
 .testo-acqua { color: #3498db !important; font-weight: bold; }
 .testo-erba  { color: #2ecc71 !important; font-weight: bold; }
+.testo-elettro { color: #ffcc00 !important; font-weight: bold; }
+.testo-ghiaccio { color: #98d8d8 !important; font-weight: bold; }
+.testo-lotta { color: #c03028 !important; font-weight: bold; }
+.testo-veleno { color: #a040a0 !important; font-weight: bold; }
+.testo-terra { color: #e0c068 !important; font-weight: bold; }
+.testo-vento { color: #a890f0 !important; font-weight: bold; }
+.testo-psico { color: #f85888 !important; font-weight: bold; }
+.testo-drago { color: #7038f8 !important; font-weight: bold; }
+.testo-folletto { color: #ee99ac !important; font-weight: bold; }
 .testo-luce  { color: #f1c40f !important; font-weight: bold; text-shadow: 1px 1px 0px rgba(0,0,0,0.2); }
 .testo-buio  { color: #9b59b6 !important; font-weight: bold; }
-
 /* Contenitore inline per mostrare l'icona affiancata al testo */
 .badge-elemento {
     display: inline-flex;

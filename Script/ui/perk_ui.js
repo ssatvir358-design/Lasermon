@@ -1,5 +1,5 @@
 // ==========================================================
-// perk_ui.js — Gestione UI e logica della selezione Perk
+// perk_ui.js \u2014 Gestione UI e logica della selezione Perk
 // Dipendenze: perks.js, stato.js, pokemon_factory.js, schermate.js
 // ==========================================================
 
@@ -15,12 +15,12 @@ let _totaleCodaPerk  = 0;  // Totale fisso all'inizio della coda, per il contato
 
 
 // ----------------------------------------------------------
-// VERIFICA POST-BATTAGLIA — chiamata da gestisciVittoriaIncontro
+// VERIFICA POST-BATTAGLIA \u2014 chiamata da gestisciVittoriaIncontro
 // ----------------------------------------------------------
 
 /**
- * Controlla se qualche Pokémon della squadra ha superato un level cap
- * durante questa battaglia. Se sì, costruisce la coda e avvia la UI.
+ * Controlla se qualche Pok\u00e9mon della squadra ha superato un level cap
+ * durante questa battaglia. Se s\u00ec, costruisce la coda e avvia la UI.
  *
  * @param {object[]} livPreBattle - Array con i livelli PRIMA del level-up,
  *                                  formato: [{ pokemon, livelloPre }]
@@ -45,8 +45,8 @@ function verificaEAvviaPerk(livPreBattle, callbackFine) {
             const tier = cap === CONFIG_PERK_LEVEL_CAP.tier1 ? 1 : 2;
             if (tier === 2 && !pokemon.perkId) return;
 
-            const giàInCoda = _codaPerk.some(e => e.pokemon === pokemon && e.tier === tier);
-            if (!giàInCoda) _codaPerk.push({ pokemon, tier });
+            const gi\u00e0InCoda = _codaPerk.some(e => e.pokemon === pokemon && e.tier === tier);
+            if (!gi\u00e0InCoda) _codaPerk.push({ pokemon, tier });
         });
     });
 
@@ -62,13 +62,13 @@ function verificaEAvviaPerk(livPreBattle, callbackFine) {
 
 /**
  * Variante standalone per eventi fuori dalla battaglia (es. scambio).
- * Controlla se il Pokémon appena ottenuto supera un level cap e avvia i perk.
- * @param {object} nuovoPokemon  - Il Pokémon appena ottenuto
+ * Controlla se il Pok\u00e9mon appena ottenuto supera un level cap e avvia i perk.
+ * @param {object} nuovoPokemon  - Il Pok\u00e9mon appena ottenuto
  * @param {Function} callbackFine - Chiamata dopo la selezione (o subito se nessun perk)
  */
 function verificaPerkDopoEvento(nuovoPokemon, callbackFine) {
-    // Costruiamo una livPreBattle fittizia: il Pokémon era a livello 0 "prima"
-    // così attraversa sicuramente qualsiasi cap ≤ del livello attuale
+    // Costruiamo una livPreBattle fittizia: il Pok\u00e9mon era a livello 0 "prima"
+    // cos\u00ec attraversa sicuramente qualsiasi cap \u2264 del livello attuale
     const livPreFittizio = [{ pokemon: nuovoPokemon, livelloPre: 0 }];
     verificaEAvviaPerk(livPreFittizio, callbackFine);
 }
@@ -95,8 +95,8 @@ function _avanzaCodaPerk() {
 
 
 /**
- * Popola e mostra la schermata di selezione Perk per un Pokémon.
- * @param {object} pokemon - Istanza Pokémon giocatore
+ * Popola e mostra la schermata di selezione Perk per un Pok\u00e9mon.
+ * @param {object} pokemon - Istanza Pok\u00e9mon giocatore
  * @param {number} tier    - 1 = Lv.45, 2 = Lv.100
  */
 function _mostraSchermaPerk(pokemon, tier) {
@@ -108,7 +108,7 @@ function _mostraSchermaPerk(pokemon, tier) {
     if (tier === 1) {
         opzioni = catDB.tier1.opzioni;
     } else {
-        // Tier 2: mostra solo l'evoluzione del Perk già scelto
+        // Tier 2: mostra solo l'evoluzione del Perk gi\u00e0 scelto
         const perkTier1Id = _getPerkBaseTier1(pokemon.perkId);
         opzioni = perkTier1Id ? [catDB.tier2[perkTier1Id]] : catDB.tier1.opzioni;
     }
@@ -116,10 +116,10 @@ function _mostraSchermaPerk(pokemon, tier) {
     // --- Aggiorna header ---
     document.getElementById("perk-header-sub").textContent =
         tier === 1
-            ? `Livello ${CONFIG_PERK_LEVEL_CAP.tier1} raggiunto! Scegli la tua abilità passiva`
-            : `Livello ${CONFIG_PERK_LEVEL_CAP.tier2} raggiunto! Evolvi la tua abilità`;
+            ? `Livello ${CONFIG_PERK_LEVEL_CAP.tier1} raggiunto! Scegli la tua abilit\u00e0 passiva`
+            : `Livello ${CONFIG_PERK_LEVEL_CAP.tier2} raggiunto! Evolvi la tua abilit\u00e0`;
 
-    // --- Aggiorna info Pokémon ---
+    // --- Aggiorna info Pok\u00e9mon ---
     document.getElementById("perk-pokemon-img").src   = pokemon.immagine;
     document.getElementById("perk-pokemon-nome").textContent = pokemon.nome;
     document.getElementById("perk-pokemon-lvl").textContent  = `Lv. ${pokemon.livello}`;
@@ -129,7 +129,7 @@ function _mostraSchermaPerk(pokemon, tier) {
     badge.className    = `perk-stat-badge perk-stat-${categoria}`;
 
     // --- Coda info ---
-    // Il giocatore ha chiesto esplicitamente di rimuovere la scritta "Pokémon 1 di 2"
+    // Il giocatore ha chiesto esplicitamente di rimuovere la scritta "Pok\u00e9mon 1 di 2"
     const infoEl = document.getElementById("perk-coda-info");
     if (infoEl) {
         infoEl.textContent = "";
@@ -141,10 +141,10 @@ function _mostraSchermaPerk(pokemon, tier) {
 
     opzioni.forEach(op => {
         if (!op) return;
-        const btnText = tier === 2 ? "✨ EVOLVI" : "✅ SCEGLI";
+        const btnText = tier === 2 ? "\u2728 EVOLVI" : "\u2705 SCEGLI";
         const card = document.createElement("div");
         card.className = "perk-card";
-        // Se è tier 2 e c'è solo un'opzione, aggiungi una classe per centrarla o evidenziarla se serve
+        // Se \u00e8 tier 2 e c'\u00e8 solo un'opzione, aggiungi una classe per centrarla o evidenziarla se serve
         if (tier === 2) card.classList.add("perk-card-singola");
         card.innerHTML = `
             <div class="perk-card-emoji">${op.emoji}</div>
@@ -169,7 +169,7 @@ function _mostraSchermaPerk(pokemon, tier) {
 // ----------------------------------------------------------
 
 /**
- * Assegna il perk selezionato al Pokémon corrente e avanza la coda.
+ * Assegna il perk selezionato al Pok\u00e9mon corrente e avanza la coda.
  * @param {string} perkId - ID del perk scelto (da PERK_DB)
  */
 function selezionaPerk(perkId) {
@@ -177,7 +177,7 @@ function selezionaPerk(perkId) {
 
     const { pokemon, tier } = _codaPerk.shift(); // rimuove dalla coda
 
-    // Assegna perk all'istanza Pokémon
+    // Assegna perk all'istanza Pok\u00e9mon
     pokemon.perkId   = perkId;
     pokemon.perkTier = tier;
 
@@ -190,7 +190,7 @@ function selezionaPerk(perkId) {
     });
 
     const perkInfo = getPerkDaId(perkId);
-    console.log(`[PERK] ${pokemon.nome} → ${perkInfo?.nome || perkId} (Tier ${tier})`);
+    console.log(`[PERK] ${pokemon.nome} \u2192 ${perkInfo?.nome || perkId} (Tier ${tier})`);
 
     // Breve pausa di conferma poi avanza
     setTimeout(() => {
@@ -205,7 +205,7 @@ function selezionaPerk(perkId) {
 
 /**
  * Data l'ID di un Perk Tier 2, restituisce la chiave (ID Tier 1) del genitore.
- * Es. "salvavita_2" → "salvavita"
+ * Es. "salvavita_2" \u2192 "salvavita"
  * @param {string|null} perkTier2Id
  * @returns {string|null}
  */
@@ -218,6 +218,6 @@ function _getPerkBaseTier1(perkTier2Id) {
             }
         }
     }
-    // Se è già un Tier 1, restituisce se stesso (es. pokemon che va direttamente al Tier 2 selezionando)
+    // Se \u00e8 gi\u00e0 un Tier 1, restituisce se stesso (es. pokemon che va direttamente al Tier 2 selezionando)
     return perkTier2Id;
 }

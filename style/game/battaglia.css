@@ -12,49 +12,117 @@
     overflow: hidden;
 }
 
-.sfondo-vs-split {
+.sfondo-vs-custom {
     width: 100%;
     height: 100%;
     position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    background: linear-gradient(135deg, #1e3c72 49.9%, #000 50%, #b22222 50.1%);
+    justify-content: center;
+    background-image: url('../../Sprite/UI/Combattimento/VS_Background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    animation: shakeScreen 0.35s ease-in-out;
+    animation-delay: 0.5s; /* Si attiva in sincrono con la discesa del logo VS */
 }
 
-.lato-giocatore, .lato-nemico {
-    width: 45%;
-    height: 60vh;
+@keyframes shakeScreen {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    15% { transform: translate(-8px, 6px) rotate(-0.5deg); }
+    30% { transform: translate(8px, -6px) rotate(0.5deg); }
+    45% { transform: translate(-6px, -4px) rotate(-0.3deg); }
+    60% { transform: translate(6px, 4px) rotate(0.3deg); }
+    75% { transform: translate(-3px, 2px) rotate(-0.1deg); }
+    90% { transform: translate(3px, -2px) rotate(0.1deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.blocco-vs {
+    position: absolute;
+    top: 50%;
+    width: 55% !important;            /* Leggermente > 50% per coprire la diagonale centrale */
+    height: 90vh !important;           /* Grande: occupa quasi tutto lo schermo in altezza */
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: absolute;
-    transition: transform 0.5s ease-out;
+    transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 12;
+    box-sizing: border-box !important;
+    overflow: hidden;
 }
 
-.lato-giocatore { left: 0; transform: translateX(-100%); }
-.lato-nemico { right: 0; transform: translateX(100%); }
-.lato-giocatore.entra, .lato-nemico.entra { transform: translateX(0); }
-
-.lato-giocatore img, .lato-nemico img {
-    max-width: 90%;
-    max-height: 100%;
-    object-fit: contain;
+.blocco-vs-blu {
+    left: 0;
+    background-image: url('../../Sprite/UI/Combattimento/Blocco_blu.png');
+    transform: translate(-100%, -50%);
+    padding-right: 12%;                /* Centra lo sprite nella parte solida del blocco */
 }
 
-.scritta-vs {
+.blocco-vs-rosso {
+    right: 0;
+    background-image: url('../../Sprite/UI/Combattimento/Blocco_rosso.png');
+    transform: translate(100%, -50%);
+    padding-left: 12%;                 /* Centra lo sprite nella parte solida del blocco */
+}
+
+.blocco-vs-blu.entra {
+    transform: translate(0, -50%);
+}
+
+.blocco-vs-rosso.entra {
+    transform: translate(0, -50%);
+}
+
+/* Character sprite inside blocks */
+.blocco-vs .vs-sprite-pokemon {
+    max-width: 75% !important;         /* Sprite più grande dentro il blocco */
+    max-height: 90% !important;
+    height: auto !important;
+    width: auto !important;
+    object-fit: contain !important;
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.6));
+    opacity: 0;
+    transform: scale(0.6) translateY(20px);
+    transition: transform 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.25), opacity 0.5s ease-out;
+    transition-delay: 0.2s;
+}
+
+.blocco-vs.entra .vs-sprite-pokemon {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+/* Center VS logo */
+.logo-vs-container {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    font-size: 80px;
-    font-weight: bold;
-    color: #fff;
-    text-shadow: 0 0 20px #ffeb3b, 4px 4px 0px #000;
-    z-index: 10;
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: translate(-50%, -50%);
+    z-index: 15;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-.scritta-vs.attiva { transform: translate(-50%, -50%) scale(1); }
+
+.logo-vs-image {
+    max-width: 500px;
+    width: 35vw;                       /* Responsivo: 35% della larghezza schermo */
+    height: auto;
+    opacity: 0;
+    transform: scale(4) rotate(-60deg);
+    transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.3), opacity 0.15s ease-out;
+    transition-delay: 0.5s;
+    filter: drop-shadow(0 0 30px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 60px rgba(255, 50, 50, 0.4));
+}
+
+.logo-vs-container.attiva .logo-vs-image {
+    opacity: 1;
+    transform: scale(1) rotate(-14deg); /* Schiacciato a terra e inclinato a sinistra */
+}
 
 /* ==========================================================
    ARENA DI COMBATTIMENTO RPG A SCHERMO INTERO CORRETTA

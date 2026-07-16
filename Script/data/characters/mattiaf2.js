@@ -1,2 +1,2 @@
 // ===== MATTIA F2 =====
-const CHAR_MATTIAF2 = { nome: "Mattia F2", isEvoluzione: true, hpBase: 6, atkBase: 8, defBase: 5, atkSpec: 4, defSpec: 5, velBase: 8, raritaTipo: "epico", elemento: "lotta", immagine: "../Sprite/personaggi/MattiaF2/MattiaF2.jpeg", immagineAtk: "../Sprite/personaggi/MattiaF2/MattiaF2_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "Attacco 3", boss: false };
+const CHAR_MATTIAF2 = { nome: "Mattia F2", hpBase: 6, atkBase: 8, defBase: 5, atkSpec: 4, defSpec: 5, velBase: 8, raritaTipo: "epico", elemento: "lotta", immagine: "../Sprite/personaggi/MattiaF2/MattiaF2.jpeg", immagineAtk: "../Sprite/personaggi/MattiaF2/MattiaF2_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "|", boss: false, isEvoluzione: true };
