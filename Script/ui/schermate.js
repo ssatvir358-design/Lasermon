@@ -24,11 +24,16 @@ cambiaSchermata = function(idNascondi, idMostra) {
     if (idMostra === "schermata-mappa") {
         riproduciMusica("mappa.mp3");
         // Imposta sfondo mappa dinamicamente
-        const elm = document.getElementById("schermata-mappa");
+        const elm = document.getElementById("contenitore-mappa-gioco");
         if (elm && typeof ARCHIVIO_MAPPE !== "undefined" && ARCHIVIO_MAPPE[mappaAttuale]) {
             elm.style.backgroundImage = `url('${ARCHIVIO_MAPPE[mappaAttuale].sfondoMappa}')`;
             elm.style.backgroundSize = "cover";
             elm.style.backgroundPosition = "center";
+        }
+        
+        // Assicurati che lo zaino persistente sia aggiornato
+        if (typeof aggiornaPannelloZainoMappa === "function") {
+            aggiornaPannelloZainoMappa();
         }
     }
     if (idMostra === "schermata-gioco") {
@@ -92,7 +97,7 @@ function mostraSelezione() {
     }
 }
 
-// Genera le opzioni Pok\u00e9mon da scegliere (per Pok\u{00e9ba}ll, non per starter)
+// // Genera le opzioni Pokémon da scegliere (per Pokéball, non per starter)
 function generaOpzioniPokemon(quanti, isStarter) {
     if (isStarter) return;
 
@@ -102,15 +107,21 @@ function generaOpzioniPokemon(quanti, isStarter) {
     let nomiEstratti = [];
     opzioniSceltaPokemon = []; // Reset
 
+    let trovatoLeggendario = false;
+
     for (let i = 0; i < quanti; i++) {
-        let infoBase = pescaPokemonCasuale(nomiEstratti); 
+        let infoBase = pescaPokemonPokeball(nomiEstratti); 
         nomiEstratti.push(infoBase.nome);
+        
+        if (infoBase.raritaTipo && infoBase.raritaTipo.toLowerCase() === "leggendario") {
+            trovatoLeggendario = true;
+        }
         
         let configGenerata = calcolaLivelloEMossaMappa(pianoAttuale);
         
-        // Calcolo livello reclutamento: Math.min(Lvl_iniziale_mappa_del_pg_max_del_team, livello_max_lvl_team - 1)
+        // Calcolo livello reclutamento: Math.max(Lvl_iniziale_mappa_del_pg_max_del_team, livello_max_lvl_team - 1)
         let maxLvlTeam = miaSquadra.length > 0 ? Math.max(...miaSquadra.filter(m => m).map(m => m.livello)) : 1;
-        let lvlReclutamento = Math.min(maxLvlTeamInizioMappa, maxLvlTeam - 1);
+        let lvlReclutamento = Math.max(maxLvlTeamInizioMappa, maxLvlTeam - 1);
 
         let p = creaPokemon(infoBase, lvlReclutamento, configGenerata.livelloMossa);
         opzioniSceltaPokemon[i] = p;
@@ -121,7 +132,7 @@ function generaOpzioniPokemon(quanti, isStarter) {
         let bloccoAzioneHTML = "";
         if (miaSquadra.length >= 6) {
             // Squadra piena: mostra select per scegliere chi sostituire
-            let opzioniSostituzione = `<option value="keep">Lascia nella Pok\u{00e9ba}ll (Tienilo cos\u00ec)</option>`;
+            let opzioniSostituzione = `<option value="keep">Lascia nella Pokéball (Tienilo così)</option>`;
             miaSquadra.forEach((membro, idx) => {
                 let elemento = membro.elemento ? membro.elemento.toUpperCase() : "FUOCO";
                 opzioniSostituzione += `<option value="${idx}">Sostituisci ${membro.nome} (${elemento}) | Lvl.${membro.livello} | HP:${membro.hpAttuali}/${membro.hpMax} | ATK:${membro.atk} DEF:${membro.def} VEL:${membro.vel} SP.ATK:${membro.atkSpec} SP.DEF:${membro.defSpec}</option>`;
@@ -134,7 +145,7 @@ function generaOpzioniPokemon(quanti, isStarter) {
                 <button class="btn-scegli" style="margin-top: 5px; width: 100%;" onclick="confermaSceltaConSostituzioneDaIndice(${i})">CONFERMA</button>
             `;
         } else {
-            // C'\u00e8 spazio, semplice tasto Scegli
+            // C'è spazio, semplice tasto Scegli
             bloccoAzioneHTML = `<button class="btn-scegli" onclick="aggiungiASquadraDaIndice(${i})">Scegli</button>`;
         }
 
@@ -158,6 +169,15 @@ function generaOpzioniPokemon(quanti, isStarter) {
             </div>
         `;
         contenitore.appendChild(colonna);
+    }
+
+    // Aggiornamento soft pity leggendari
+    if (trovatoLeggendario) {
+        tentativiSenzaLeggendari = 0;
+        console.log("[Soft Pity] Legendary rolled! Counter reset to 0.");
+    } else {
+        tentativiSenzaLeggendari++;
+        console.log(`[Soft Pity] No legendary rolled. Counter incremented to ${tentativiSenzaLeggendari}.`);
     }
 }
 
@@ -195,77 +215,129 @@ function confermaSceltaConSostituzioneDaIndice(indiceOpzione) {
 }
 
 // ----------------------------------------------------------
-// ZAINO MAPPA (SOLO VISIVO)
+// ZAINO MAPPA (UI PERSISTENTE)
 // ----------------------------------------------------------
-function apriPannelloZainoMappa() {
-    const modale = document.getElementById("modale-zaino-mappa");
+function aggiornaPannelloZainoMappa() {
     const contenitore = document.getElementById("zaino-mappa-lista");
-    if (!modale || !contenitore) return;
+    const capacitaCounter = document.getElementById("zaino-capacita-counter");
+    if (!contenitore) return;
+    
+    // Calcola il numero di slot occupati (somma delle quantità)
+    let slotOccupati = 0;
+    zaino.forEach(item => {
+        slotOccupati += (item.quantita || 1);
+    });
+    const maxSlot = 20; // Capacità fittizia per ora
+    
+    if (capacitaCounter) {
+        capacitaCounter.textContent = `${slotOccupati}/${maxSlot}`;
+        if (slotOccupati > maxSlot) {
+            capacitaCounter.style.color = "#e74c3c"; // Rosso se supera
+        } else {
+            capacitaCounter.style.color = "#bbb";
+        }
+    }
     
     contenitore.innerHTML = "";
     
-    if (zaino.length === 0) {
-        contenitore.innerHTML = "<p style='color: white; width: 100%; text-align: center;'>Lo zaino \u00e8 vuoto.</p>";
-    } else {
-        zaino.forEach((item, indexZaino) => {
-            const divItem = document.createElement("div");
-            divItem.className = "card-item-shop";
-            divItem.style.cursor = "default";
-            
+    // Generiamo esattamente 20 celle (maxSlot) per mantenere l'ordine visivo
+    for (let i = 0; i < maxSlot; i++) {
+        const cella = document.createElement("div");
+        
+        if (i < zaino.length) {
+            // Cella piena
+            const item = zaino[i];
             const fullItem = item.dbId ? (typeof getOggettoDb === "function" ? getOggettoDb(item.dbId) : DB_OGGETTI.find(o => o.id === item.dbId)) : item;
-            const quantitaStr = item.quantita && item.quantita > 1 ? ` (x${item.quantita})` : "";
-            const itemNome = fullItem ? fullItem.nome : "Oggetto Sconosciuto";
-            const itemDesc = fullItem ? fullItem.descrizione : "Nessuna descrizione.";
+            const quantitaStr = item.quantita && item.quantita > 1 ? `x${item.quantita}` : "x1";
+            const itemNome = fullItem ? fullItem.nome : "Sconosciuto";
             const itemCat = fullItem ? fullItem.categoria : "";
             
-            let htmlInner = `
-                <div style="font-weight: bold; color: #f1c40f;">${itemNome}${quantitaStr}</div>
-                <div style="font-size: 12px; margin: 5px 0; color: #ddd;">${itemDesc}</div>
-            `;
-            
+            cella.className = "zaino-cella piena";
             if (itemCat === "equipaggiabile") {
-                let opzioni = miaSquadra.map((p, i) => `<option value="${i}">${p.nome}</option>`).join("");
-                htmlInner += `
-                    <div style="margin-top: 10px; display: flex; gap: 5px;">
-                        <select id="select-equip-${indexZaino}" style="flex: 1; padding: 5px; background: #2c3e50; color: white; border: 1px solid #34495e; border-radius: 4px;">
-                            ${opzioni}
-                        </select>
-                        <button class="btn-scegli" onclick="equipaggiaDaZaino(${indexZaino})" style="padding: 5px 10px; font-size: 12px;">DAI</button>
-                    </div>
-                `;
+                cella.onclick = () => apriAssegnazioneOggetto(i);
             }
             
-            divItem.innerHTML = htmlInner;
-            contenitore.appendChild(divItem);
-        });
+            cella.innerHTML = `
+                <div class="zaino-cella-nome">${itemNome}</div>
+                <div class="zaino-cella-qty">${quantitaStr}</div>
+            `;
+        } else {
+            // Cella vuota
+            cella.className = "zaino-cella vuota";
+            cella.innerHTML = `<div style="color: rgba(255,255,255,0.2); font-size: 20px;">+</div>`;
+        }
+        
+        contenitore.appendChild(cella);
     }
-    
-    modale.style.display = "flex";
 }
 
-function chiudiPannelloZainoMappa() {
-    const modale = document.getElementById("modale-zaino-mappa");
-    if (modale) modale.style.display = "none";
+// ----------------------------------------------------------
+// VISTA ASSEGNAZIONE OGGETTO (DENTRO LO ZAINO)
+// ----------------------------------------------------------
+function apriAssegnazioneOggetto(indexZaino) {
+    const vistaPrincipale = document.getElementById("zaino-mappa-lista");
+    const vistaAssegnazione = document.getElementById("zaino-vista-assegnazione");
+    const listaAssegnazione = document.getElementById("zaino-assegnazione-lista");
+    
+    if (!vistaPrincipale || !vistaAssegnazione || !listaAssegnazione) return;
+    
+    vistaPrincipale.style.display = "none";
+    vistaAssegnazione.style.display = "flex";
+    
+    listaAssegnazione.innerHTML = "";
+    
+    miaSquadra.forEach((p, i) => {
+        const row = document.createElement("div");
+        row.className = "zaino-pokemon-row";
+        
+        const folder = p.nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3');
+        const iconSrc = `../Sprite/personaggi/${folder}/${p.nome}VS.jpeg`;
+        const haItem = p.oggetti && p.oggetti.length > 0 ? " ⭐" : "";
+        
+        row.onclick = () => confermaAssegnazioneOggetto(indexZaino, i);
+        
+        row.innerHTML = `
+            <div class="zaino-pokemon-icon" style="background-image: url('${iconSrc}');"></div>
+            <div class="zaino-pokemon-info">
+                <span style="font-weight: bold; font-size: 13px;">${p.nome}${haItem}</span>
+                <span>Lv. ${p.livello} | HP: ${p.hpAttuali}/${p.hpMax}</span>
+            </div>
+        `;
+        
+        listaAssegnazione.appendChild(row);
+    });
 }
 
-function equipaggiaDaZaino(indexZaino) {
-    const select = document.getElementById(`select-equip-${indexZaino}`);
-    if (!select) return;
+function annullaAssegnazioneOggetto() {
+    const vistaPrincipale = document.getElementById("zaino-mappa-lista");
+    const vistaAssegnazione = document.getElementById("zaino-vista-assegnazione");
     
-    let pIndex = parseInt(select.value);
-    let p = miaSquadra[pIndex];
+    if (vistaPrincipale) vistaPrincipale.style.display = "grid";
+    if (vistaAssegnazione) vistaAssegnazione.style.display = "none";
+}
+
+function confermaAssegnazioneOggetto(indexZaino, indexPokemon) {
     let itemInZaino = zaino[indexZaino];
-    let fullItem = itemInZaino.dbId ? (typeof getOggettoDb === "function" ? getOggettoDb(itemInZaino.dbId) : DB_OGGETTI.find(o => o.id === itemInZaino.dbId)) : itemInZaino;
+    if (!itemInZaino) return;
     
-    // Controlla se il pokemon ha gi\u00e0 raggiunto il limite di oggetti
-    if (p.oggetti && p.oggetti.length >= 1) {
-        let log = document.getElementById("console-log-zaino");
-        if (log) log.innerHTML = `<span style="color: #e74c3c;">${p.nome} ha gi\u00e0 un oggetto equipaggiato!</span>`;
+    let fullItem = itemInZaino.dbId ? (typeof getOggettoDb === "function" ? getOggettoDb(itemInZaino.dbId) : DB_OGGETTI.find(o => o.id === itemInZaino.dbId)) : itemInZaino;
+    if (!fullItem || fullItem.categoria !== "equipaggiabile") return;
+
+    let p = miaSquadra[indexPokemon];
+    if (!p) return;
+    
+    if (!p.oggetti) p.oggetti = [];
+    if (p.oggetti.length >= 3) {
+        alert("Questo Pokémon ha già il massimo degli oggetti equipaggiati (3)!");
         return;
     }
     
-    // Aggiungi l'item al pokemon
+    // Equipaggia
     p.oggetti.push(fullItem);
+    
+    // Notifica visiva (opzionale)
+    let log = document.getElementById("console-log-zaino") || document.getElementById("console-log");
+    if (log) log.innerHTML = `🛡️ ${fullItem.nome} equipaggiato a ${p.nome}!`;
     
     // Rimuovi l'item dallo zaino
     if (itemInZaino.quantita && itemInZaino.quantita > 1) {
@@ -274,21 +346,16 @@ function equipaggiaDaZaino(indexZaino) {
         zaino.splice(indexZaino, 1);
     }
     
-    // Riapplica i bonus statistici
-    if (typeof applicaBonusOggetti === "function") {
-        applicaBonusOggetti(p);
-    }
-    
-    // Notifica visiva (opzionale)
-    let log = document.getElementById("console-log");
-    if (log) log.innerHTML = `\u{1f6e1}\ufe0f ${fullItem.nome} equipaggiato a ${p.nome}!`;
-    
     // Ricarica la schermata
     aggiornaSquadraMappa();
-    apriPannelloZainoMappa();
+    
+    // Torna alla vista zaino
+    annullaAssegnazioneOggetto();
+    aggiornaPannelloZainoMappa();
 }
 
-// Aggiunge un Pok\u00e9mon alla squadra e va alla mappa
+
+// Aggiunge un Pokémon alla squadra e va alla mappa
 let nomeStarterOriginale = null;
 
 function aggiungiASquadra(pObiettivo) {
@@ -932,3 +999,37 @@ function applicaFiltriPokedex() {
         griglia.appendChild(scheda);
     });
 }
+
+// ==========================================================
+// SCALING DEL CONTENITORE GIOCO (STILE POKELIKE 900x1281)
+// ==========================================================
+function adattaRisoluzioneGioco() {
+    const container = document.getElementById("contenitore-mappa-gioco");
+    if (!container) return;
+    
+    const baseWidth = 900;
+    const baseHeight = 1281;
+    
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    
+    // Calcola il fattore di scala mantenendo le proporzioni
+    const scalaX = windowWidth / baseWidth;
+    const scalaY = windowHeight / baseHeight;
+    const scala = Math.min(scalaX, scalaY);
+    
+    // Centra e scala il container
+    container.style.transform = `translate(-50%, -50%) scale(${scala})`;
+    
+    // Esponi la larghezza e altezza scalata per la UI esterna
+    document.documentElement.style.setProperty('--map-scaled-width', (baseWidth * scala) + 'px');
+    document.documentElement.style.setProperty('--map-scaled-height', (baseHeight * scala) + 'px');
+}
+
+// Registra i trigger
+window.addEventListener("resize", adattaRisoluzioneGioco);
+window.addEventListener("load", adattaRisoluzioneGioco);
+document.addEventListener("DOMContentLoaded", adattaRisoluzioneGioco);
+
+// Esegui subito all'avvio dello script
+adattaRisoluzioneGioco();

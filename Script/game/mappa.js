@@ -25,6 +25,9 @@ function generaMappaProcedurale() {
         ? Math.max(...miaSquadra.filter(p => p).map(p => p.livello)) 
         : 1;
 
+    // Genera la variazione seed per questa mappa (-1, 0, or 1)
+    variazioneSeedMappa = Math.floor(Math.random() * 3) - 1;
+
     // Contatore di quante volte ogni tipo di evento \u00e8 gi\u00e0 stato piazzato in questa mappa
     const contatoreEventi = {};
     Object.keys(DB_EVENTI_NODI).forEach(tipo => contatoreEventi[tipo] = 0);
@@ -75,7 +78,21 @@ function generaMappaProcedurale() {
 
             let elementoNpc = null;
             if (tipoEvento === "npc") {
-                const elementiPossibili = ["fuoco", "acqua", "erba", "elettro", "ghiaccio", "normale"];
+                // Calcola i tipi possibili scansionando il database reale (escludendo luce e buio)
+                const tipiPresenti = new Set();
+                if (typeof pokemonDatabase !== "undefined") {
+                    pokemonDatabase.forEach(p => {
+                        if (p && p.elemento) {
+                            const el = p.elemento.toLowerCase();
+                            if (el !== "luce" && el !== "buio") {
+                                tipiPresenti.add(el);
+                            }
+                        }
+                    });
+                }
+                const elementiPossibili = Array.from(tipiPresenti);
+                if (elementiPossibili.length === 0) elementiPossibili.push("normale"); // Fallback di sicurezza
+                
                 elementoNpc = elementiPossibili[Math.floor(Math.random() * elementiPossibili.length)];
             }
 
@@ -223,6 +240,24 @@ function generaMappaAlbero() {
                         // Aggiungiamo l'ombra per farla sembrare un nodo
                         imgChibi.style.filter = "drop-shadow(0px 4px 6px rgba(0,0,0,0.5))";
                         
+                        // Compensa le differenze di dimensione nei file sorgente degli sprite
+                        let scaleFactor = 1;
+                        switch (nodoObj.elementoNpc.toLowerCase()) {
+                            case "ghiaccio":
+                            case "erba":
+                            case "fuoco":
+                            case "lotta":
+                            case "veleno":
+                                scaleFactor = 1.35; // Aumenta molto la dimensione
+                                break;
+                            case "elettro":
+                                scaleFactor = 1.15; // Aumenta leggermente
+                                break;
+                        }
+                        if (scaleFactor !== 1) {
+                            imgChibi.style.transform = `scale(${scaleFactor})`;
+                        }
+                        
                         bottone.appendChild(imgChibi);
                     }
                 }
@@ -272,10 +307,15 @@ function generaMappaAlbero() {
 // Disegna le linee SVG di collegamento tra i nodi della mappa
 function disegnaLineeMappa() {
     const container = document.getElementById("albero-container");
-    if (!container) {
-        console.error("Il container albero-container non esiste nel DOM!");
+    const mappaElement = document.getElementById("contenitore-mappa-gioco");
+    if (!container || !mappaElement) {
+        console.error("Manca il container della mappa per disegnare le linee!");
         return;
     }
+
+    // Calcoliamo lo scale ESATTO basandoci sulla larghezza reale (900px CSS) del contenitore padre scalato
+    const mappaRect = mappaElement.getBoundingClientRect();
+    const exactScale = mappaRect.width / 900 || 1;
 
     // Rimuove il vecchio SVG per evitare duplicati
     const oldSvg = document.getElementById("mappa-svg");
@@ -302,12 +342,13 @@ function disegnaLineeMappa() {
                 const rectA = elA.getBoundingClientRect();
                 const rectB = elB.getBoundingClientRect();
                 const cRect = container.getBoundingClientRect();
+                const scale = exactScale;
 
                 const linea = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                linea.setAttribute("x1", rectA.left + rectA.width / 2 - cRect.left);
-                linea.setAttribute("y1", rectA.top  + rectA.height / 2 - cRect.top);
-                linea.setAttribute("x2", rectB.left + rectB.width / 2 - cRect.left);
-                linea.setAttribute("y2", rectB.top  + rectB.height / 2 - cRect.top);
+                linea.setAttribute("x1", (rectA.left + rectA.width / 2 - cRect.left) / scale);
+                linea.setAttribute("y1", (rectA.top  + rectA.height / 2 - cRect.top) / scale);
+                linea.setAttribute("x2", (rectB.left + rectB.width / 2 - cRect.left) / scale);
+                linea.setAttribute("y2", (rectB.top  + rectB.height / 2 - cRect.top) / scale);
                 linea.setAttribute("stroke",           "#000000");
                 linea.setAttribute("stroke-width",     "2.5");
                 linea.setAttribute("stroke-dasharray", "4,4");

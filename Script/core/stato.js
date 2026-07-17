@@ -104,6 +104,8 @@ let nodoSceltoAttuale = 0;
 let mappaEventi = {};
 let mappaAttuale = "mappa1";
 let maxLvlTeamInizioMappa = 1;
+let variazioneSeedMappa = 0;
+let tentativiSenzaLeggendari = 0;
 
 // --- UI / Impostazioni ---
 let isSkipAttivo         = false;

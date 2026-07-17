@@ -2,26 +2,116 @@
    STRUTTURA E GESTIONE DELLA MAPPA DI GIOCO
    ========================================================== */
 #schermata-mappa {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #0f0f1a;
+    background-image: radial-gradient(circle at center, #1a1a2e 0%, #0a0a14 100%);
+    z-index: 10;
+}
+
+#schermata-mappa.attiva {
+    display: block; /* Non flex, usiamo positioning assoluto all'interno */
+}
+
+/* Il contenitore che subisce lo zoom in scala e mantiene la proporzione Pokelike 900x1281 */
+#contenitore-mappa-gioco {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 900px;
+    height: 1281px;
+    transform: translate(-50%, -50%) scale(1); /* La scala viene gestita da schermate.js */
+    transform-origin: center center;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9);
+    border: 3px solid #2d2d44;
+    border-radius: 12px;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 20px;
     background-image: url("../../Sprite/mappe/1.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    width: 100vw;
-    height: 100vh;
-    position: absolute;
-    top: 0;
-    left: 0;
-    box-sizing: border-box;
-    padding: 20px;
-    overflow: hidden; /* Impedisce barre di scorrimento fastidiose */
+    z-index: 10;
 }
 
-#schermata-mappa h2 {
+/* Stili Premium per UI Esterna (Zaino, Monete, Squadra, Reset) */
+.ui-box-moderno {
+    background: rgba(15, 15, 26, 0.85);
+    backdrop-filter: blur(10px);
+    border: 2px solid #3498db;
+    border-radius: 12px;
+    padding: 10px 20px;
+    color: white;
+    font-family: monospace;
+    font-size: 18px;
+    font-weight: bold;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ui-btn-moderno {
+    background: rgba(15, 15, 26, 0.85);
+    backdrop-filter: blur(10px);
+    border: 2px solid #f1c40f;
+    border-radius: 12px;
+    padding: 10px 20px;
+    color: white;
+    font-family: monospace;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.ui-btn-moderno:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px rgba(241, 196, 15, 0.3);
+    border-color: #f39c12;
+}
+
+.ui-btn-danger {
+    border-color: #e74c3c;
+    color: #e74c3c;
+}
+
+.ui-btn-danger:hover {
+    box-shadow: 0 12px 20px rgba(231, 76, 60, 0.3);
+    border-color: #c0392b;
+}
+
+.squadra-moderna {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    padding: 30px 15px;
+    background: rgba(15, 15, 26, 0.85);
+    backdrop-filter: blur(10px);
+    border: 2px solid #2d2d44;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+}
+
+
+#titolo-percorso-mappa {
     text-align: center;
     width: 100%;
     margin-top: 10px;
     margin-bottom: 0;
-    z-index: 5;
+    z-index: 10;
+    color: white;
+    font-family: monospace;
+    text-shadow: 2px 2px #000;
+    position: absolute;
+    top: 10px;
+    left: 0;
 }
 
 #mappa-collegamenti {
@@ -39,7 +129,7 @@
     background: transparent !important;
     border: none !important;
     width: 100%;
-    height: calc(100vh - 120px);
+    height: calc(100% - 120px);
     position: relative;
     z-index: 5;
     display: flex;
@@ -47,8 +137,8 @@
     justify-content: space-between;
     align-items: center;
     margin: 0;
-    /* Margini dinamici per non far attaccare i nodi ai bordi dello schermo */
-    padding: 4vh 2vw; 
+    /* Margini fissi per non far attaccare i nodi ai bordi */
+    padding: 50px 30px; 
     box-sizing: border-box;
 }
 
@@ -56,7 +146,7 @@
 .piano {
     display: flex;
     justify-content: center;
-    gap: 7vw; /* Spaziatura flessibile in base allo schermo */
+    gap: 70px; /* Spaziatura fissa interna al container */
     width: 100%;
     min-height: 60px; 
 }
@@ -123,20 +213,14 @@
 .evento-mistero { background-image: url("../../Sprite/nodi/mistery.png") !important; }
 .evento-item { background-image: url("../../Sprite/nodi/item.png") !important; }
 
-/* ==========================================================
-   INTERFACCIA SQUADRA VISIBILE NELLA MAPPA
-   ========================================================== */
+/* Griglia squadra (usiamo squadra-moderna ora) */
 #griglia-squadra {
-    position: absolute;
-    top: 20px;       
-    left: 20px;      
     display: flex;
-    flex-direction: column; 
-    gap: 12px; /* Un po' più di spazio tra una foto e l'altra */        
-    z-index: 10;     
-    background: rgba(0, 0, 0, 0.6); 
-    padding: 12px;
-    border-radius: 12px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px; 
+    z-index: 10;
+    position: relative;
 }
 
 .icona-squadra { 
@@ -164,6 +248,218 @@
     color: #333; font-size: 14px; padding: 4px; border-radius: 50%; border: 2px solid #333; 
 }
 
+/* ==========================================================
+   CUSTOM SCROLLBAR PER ZAINO PERSISTENTE
+   ========================================================== */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(52, 152, 219, 0.6);
+    border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(52, 152, 219, 1);
+}
+/* Il cerchio del Pokémon in squadra */
+.cerchio-pokemon { /* CAMBIA QUESTO NOME CON QUELLO CHE USI TU */
+    width: 80px !important;  /* Molto più grande (prima magari era 30 o 40px) */
+    height: 80px !important;
+    border-radius: 50% !important; /* Mantiene la forma a cerchio */
+    border: 3px solid #2f3640 !important; /* Bordo visibile */
+    background-color: white !important;
+    
+    /* Queste tre righe servono per centrare bene l'immagine che metteremo dentro */
+    background-size: cover !important; 
+    background-position: top center !important; /* 'top' è utile per le foto di persone, per inquadrare il viso */
+    background-repeat: no-repeat !important;
+    
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5) !important;
+    cursor: pointer;
+}
+
+/* ==========================================================
+   GESTIONE DIMENSIONI ICONE CHIBI DEI BOSS SULLA MAPPA
+   ========================================================== */
+
+/* Il Boss leggermente più grande ma senza esagerare */
+.nodo-boss, .nodo-mappa.boss, [data-tipo="boss"] {
+    width: 150px !important;  
+    height: 150px !important; 
+    z-index: 999 !important; 
+}
+
+/* L'immagine reale del boss: si adatta al nuovo contenitore e aggiunge effetti */
+.nodo-boss img, .chibi-boss, [data-tipo="boss"] img {
+    width: 100% !important;         /* Prende tutti i 65px del contenitore */
+    height: 100% !important;        /* Prende tutti i 65px del contenitore */
+    object-fit: contain !important; /* Evita che l'immagine si deformi o si schiacci */
+    filter: drop-shadow(0px 0px 8px #ff3838) !important; /* Crea un'ombra rossa luminosa attorno al boss */
+    border: 2px solid #ff3838 !important;                /* Aggiunge un bordo rosso solido */
+    border-radius: 50% !important;                       /* Rende il bordo perfettamente circolare */
+    background-color: rgba(255, 0, 0, 0.2) !important;   /* Sfondo rosso trasparente dietro l'icona */
+    transition: transform 0.2s ease-in-out !important;   /* Prepara un'animazione fluida per l'hover */
+}
+
+    top: 10px;
+    left: 0;
+}
+
+#mappa-collegamenti {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1 !important; /* Linee dei collegamenti sotto i nodi */
+}
+
+/* Container principale della mappa: diamo un po' di margine responsive */
+#albero-container {
+    background: transparent !important;
+    border: none !important;
+    width: 100%;
+    height: calc(100% - 120px);
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    /* Margini fissi per non far attaccare i nodi ai bordi */
+    padding: 50px 30px; 
+    box-sizing: border-box;
+}
+
+/* Maggiore spaziatura orizzontale tra le icone */
+.piano {
+    display: flex;
+    justify-content: center;
+    gap: 70px; /* Spaziatura fissa interna al container */
+    width: 100%;
+    min-height: 60px; 
+}
+
+/* Nodo START proporzionato */
+.radice-mappa { 
+    width: 50px;
+    height: 50px;
+    background-color: #333;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 11px;
+    font-weight: bold;
+    position: relative;
+    z-index: 10 !important;
+}
+
+/* Icone degli eventi a dimensione normale e pulita */
+.nodo-bottone {
+    width: 50px;
+    height: 50px;
+    border: none !important;
+    background-color: transparent !important;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: not-allowed;
+    transition: transform 0.2s, filter 0.2s;
+    font-size: 0;
+    outline: none;
+    filter: none; 
+    opacity: 0.9;
+    position: relative !important;
+    z-index: 20 !important; 
+}
+
+.nodo-passato {
+    opacity: 0.4;
+    filter: grayscale(100%) !important; /* Bianco e nero sulla strada già percorsa */
+    cursor: not-allowed;
+}
+
+.nodo-selezionabile {
+    cursor: pointer;
+    opacity: 1;
+    filter: drop-shadow(0px 0px 8px rgba(255, 204, 0, 0.8)); /* Bagliore sulle scelte attuali */
+}
+
+.nodo-selezionabile:hover {
+    transform: scale(1.2);
+    filter: drop-shadow(0px 0px 12px rgba(255, 204, 0, 1));
+}
+
+/* PNG delle icone mappa */
+.evento-cespuglio { background-image: url("../../Sprite/nodi/grass.png") !important; }
+.evento-npc { background-image: url("../../Sprite/nodi/team-rocket.png") !important; }
+.evento-pokeball { background-image: url("../../Sprite/nodi/pokeball.png") !important; }
+.evento-centro-medico { background-image: url("../../Sprite/nodi/poke-center.png") !important; }
+.evento-disco { background-image: url("../../Sprite/nodi/disco.png") !important; background-color: #9c27b0; }
+.evento-scambio { background-image: url("../../Sprite/nodi/scambio.png") !important; }
+.evento-mistero { background-image: url("../../Sprite/nodi/mistery.png") !important; }
+.evento-item { background-image: url("../../Sprite/nodi/item.png") !important; }
+
+/* Griglia squadra (usiamo squadra-moderna ora) */
+#griglia-squadra {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px; 
+    z-index: 10;
+    position: relative;
+}
+
+.icona-squadra { 
+    width: 80px !important; /* Molto più grande */
+    height: 80px !important; 
+    border: 4px solid #333; 
+    border-radius: 50% !important; 
+    cursor: grab; 
+    position: relative;
+    background-size: cover !important;
+    background-position: top center !important; /* Centra il viso */
+    background-repeat: no-repeat !important;
+    background-color: #fff !important; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.5); /* rimosso important per glow via js */
+    transition: transform 0.2s !important;
+}
+.icona-squadra:hover {
+    transform: scale(1.1) !important; /* Effetto zoom al passaggio del mouse */
+}
+.icona-squadra:active {
+    cursor: grabbing;
+}
+.icona-squadra.primo-posto::after { 
+    content: "👑"; position: absolute; top: 0px; right: 0px; background: #ffcc00; 
+    color: #333; font-size: 14px; padding: 4px; border-radius: 50%; border: 2px solid #333; 
+}
+
+/* ==========================================================
+   CUSTOM SCROLLBAR PER ZAINO PERSISTENTE
+   ========================================================== */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(52, 152, 219, 0.6);
+    border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(52, 152, 219, 1);
+}
 /* Il cerchio del Pokémon in squadra */
 .cerchio-pokemon { /* CAMBIA QUESTO NOME CON QUELLO CHE USI TU */
     width: 80px !important;  /* Molto più grande (prima magari era 30 o 40px) */
@@ -232,4 +528,96 @@
     pointer-events: none;
     box-shadow: 0px 4px 6px rgba(0,0,0,0.3);
     text-transform: capitalize;
+}
+
+/* ==========================================================
+   STILI ZAINO A CELLE E VISTA ASSEGNAZIONE
+   ========================================================== */
+.zaino-cella {
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid #2d2d44;
+    border-radius: 8px;
+    height: 70px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    box-sizing: border-box;
+    text-align: center;
+    transition: transform 0.1s, border-color 0.1s;
+}
+
+.zaino-cella.vuota {
+    opacity: 0.5;
+}
+
+.zaino-cella.piena {
+    background: rgba(15, 15, 26, 0.8);
+    border-color: #3498db;
+    cursor: pointer;
+}
+
+.zaino-cella.piena:hover {
+    transform: scale(1.05);
+    border-color: #f1c40f;
+    box-shadow: 0 4px 8px rgba(241, 196, 15, 0.2);
+}
+
+.zaino-cella-nome {
+    font-size: 11px;
+    font-weight: bold;
+    color: #f1c40f;
+    margin-bottom: 3px;
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.zaino-cella-qty {
+    font-size: 10px;
+    color: #fff;
+    background: #e74c3c;
+    border-radius: 10px;
+    padding: 2px 6px;
+    margin-top: auto;
+}
+
+/* Riga Pokemon per Assegnazione */
+.zaino-pokemon-row {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid #2d2d44;
+    border-radius: 8px;
+    padding: 6px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.zaino-pokemon-row:hover {
+    background: rgba(46, 204, 113, 0.3);
+    border-color: #2ecc71;
+}
+
+.zaino-pokemon-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    border: 2px solid #fff;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.zaino-pokemon-info {
+    font-size: 11px;
+    color: white;
+    display: flex;
+    flex-direction: column;
 }

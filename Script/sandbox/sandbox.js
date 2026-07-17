@@ -415,14 +415,16 @@ function terminaSandbox(risultato) {
         if (el) el.style.display = "none";
     });
 
-    // Crea dinamicamente un bottone per uscire (sicuro: non dipende da btn-torna-mappa)
-    const console = document.getElementById("console-log");
+    // Crea dinamicamente un bottone per uscire inserendolo nei controlli di arena
+    const controlliArea = document.getElementById("controlli-arena");
     const btnEsci = document.createElement("button");
-    btnEsci.className  = "btn-battle";
-    btnEsci.style.cssText = "margin:20px auto; display:block; background:#3498db;";
-    btnEsci.innerText  = "ESCI DALLA SANDBOX";
-    btnEsci.onclick    = function() {
+    btnEsci.id = "btn-esci-sandbox";
+    btnEsci.className = "btn-action";
+    btnEsci.style.cssText = "position: absolute; top: 0; left: 0; width: 100%; height: 100%; font-size: 22px; font-weight: bold; background: #3498db; color: white; border: 3px solid white; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;";
+    btnEsci.innerText = "🚪 ESCI DALLA SIMULAZIONE";
+    btnEsci.onclick = function() {
         isSandboxAttiva = false;
+        btnEsci.remove(); // Rimuove il pulsante
         document.getElementById("schermata-gioco").style.display   = "none";
         document.getElementById("schermata-sandbox").style.display = "flex";
 
@@ -435,7 +437,9 @@ function terminaSandbox(risultato) {
             }
         });
     };
-    console.appendChild(btnEsci);
+    if (controlliArea) {
+        controlliArea.appendChild(btnEsci);
+    }
 }
 
 

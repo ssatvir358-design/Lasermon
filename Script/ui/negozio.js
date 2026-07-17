@@ -23,6 +23,11 @@ function aggiungiAZaino(dbId) {
     } else {
         zaino.push({ dbId, quantita: 1 });
     }
+    
+    // Aggiorna l'interfaccia persistente dello zaino se siamo sulla mappa
+    if (typeof aggiornaPannelloZainoMappa === "function") {
+        aggiornaPannelloZainoMappa();
+    }
 }
 
 /**
@@ -35,6 +40,12 @@ function rimuoviDaZaino(dbId) {
     if (idx === -1) return false;
     zaino[idx].quantita--;
     if (zaino[idx].quantita <= 0) zaino.splice(idx, 1);
+    
+    // Aggiorna l'interfaccia persistente dello zaino se siamo sulla mappa
+    if (typeof aggiornaPannelloZainoMappa === "function") {
+        aggiornaPannelloZainoMappa();
+    }
+    
     return true;
 }
 

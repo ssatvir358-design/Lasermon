@@ -69,23 +69,30 @@ function calcolaLivelloEMossaMappa(piano, tipoEvento) {
     const configLivelli = CONFIG_LIVELLI_MAPPE[indiceMappa] || CONFIG_LIVELLI_MAPPE[1];
     
     let lvIngresso = configLivelli.ingresso;
-    let lvBoss = configLivelli.boss;
+    let lvBossConfig = configLivelli.boss;
+    
+    // calcolo livello boss per ogni mappa = Math.floor(LvL_MIN_Mappa + delta_livello + variazione_seed)
+    let delta_livello = lvBossConfig - lvIngresso;
+    let variazione_seed = (typeof variazioneSeedMappa !== "undefined") ? variazioneSeedMappa : 0;
+    let lvBoss = Math.floor(lvIngresso + delta_livello + variazione_seed);
     
     let livelloGenerato = 1;
     
     if (tipoEvento === "boss") {
         livelloGenerato = lvBoss;
     } else if (tipoEvento === "npc" || tipoEvento === "allenatore") {
-        let randomOffset = Math.floor(Math.random() * 2); // 0 o +1
+        // MIN(LV_BOSS-5; ROUND(LV_INGRESSO + (((LV_BOSS - LV_INGRESSO)/6)*P*0,45))+RANDOM(0;+1))
+        let randomOffset = Math.floor(Math.random() * 2); // 0 or +1
         let baseCalc = lvIngresso + (((lvBoss - lvIngresso) / 6) * piano * 0.45);
         let calc = Math.round(baseCalc) + randomOffset;
-        livelloGenerato = Math.min(lvBoss - 3, calc);
+        livelloGenerato = Math.min(lvBoss - 5, calc);
     } else {
         // Erba o default (cespuglio, ecc.)
-        let randomOffset = Math.floor(Math.random() * 2) - 1; // -1 o 0
+        // MIN(LV_BOSS-7; ROUND(LV_INGRESSO + (((LV_BOSS- LV_INGRESSO)/6)*P*0,15))+RANDOM(-1;0))
+        let randomOffset = Math.floor(Math.random() * 2) - 1; // -1 or 0
         let baseCalc = lvIngresso + (((lvBoss - lvIngresso) / 6) * piano * 0.15);
         let calc = Math.round(baseCalc) + randomOffset;
-        livelloGenerato = Math.min(lvBoss - 5, calc);
+        livelloGenerato = Math.min(lvBoss - 7, calc);
     }
     
     // Protezione per evitare livelli negativi o a zero
@@ -546,6 +553,95 @@ function pescaPokemonCasuale(esclusioniNomi = [], elementoFiltro = null) {
     }
 
     return poolDisponibili[0];
+}
+
+const PROB_POKEBALL_MAPPA = {
+    1: { comune: 0.70, "non comune": 0.20, raro: 0.10, epico: 0.00, leggendario: 0.00 },
+    2: { comune: 0.50, "non comune": 0.30, raro: 0.15, epico: 0.05, leggendario: 0.00 },
+    3: { comune: 0.35, "non comune": 0.35, raro: 0.20, epico: 0.08, leggendario: 0.02 },
+    4: { comune: 0.25, "non comune": 0.35, raro: 0.25, epico: 0.11, leggendario: 0.04 },
+    5: { comune: 0.15, "non comune": 0.30, raro: 0.30, epico: 0.18, leggendario: 0.07 },
+    6: { comune: 0.05, "non comune": 0.20, raro: 0.35, epico: 0.28, leggendario: 0.12 },
+    7: { comune: 0.00, "non comune": 0.10, raro: 0.30, epico: 0.42, leggendario: 0.18 },
+    8: { comune: 0.00, "non comune": 0.05, raro: 0.20, epico: 0.50, leggendario: 0.25 },
+    9: { comune: 0.00, "non comune": 0.00, raro: 0.15, epico: 0.50, leggendario: 0.35 }
+};
+
+function pescaPokemonPokeball(esclusioniNomi = []) {
+    let indiceMappa = 1;
+    if (mappaAttuale && mappaAttuale.startsWith("mappa")) {
+        indiceMappa = parseInt(mappaAttuale.replace("mappa", "")) || 1;
+    }
+    const baseRates = PROB_POKEBALL_MAPPA[indiceMappa] || PROB_POKEBALL_MAPPA[9];
+    
+    // Copia i tassi base
+    let rates = { ...baseRates };
+    
+    // Applica il soft pity ai leggendari
+    let tasso_base_leggendario = rates.leggendario;
+    let tasso_leggendario = tasso_base_leggendario;
+    
+    if (typeof tentativiSenzaLeggendari !== "undefined" && tentativiSenzaLeggendari > 10) {
+        let extra = (tentativiSenzaLeggendari - 10) * 0.05;
+        tasso_leggendario = tasso_base_leggendario + extra;
+        if (tasso_leggendario > 1.0) tasso_leggendario = 1.0;
+    }
+    
+    rates.leggendario = tasso_leggendario;
+    
+    // Normalizza gli altri tassi
+    let sumOthersBase = baseRates.comune + baseRates["non comune"] + baseRates.raro + baseRates.epico;
+    let remaining = 1.0 - tasso_leggendario;
+    
+    if (sumOthersBase > 0 && remaining > 0) {
+        rates.comune = (baseRates.comune / sumOthersBase) * remaining;
+        rates["non comune"] = (baseRates["non comune"] / sumOthersBase) * remaining;
+        rates.raro = (baseRates.raro / sumOthersBase) * remaining;
+        rates.epico = (baseRates.epico / sumOthersBase) * remaining;
+    } else {
+        rates.comune = 0;
+        rates["non comune"] = 0;
+        rates.raro = 0;
+        rates.epico = 0;
+    }
+    
+    // Estrazione rarità
+    let rand = Math.random();
+    let rarScelta = "comune";
+    
+    if (rand < rates.comune) {
+        rarScelta = "comune";
+    } else if (rand < rates.comune + rates["non comune"]) {
+        rarScelta = "non comune";
+    } else if (rand < rates.comune + rates["non comune"] + rates.raro) {
+        rarScelta = "raro";
+    } else if (rand < rates.comune + rates["non comune"] + rates.raro + rates.epico) {
+        rarScelta = "epico";
+    } else {
+        rarScelta = "leggendario";
+    }
+    
+    // Filtra il database
+    let pool = pokemonDatabase.filter(p => 
+        !p.boss && 
+        !p.isEvoluzione && 
+        p.raritaTipo.toLowerCase() === rarScelta && 
+        !esclusioniNomi.includes(p.nome)
+    );
+    
+    if (pool.length === 0) {
+        pool = pokemonDatabase.filter(p => 
+            !p.boss && 
+            !p.isEvoluzione && 
+            p.raritaTipo.toLowerCase() === rarScelta
+        );
+    }
+    
+    if (pool.length === 0) {
+        return pescaPokemonCasuale(esclusioniNomi);
+    }
+    
+    return pool[Math.floor(Math.random() * pool.length)];
 }
 
 // Genera HTML compatto di una card Pok\u00e9mon (usata in vari punti della UI)

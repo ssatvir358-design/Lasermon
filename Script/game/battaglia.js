@@ -799,8 +799,30 @@ function avviaBossBattle(idBoss) {
     datiBoss.squadra.forEach(pBoss => {
         const base = pokemonDatabase.find(p => p.nome.toLowerCase() === pBoss.nome.toLowerCase());
         if (!base) return;
-        const lvl = pBoss.livello;
-        let p = creaPokemon(base, lvl, 3);
+        
+        let lvl = pBoss.livello;
+        let indiceMappa = 1;
+        if (mappaAttuale && mappaAttuale.startsWith("mappa")) {
+            indiceMappa = parseInt(mappaAttuale.replace("mappa", "")) || 1;
+        }
+        
+        const configLivelli = CONFIG_LIVELLI_MAPPE[indiceMappa] || CONFIG_LIVELLI_MAPPE[1];
+        let lvIngresso = configLivelli.ingresso;
+        let lvBossConfig = configLivelli.boss;
+        let delta_livello = lvBossConfig - lvIngresso;
+        let variazione_seed = (typeof variazioneSeedMappa !== "undefined") ? variazioneSeedMappa : 0;
+        let lvBossCalculated = Math.floor(lvIngresso + delta_livello + variazione_seed);
+        
+        let finalLvl = lvBossCalculated || lvl;
+        if (mappaAttuale === "mappa9") {
+            if (pBoss.nome.toLowerCase() === "max") {
+                finalLvl = Math.min(100, lvBossCalculated);
+            } else {
+                finalLvl = Math.max(1, lvBossCalculated - 5);
+            }
+        }
+        
+        let p = creaPokemon(base, finalLvl, 3);
         p.boss = true;
         nemiciIncontro.push(p);
     });
