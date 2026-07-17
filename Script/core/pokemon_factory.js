@@ -26,30 +26,34 @@
 /**
  * Calcola una singola statistica (non HP) dal livello con la formula attuale.
  * @param {number} statBase  - Valore base della stat nel DB
- * @param {number} livello   - Livello del Pok\u00e9mon
+ * @param {number} livello   - Livello del Pokémon
  * @param {number} molElem   - Moltiplicatore elemento (CONFIG_STAT_ELEMENTO)
- * @param {number} molRar    - Moltiplicatore rarit\u00e0 (CONFIG_MOLTIPLICATORE_RARITA)
+ * @param {number} molRar    - Moltiplicatore rarità (CONFIG_MOLTIPLICATORE_RARITA)
+ * @param {number} molEvo    - Moltiplicatore evoluzione
  * @returns {number}         - Valore arrotondato della stat
  */
-function calcolaStat(statBase, livello, molElem, molRar) {
-    // Formula: ROUND(statBase + (livello \u00d7 molElem \u00d7 molRar) / 0.75)
+function calcolaStat(statBase, livello, molElem, molRar, molEvo = 1) {
+    // Formula: ROUND(statBase + (livello × molElem × molRar × molEvo) / 0.75)
+    // molEvo: moltiplicatore evoluzione (default 1, >1 per evoluzioni più forti)
     // Modifica il divisore 0.75 per cambiare lo scaling di ATK/DEF/VEL
-    return Math.round(statBase + (livello * molElem * molRar) / 0.75);
+    return Math.round(statBase + (livello * molElem * molRar * molEvo) / 0.75);
 }
 
 /**
  * Calcola gli HP dal livello con la formula attuale.
  * @param {number} hpBase  - HP base nel DB
- * @param {number} livello - Livello del Pok\u00e9mon
+ * @param {number} livello - Livello del Pokémon
  * @param {number} molElem - Moltiplicatore elemento HP (CONFIG_STAT_ELEMENTO.hp)
- * @param {number} molRar  - Moltiplicatore rarit\u00e0 (CONFIG_MOLTIPLICATORE_RARITA)
+ * @param {number} molRar  - Moltiplicatore rarità (CONFIG_MOLTIPLICATORE_RARITA)
+ * @param {number} molEvo  - Moltiplicatore evoluzione
  * @returns {number}       - Valore arrotondato degli HP
  */
-function calcolaHP(hpBase, livello, molElem, molRar) {
-    // Formula: ROUND(hpBase + (livello \u00d7 molElem \u00d7 molRar) / 0.25) + livello
+function calcolaHP(hpBase, livello, molElem, molRar, molEvo = 1) {
+    // Formula: ROUND(hpBase + (livello × molElem × molRar × molEvo) / 0.25) + livello
+    // molEvo: moltiplicatore evoluzione (default 1, >1 per evoluzioni più forti)
     // Modifica il divisore 0.25 per cambiare lo scaling degli HP
     // Il "+ livello" aggiunge un bonus lineare per livello
-    return Math.round(hpBase + (livello * molElem * molRar) / 0.25) + livello;
+    return Math.round(hpBase + (livello * molElem * molRar * molEvo) / 0.25) + livello;
 }
 
 // Calcola il livello e il livello mossa appropriati per un nodo della mappa corrente

@@ -1,0 +1,2 @@
+// ===== BABBO NATALE =====
+const CHAR_BABBONATALE = { nome: "Babbo Natale", hpBase: 5, atkBase: 4, defBase: 5, atkSpec: 6, defSpec: 6, velBase: 4, raritaTipo: "raro", elemento: "veleno", immagine: "../Sprite/personaggi/BabboNatale/BabboNatale.jpeg", immagineAtk: "../Sprite/personaggi/BabboNatale/BabboNatale_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "Attacco 3", boss: false };

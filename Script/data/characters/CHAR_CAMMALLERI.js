@@ -1,0 +1,2 @@
+// ===== CAMMALLERI =====
+const CHAR_CAMMALLERI = { nome: "Cammalleri", hpBase: 7, atkBase: 7, defBase: 7, atkSpec: 7, defSpec: 7, velBase: 7, raritaTipo: "leggendario", elemento: "normale", immagine: "../Sprite/personaggi/Cammalleri/Cammalleri.jpeg", immagineAtk: "../Sprite/personaggi/Cammalleri/Cammalleri_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "Attacco 3", boss: false };

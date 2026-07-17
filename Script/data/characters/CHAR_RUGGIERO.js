@@ -1,0 +1,2 @@
+// ===== RUGGIERO =====
+const CHAR_RUGGIERO = { nome: "Ruggiero", hpBase: 4, atkBase: 5, defBase: 2, atkSpec: 4, defSpec: 4, velBase: 5, raritaTipo: "non comune", elemento: "fuoco", immagine: "../Sprite/personaggi/Ruggiero/Ruggiero.jpeg", immagineAtk: "../Sprite/personaggi/Ruggiero/Ruggiero_atk.jpeg", mossaLvl1: "Invio corrispettivi", mossaLvl2: "Sfuriata mail", mossaLvl3: "Divieto di parcheggio", boss: false };

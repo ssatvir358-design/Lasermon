@@ -1,0 +1,2 @@
+// ===== SIMONE MENZÀ =====
+const CHAR_SIMONEMENZÀ = { nome: "Simone Menzà", hpBase: 4, atkBase: 3, defBase: 4, atkSpec: 5, defSpec: 4, velBase: 4, raritaTipo: "non comune", elemento: "ghiaccio", immagine: "../Sprite/personaggi/SimoneMenzà/SimoneMenzà.jpeg", immagineAtk: "../Sprite/personaggi/SimoneMenzà/SimoneMenzà_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "Attacco 3", boss: false };

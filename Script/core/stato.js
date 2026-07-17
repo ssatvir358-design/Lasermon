@@ -3,6 +3,15 @@
 // NOTA: caricare DOPO i file data/, PRIMA di tutto il resto.
 // ==========================================================
 
+// ==========================================================
+// VARIABILI MODALITA' SANDBOX
+// ==========================================================
+let isSandboxAttiva = false;
+let sandboxConfig = {
+    mioPokemon: null,
+    nemicoPokemon: null
+};
+
 // ----------------------------------------------------------
 // CONFIGURAZIONE SLOT ITEM PER POK\u00c9MON
 // Cambia questo numero per variare gli slot item equipaggiabili

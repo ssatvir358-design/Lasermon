@@ -1,0 +1,2 @@
+// ===== DONATO =====
+const CHAR_DONATO = { nome: "Donato", hpBase: 4, atkBase: 7, defBase: 4, atkSpec: 4, defSpec: 5, velBase: 6, raritaTipo: "raro", elemento: "lotta", immagine: "../Sprite/personaggi/Donato/Donato.jpeg", immagineAtk: "../Sprite/personaggi/Donato/Donato_atk.jpeg", mossaLvl1: "Falco rispondi!", mossaLvl2: "Da ora sei il suo referente", mossaLvl3: "Preventivo eccessivo", boss: true, mossaULT: "Referente Supremo", numFrameUlt: 3 };

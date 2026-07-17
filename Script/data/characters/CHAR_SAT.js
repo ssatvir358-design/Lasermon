@@ -1,0 +1,2 @@
+// ===== SAT =====
+const CHAR_SAT = { nome: "Sat", hpBase: 11, atkBase: 10, defBase: 6, atkSpec: 5, defSpec: 7, velBase: 6, raritaTipo: "bombers", elemento: "buio", immagine: "../Sprite/personaggi/Sat/Sat.jpeg", immagineAtk: "../Sprite/personaggi/Sat/Sat_atk.jpeg", mossaLvl1: "Rifatta DLL ora ok", mossaLvl2: "Malattia", mossaLvl3: "Nicolassata", boss: true, mossaULT: "Maremoto del Bomber", numFrameUlt: 3 };

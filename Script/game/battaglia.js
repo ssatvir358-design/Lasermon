@@ -591,8 +591,13 @@ function gestisciKOGiocatore() {
             abilitaControlliGiocatore();
         }, isSkipAttivo ? 800 : 1500);
     } else {
-        // Tutta la squadra KO: game over
+        // Tutta la squadra KO
         setTimeout(() => {
+            // In sandbox: mostra schermata risultato senza game over definitivo
+            if (typeof isSandboxAttiva !== 'undefined' && isSandboxAttiva) {
+                if (typeof terminaSandbox === 'function') terminaSandbox("Sconfitta");
+                return;
+            }
             riproduciMusica("gameover.mp3");
             document.getElementById("schermata-gioco").style.display = "none";
             document.getElementById("schermata-gameover").style.setProperty("display", "flex", "important");
@@ -605,6 +610,14 @@ function gestisciKOGiocatore() {
  * Assegna level-up e monete in base al tipo di evento.
  */
 function gestisciVittoriaIncontro() {
+    // In sandbox: la vittoria non assegna level-up né monete, mostra solo il risultato
+    if (typeof isSandboxAttiva !== 'undefined' && isSandboxAttiva) {
+        document.getElementById("console-log").innerHTML +=
+            "<br><strong style='color:#4cd137'>Nemico sconfitto!</strong>";
+        if (typeof terminaSandbox === 'function') terminaSandbox("Vittoria");
+        return;
+    }
+
     // --- SALVA LIVELLI PRE-LEVEL-UP (per verificare i level cap perk) ---
     const livPreBattle = miaSquadra.map(p => ({ pokemon: p, livelloPre: p ? p.livello : 0 }));
 

@@ -499,6 +499,297 @@
         <div id="perk-coda-info"></div>
     </div>
 
+    <!-- ============= SCHERMATA SANDBOX / DEBUGGER ============= -->
+    <!-- Accessibile via ?sandbox nell'URL oppure tramite apriSandbox() -->
+    <div id="schermata-sandbox" class="schermata" style="display:none; background:#0a0a12; flex-direction:column; overflow:hidden;">
+
+        <!-- Header -->
+        <div style="background:#0f0f1a; border-bottom:4px solid #9b59b6; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+            <h2 style="color:#9b59b6; font-family:monospace; margin:0; font-size:20px;">&#x1F527; SANDBOX DEBUGGER</h2>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <span style="color:#7f8fa6; font-size:12px; font-family:monospace;">Simula battaglie e bilanciamento</span>
+            </div>
+        </div>
+
+        <!-- Corpo principale: 2 colonne (Giocatore | Nemico) -->
+        <div style="display:flex; flex:1; gap:0; overflow:hidden;">
+
+            <!-- === COLONNA GIOCATORE === -->
+            <div style="flex:1; padding:15px; overflow-y:auto; background:#111827; border-right:3px solid #0f0f1a;">
+                <h3 style="color:#3498db; font-family:monospace; font-size:14px; margin:0 0 12px 0; text-align:center; border-bottom:2px solid #3498db; padding-bottom:6px;">&#x1F535; GIOCATORE</h3>
+
+                <div style="display:flex; flex-direction:column; gap:8px; font-family:monospace; font-size:13px;">
+                    <!-- Selezione Pokemon -->
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Pokemon:</label>
+                        <select id="sb-gio-nome" style="flex:1; background:#1a1a2e; color:white; border:2px solid #3498db; border-radius:6px; padding:4px; font-family:monospace;" onchange="aggiornaDatiSandbox('gio')"></select>
+                    </div>
+                    <div style="display:flex; gap:15px;">
+                        <span style="color:#7f8fa6;">Elem: <span id="sb-gio-elemento" style="color:#f1c40f;">-</span></span>
+                        <span style="color:#7f8fa6;">Rarit&#xE0;: <span id="sb-gio-rarita" style="color:#f1c40f;">-</span></span>
+                    </div>
+
+                    <!-- Livello e Mossa -->
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Livello:</label>
+                        <input type="number" id="sb-gio-lvl" value="50" min="1" max="100" style="width:70px; background:#1a1a2e; color:white; border:2px solid #555; border-radius:6px; padding:4px; font-family:monospace;" oninput="calcolaStatsSandbox('gio')">
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Mossa:</label>
+                        <select id="sb-gio-lvl-mossa" style="flex:1; background:#1a1a2e; color:white; border:2px solid #555; border-radius:6px; padding:4px; font-family:monospace;">
+                            <option value="1">LVL 1</option>
+                            <option value="2">LVL 2</option>
+                            <option value="3">LVL 3</option>
+                        </select>
+                    </div>
+
+                    <!-- Moltiplicatore Rarita -->
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Rarit&#xE0;x:</label>
+                        <input type="number" id="sb-gio-molt-rarita" step="0.01" style="width:80px; background:#1a1a2e; color:white; border:2px solid #555; border-radius:6px; padding:4px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('gio')">
+                        <label style="color:#7f8fa6; font-size:11px;"><input type="checkbox" id="chk-m-rarita-gio" onchange="toggleManualRarita('gio')"> Override</label>
+                    </div>
+
+                    <!-- Moltiplicatore Schivata -->
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Schivata:</label>
+                        <input type="number" id="sb-gio-molt-schivata" value="30" step="1" style="width:70px; background:#1a1a2e; color:white; border:2px solid #555; border-radius:6px; padding:4px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('gio')">
+                        <label style="color:#7f8fa6; font-size:11px;"><input type="checkbox" id="chk-m-schivata-gio" onchange="toggleManualSchivata('gio')"> Override</label>
+                    </div>
+
+                    <!-- STATS -->
+                    <div style="background:#1a1a2e; border-radius:8px; padding:10px; margin-top:4px;">
+                        <div style="color:#f1c40f; font-size:12px; margin-bottom:8px;">&#x1F4CA; STATISTICHE</div>
+
+                        <!-- HP -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#e74c3c; min-width:65px;">HP:</span>
+                            <div data-formula="" style="flex:1; position:relative;">
+                                <input type="number" id="sb-gio-hp" readonly style="width:100%; background:#0a0a12; color:#e74c3c; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-gio-elem-hp" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('gio')" title="Molt. Elemento HP">
+                            <label title="Override moltiplicatore elemento"><input type="checkbox" id="chk-m-elem-gio-hp" onchange="toggleManualElem('hp','gio')"></label>
+                            <input type="number" id="sb-gio-m-hp" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('gio')" title="Divisore custom (0=default)">
+                        </div>
+
+                        <!-- ATK -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#e67e22; min-width:65px;">ATK:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-gio-atk" readonly style="width:100%; background:#0a0a12; color:#e67e22; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-gio-elem-atk" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('gio')" title="Molt. Elemento ATK">
+                            <label><input type="checkbox" id="chk-m-elem-gio-atk" onchange="toggleManualElem('atk','gio')"></label>
+                            <input type="number" id="sb-gio-m-atk" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('gio')" title="Divisore custom">
+                        </div>
+
+                        <!-- ATK SPEC -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#e67e22; min-width:65px;">ATK Spe:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-gio-atk-spec" readonly style="width:100%; background:#0a0a12; color:#e67e22; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-gio-elem-atk-spec" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('gio')" title="Molt. Elemento ATK Spec">
+                            <label><input type="checkbox" id="chk-m-elem-gio-atk-spec" onchange="toggleManualElem('atk-spec','gio')"></label>
+                            <input type="number" id="sb-gio-m-atk-spec" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('gio')" title="Divisore custom">
+                        </div>
+
+                        <!-- DEF -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#3498db; min-width:65px;">DEF:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-gio-def" readonly style="width:100%; background:#0a0a12; color:#3498db; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-gio-elem-def" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('gio')" title="Molt. Elemento DEF">
+                            <label><input type="checkbox" id="chk-m-elem-gio-def" onchange="toggleManualElem('def','gio')"></label>
+                            <input type="number" id="sb-gio-m-def" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('gio')" title="Divisore custom">
+                        </div>
+
+                        <!-- DEF SPEC -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#3498db; min-width:65px;">DEF Spe:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-gio-def-spec" readonly style="width:100%; background:#0a0a12; color:#3498db; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-gio-elem-def-spec" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('gio')" title="Molt. Elemento DEF Spec">
+                            <label><input type="checkbox" id="chk-m-elem-gio-def-spec" onchange="toggleManualElem('def-spec','gio')"></label>
+                            <input type="number" id="sb-gio-m-def-spec" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('gio')" title="Divisore custom">
+                        </div>
+
+                        <!-- VEL -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#2ecc71; min-width:65px;">VEL:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-gio-vel" readonly style="width:100%; background:#0a0a12; color:#2ecc71; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-gio-elem-vel" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('gio')" title="Molt. Elemento VEL">
+                            <label><input type="checkbox" id="chk-m-elem-gio-vel" onchange="toggleManualElem('vel','gio')"></label>
+                            <input type="number" id="sb-gio-m-vel" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('gio')" title="Divisore custom">
+                        </div>
+
+                        <!-- SCHIVATA RISULTANTE -->
+                        <div style="display:flex; gap:6px; align-items:center; padding-top:8px; border-top:1px dashed #333;">
+                            <span style="color:#f39c12; min-width:65px;">Schivata:</span>
+                            <span id="sb-gio-res-schivata" style="color:#f39c12; font-weight:bold;">0</span><span style="color:#7f8fa6;">%</span>
+                        </div>
+                    </div>
+
+                    <!-- Oggetto equipaggiato -->
+                    <div style="margin-top:6px;">
+                        <label style="color:#f1c40f; font-size:12px;">&#x1F392; OGGETTO:</label>
+                        <div style="display:flex; gap:6px; align-items:center; margin-top:4px;">
+                            <span title="Nessuna descrizione" style="cursor:help; color:#3498db;">&#x2139;</span>
+                            <select id="sb-gio-item" style="flex:1; background:#1a1a2e; color:white; border:2px solid #f1c40f; border-radius:6px; padding:4px; font-family:monospace; font-size:12px;" onchange="toggleValore(this,'sb-gio-val-item'); aggiornaTooltip(this,'item'); calcolaStatsSandbox('gio')"></select>
+                            <input type="number" id="sb-gio-val-item" placeholder="Val" style="width:60px; display:none; background:#1a1a2e; color:#f1c40f; border:1px solid #f1c40f; border-radius:4px; padding:3px; font-family:monospace;" oninput="aggiornaTooltip(document.getElementById('sb-gio-item'),'item'); calcolaStatsSandbox('gio')">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- === COLONNA NEMICO === -->
+            <div style="flex:1; padding:15px; overflow-y:auto; background:#1a0a0a;">
+                <h3 style="color:#e74c3c; font-family:monospace; font-size:14px; margin:0 0 12px 0; text-align:center; border-bottom:2px solid #e74c3c; padding-bottom:6px;">&#x1F534; NEMICO</h3>
+
+                <div style="display:flex; flex-direction:column; gap:8px; font-family:monospace; font-size:13px;">
+                    <!-- Selezione Pokemon -->
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Pokemon:</label>
+                        <select id="sb-nem-nome" style="flex:1; background:#1a1a2e; color:white; border:2px solid #e74c3c; border-radius:6px; padding:4px; font-family:monospace;" onchange="aggiornaDatiSandbox('nem')"></select>
+                    </div>
+                    <div style="display:flex; gap:15px;">
+                        <span style="color:#7f8fa6;">Elem: <span id="sb-nem-elemento" style="color:#f1c40f;">-</span></span>
+                        <span style="color:#7f8fa6;">Rarit&#xE0;: <span id="sb-nem-rarita" style="color:#f1c40f;">-</span></span>
+                    </div>
+
+                    <!-- Livello e Mossa -->
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Livello:</label>
+                        <input type="number" id="sb-nem-lvl" value="50" min="1" max="100" style="width:70px; background:#1a1a2e; color:white; border:2px solid #555; border-radius:6px; padding:4px; font-family:monospace;" oninput="calcolaStatsSandbox('nem')">
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Mossa:</label>
+                        <select id="sb-nem-lvl-mossa" style="flex:1; background:#1a1a2e; color:white; border:2px solid #555; border-radius:6px; padding:4px; font-family:monospace;">
+                            <option value="1">LVL 1</option>
+                            <option value="2">LVL 2</option>
+                            <option value="3">LVL 3</option>
+                        </select>
+                    </div>
+
+                    <!-- Moltiplicatore Rarita -->
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Rarit&#xE0;x:</label>
+                        <input type="number" id="sb-nem-molt-rarita" step="0.01" style="width:80px; background:#1a1a2e; color:white; border:2px solid #555; border-radius:6px; padding:4px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('nem')">
+                        <label style="color:#7f8fa6; font-size:11px;"><input type="checkbox" id="chk-m-rarita-nem" onchange="toggleManualRarita('nem')"> Override</label>
+                    </div>
+
+                    <!-- Moltiplicatore Schivata -->
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Schivata:</label>
+                        <input type="number" id="sb-nem-molt-schivata" value="30" step="1" style="width:70px; background:#1a1a2e; color:white; border:2px solid #555; border-radius:6px; padding:4px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('nem')">
+                        <label style="color:#7f8fa6; font-size:11px;"><input type="checkbox" id="chk-m-schivata-nem" onchange="toggleManualSchivata('nem')"> Override</label>
+                    </div>
+
+                    <!-- STATS -->
+                    <div style="background:#1a0a0a; border-radius:8px; padding:10px; margin-top:4px; border:1px solid #2c1010;">
+                        <div style="color:#f1c40f; font-size:12px; margin-bottom:8px;">&#x1F4CA; STATISTICHE</div>
+
+                        <!-- HP -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#e74c3c; min-width:65px;">HP:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-nem-hp" readonly style="width:100%; background:#0a0a12; color:#e74c3c; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-nem-elem-hp" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('nem')" title="Molt. Elemento HP">
+                            <label><input type="checkbox" id="chk-m-elem-nem-hp" onchange="toggleManualElem('hp','nem')"></label>
+                            <input type="number" id="sb-nem-m-hp" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('nem')" title="Divisore custom">
+                        </div>
+
+                        <!-- ATK -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#e67e22; min-width:65px;">ATK:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-nem-atk" readonly style="width:100%; background:#0a0a12; color:#e67e22; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-nem-elem-atk" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('nem')" title="Molt. Elemento ATK">
+                            <label><input type="checkbox" id="chk-m-elem-nem-atk" onchange="toggleManualElem('atk','nem')"></label>
+                            <input type="number" id="sb-nem-m-atk" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('nem')" title="Divisore custom">
+                        </div>
+
+                        <!-- ATK SPEC -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#e67e22; min-width:65px;">ATK Spe:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-nem-atk-spec" readonly style="width:100%; background:#0a0a12; color:#e67e22; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-nem-elem-atk-spec" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('nem')" title="Molt. Elemento ATK Spec">
+                            <label><input type="checkbox" id="chk-m-elem-nem-atk-spec" onchange="toggleManualElem('atk-spec','nem')"></label>
+                            <input type="number" id="sb-nem-m-atk-spec" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('nem')" title="Divisore custom">
+                        </div>
+
+                        <!-- DEF -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#3498db; min-width:65px;">DEF:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-nem-def" readonly style="width:100%; background:#0a0a12; color:#3498db; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-nem-elem-def" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('nem')" title="Molt. Elemento DEF">
+                            <label><input type="checkbox" id="chk-m-elem-nem-def" onchange="toggleManualElem('def','nem')"></label>
+                            <input type="number" id="sb-nem-m-def" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('nem')" title="Divisore custom">
+                        </div>
+
+                        <!-- DEF SPEC -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#3498db; min-width:65px;">DEF Spe:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-nem-def-spec" readonly style="width:100%; background:#0a0a12; color:#3498db; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-nem-elem-def-spec" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('nem')" title="Molt. Elemento DEF Spec">
+                            <label><input type="checkbox" id="chk-m-elem-nem-def-spec" onchange="toggleManualElem('def-spec','nem')"></label>
+                            <input type="number" id="sb-nem-m-def-spec" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('nem')" title="Divisore custom">
+                        </div>
+
+                        <!-- VEL -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#2ecc71; min-width:65px;">VEL:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-nem-vel" readonly style="width:100%; background:#0a0a12; color:#2ecc71; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-nem-elem-vel" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('nem')" title="Molt. Elemento VEL">
+                            <label><input type="checkbox" id="chk-m-elem-nem-vel" onchange="toggleManualElem('vel','nem')"></label>
+                            <input type="number" id="sb-nem-m-vel" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('nem')" title="Divisore custom">
+                        </div>
+
+                        <!-- SCHIVATA RISULTANTE -->
+                        <div style="display:flex; gap:6px; align-items:center; padding-top:8px; border-top:1px dashed #333;">
+                            <span style="color:#f39c12; min-width:65px;">Schivata:</span>
+                            <span id="sb-nem-res-schivata" style="color:#f39c12; font-weight:bold;">0</span><span style="color:#7f8fa6;">%</span>
+                        </div>
+                    </div>
+
+                    <!-- Oggetto equipaggiato -->
+                    <div style="margin-top:6px;">
+                        <label style="color:#f1c40f; font-size:12px;">&#x1F392; OGGETTO:</label>
+                        <div style="display:flex; gap:6px; align-items:center; margin-top:4px;">
+                            <span title="Nessuna descrizione" style="cursor:help; color:#e74c3c;">&#x2139;</span>
+                            <select id="sb-nem-item" style="flex:1; background:#1a1a2e; color:white; border:2px solid #f1c40f; border-radius:6px; padding:4px; font-family:monospace; font-size:12px;" onchange="toggleValore(this,'sb-nem-val-item'); aggiornaTooltip(this,'item'); calcolaStatsSandbox('nem')"></select>
+                            <input type="number" id="sb-nem-val-item" placeholder="Val" style="width:60px; display:none; background:#1a1a2e; color:#f1c40f; border:1px solid #f1c40f; border-radius:4px; padding:3px; font-family:monospace;" oninput="aggiornaTooltip(document.getElementById('sb-nem-item'),'item'); calcolaStatsSandbox('nem')">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer: pulsante AVVIA -->
+        <div style="background:#0f0f1a; border-top:4px solid #9b59b6; padding:12px 20px; display:flex; justify-content:center; align-items:center; gap:20px; flex-shrink:0;">
+            <div style="color:#7f8fa6; font-size:11px; font-family:monospace; text-align:center;">
+                Colonne: <b>Stat calcolata</b> | <b>Molt. Elemento</b> | <b>Override</b> | <b>Divisore custom</b>
+            </div>
+            <button onclick="avviaSandbox()" style="background:linear-gradient(135deg,#9b59b6,#6c3483); color:white; border:3px solid #fff; border-radius:12px; padding:12px 40px; font-family:monospace; font-size:18px; font-weight:bold; cursor:pointer; text-transform:uppercase; box-shadow:0 0 20px rgba(155,89,182,0.5); transition:transform 0.1s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                &#x25B6; AVVIA SIMULAZIONE
+            </button>
+        </div>
+    </div>
+
     <!-- Audio del gioco -->
     <audio id="musica-gioco" src="../Audio/lobby.mp3"></audio>
 
@@ -607,6 +898,9 @@
 
     <!-- 5b. UI Perk -->
     <script src="../Script/ui/perk_ui.js"></script>
+
+    <!-- 5c. Sandbox / Debugger (carica DOPO stato.js, pokemon_factory.js e perk_ui.js) -->
+    <script src="../Script/sandbox/sandbox.js"></script>
 
     <!-- 6. Game -->
     <script src="../Script/game/mappa.js"></script>
