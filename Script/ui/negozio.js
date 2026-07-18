@@ -77,6 +77,8 @@ function aggiornaDisplayMonete() {
 // CENTRO MEDICO \u2014 Logica scelta iniziale
 // ==========================================================
 
+let haCuratoInVisita = false;
+
 /** Mostra la fase di scelta del Centro Medico (cura vs negozio).
  *  Chiude anche l'eventuale negozio rimasto aperto per sicurezza. */
 function apriCentroMedico() {
@@ -87,16 +89,40 @@ function apriCentroMedico() {
     // Mostra la fase scelta (display:flex), nasconde la fase cura
     document.getElementById("centro-fase-scelta").style.display = "flex";
     document.getElementById("centro-fase-cura").style.display   = "none";
+    
+    // Ripristina stato pulsante cura
+    haCuratoInVisita = false;
+    const btnCura = document.getElementById("btn-cura-squadra");
+    const txtCura = document.getElementById("testo-cura-squadra");
+    if (btnCura) {
+        btnCura.disabled = false;
+        btnCura.style.opacity = "1";
+        btnCura.style.cursor = "pointer";
+    }
+    if (txtCura) txtCura.innerText = "Ripristina tutti gli HP";
+    
     cambiaSchermata("schermata-mappa", "schermata-centro-medico");
 }
 
 /** Cura tutta la squadra e mostra il team curato. */
 function scegliCura() {
+    if (haCuratoInVisita) return;
     miaSquadra.forEach(p => p.hpAttuali = p.hpMax);
+    
+    haCuratoInVisita = true;
+    const btnCura = document.getElementById("btn-cura-squadra");
+    const txtCura = document.getElementById("testo-cura-squadra");
+    if (btnCura) {
+        btnCura.disabled = true;
+        btnCura.style.opacity = "0.5";
+        btnCura.style.cursor = "not-allowed";
+    }
+    if (txtCura) txtCura.innerText = "Squadra Curata!";
+    
+    // Mostriamo solo un toast invece di chiudere la schermata
+    let log = document.getElementById("console-log-zaino") || document.getElementById("console-log");
+    if (log) log.innerHTML = `🏥 Tutti i Pokémon sono stati curati!`;
 
-    // Nasconde la scelta, mostra la lista del team curato
-    document.getElementById("centro-fase-scelta").style.display = "none";
-    document.getElementById("centro-fase-cura").style.display   = "block";
 
     const contenitore = document.getElementById("contenitore-medico-squadra");
     if (!contenitore) return;
@@ -304,13 +330,13 @@ function acquistaItem(dbId, quantita = 1) {
     
     const costoTotale = item.costo * quantita;
     if (monete < costoTotale) {
-        alert("Monete insufficienti!");
+        mostraAvviso("Monete insufficienti!");
         return;
     }
     
     const acquistiRimasti = CONFIG_NEGOZIO.maxAcquistiPerVisita - _acquistiFattiInVisita;
     if (quantita > acquistiRimasti) {
-        alert(`Puoi acquistare al massimo ancora ${acquistiRimasti} item!`);
+        mostraAvviso(`Puoi acquistare al massimo ancora ${acquistiRimasti} item!`);
         return;
     }
 
@@ -320,33 +346,20 @@ function acquistaItem(dbId, quantita = 1) {
     }
     aggiornaDisplayMonete();
     
-    _acquistiFattiInVisita += quantita;
-
-    // Feedback visivo immediato
+    _acquistiFattiInVisita += quantita;    // Feedback visivo immediato
     const det = document.getElementById("negozio-dettaglio");
     if (det) {
         const feedback = document.createElement("div");
         feedback.style.cssText = "color:#2ecc71; font-family:monospace; font-weight:bold; font-size:14px; margin-top:8px; text-align: center;";
-        feedback.innerText     = `\u2705 ${quantita > 1 ? quantita + 'x ' : ''}${item.nome} aggiunto allo zaino!`;
+        feedback.innerText     = `✅ ${quantita > 1 ? quantita + 'x ' : ''}${item.nome} aggiunto allo zaino! Torno alla mappa...`;
         det.appendChild(feedback);
-        setTimeout(() => { if(feedback.parentNode) feedback.remove() }, 2000);
     }
     
-    // Se limite raggiunto, chiudi automaticamente
-    if (_acquistiFattiInVisita >= CONFIG_NEGOZIO.maxAcquistiPerVisita) {
-        setTimeout(() => {
-            chiudiNegozio();
-        }, 1000);
-        return;
-    }
-
-    // Ricalcola se ora si pu\u00f2 ancora acquistare (aggiorna bottone)
-    const numMappa = parseInt(mappaAttuale.replace("mappa", "")) || 1;
-    const itemsDisponibili = DB_OGGETTI.filter(o =>
-        o.acquistabile && o.mappeAbilitate.includes(numMappa)
-    );
-    _popolaListaNegozio(itemsDisponibili);
-    if (_itemSelezionatoNegozio) _aggiornaDettaglioNegozio();
+    // Rimanda alla mappa automaticamente dopo l'acquisto
+    setTimeout(() => {
+        chiudiNegozio();
+        tornaAllaMappaDaCentro();
+    }, 1000);
 }
 
 /** Chiude il negozio (nasconde l'overlay) e aggiorna la mappa. */

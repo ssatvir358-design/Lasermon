@@ -283,8 +283,9 @@ function calcolaEdEseguiDannoGiocatore(moltMossa, nomeMossaUsata) {
     const moltiplicatoreTipo = CONFIG_DEBOLEZZE[mioPokemon.elemento]?.[nemicoPokemon.elemento] || 1.0;
 
     // --- SCHIVATA NEMICO ---
+    const isUlt = moltMossa >= 3.0;
     const schivataNemica = calcolaSchivata(nemicoPokemon);
-    if (schivataNemica > 0 && Math.random() * 100 < schivataNemica) {
+    if (!isUlt && schivataNemica > 0 && Math.random() * 100 < schivataNemica) {
         document.getElementById("console-log").innerHTML =
             `\u{1f4a8} ${nemicoPokemon.nome} <strong>schiva l'attacco!</strong> (${schivataNemica}% schivata)`;
         
@@ -464,8 +465,9 @@ function calcolaEdEseguiDannoNemico(moltMossa, nomeMossaUsata) {
     const moltiplicatoreTipo = CONFIG_DEBOLEZZE[nemicoPokemon.elemento]?.[mioPokemon.elemento] || 1.0;
 
     // --- SCHIVATA GIOCATORE ---
+    const isUlt = moltMossa >= 3.0;
     const schivataGiocatore = calcolaSchivata(mioPokemon);
-    if (schivataGiocatore > 0 && Math.random() * 100 < schivataGiocatore) {
+    if (!isUlt && schivataGiocatore > 0 && Math.random() * 100 < schivataGiocatore) {
         document.getElementById("console-log").innerHTML +=
             `<br>\u{1f4a8} ${mioPokemon.nome} <strong>schiva l'attacco!</strong> (${schivataGiocatore}% schivata)`;
         
@@ -700,7 +702,9 @@ function gestisciVittoriaIncontro() {
 
         if (indiceProssimo >= chiaviMappe.length) {
             document.getElementById("console-log").innerHTML =
-                "\u{1f3c6} COMPLIMENTI! Hai completato tutte le mappe! \u{1f3c6}";
+                "🏆 COMPLIMENTI! Hai completato tutte le mappe! 🏆";
+            const modale = document.getElementById("modal-vittoria-finale");
+            if (modale) modale.style.display = "flex";
             return;
         }
 

@@ -174,6 +174,7 @@
     justify-content: space-between !important; 
     flex-grow: 1 !important;
     width: 100% !important; 
+    min-height: 0 !important; /* PREVIENE CHE I BOTTONI VENGANO SPINTI FUORI SCHERMO */
     
     /* IMPOSTAZIONE IMMAGINE DI SFONDO */
     background-image: url("../../Sprite/UI/Combattimento/Combattimento2.png") !important;
@@ -361,7 +362,7 @@
     height: 100% !important;
     border-right: 4px solid #f5f6fa !important;
     box-sizing: border-box !important;
-    padding: 20px !important;
+    padding: 10px !important;
 }
 
 #controlli-arena {
@@ -377,7 +378,7 @@
     width: 50% !important;
     height: 100% !important;
     box-sizing: border-box !important;
-    padding: 20px !important;
+    padding: 10px !important;
 }
 
 #console-log { 
@@ -567,7 +568,7 @@
     cursor: not-allowed !important;
 }
 .btn-icon {
-    width: 60px !important;
-    height: 60px !important;
+    width: 40px !important;
+    height: 40px !important;
     image-rendering: pixelated !important;
 }

@@ -218,12 +218,12 @@
         <div id="ui-esterna-mappa" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50;">
             
             <!-- Top Right: Monete -->
-            <div id="top-right-ui" style="position: absolute; top: 20px; left: calc(50% + (var(--map-scaled-width) / 2)); pointer-events: auto;">
+            <div id="top-right-ui" style="position: absolute; top: 20px; left: calc(50% + (var(--map-scaled-width) / 2) + 20px); pointer-events: auto;">
                 <div id="monete-display-mappa" class="ui-box-moderno" style="padding: 5px 15px; font-size: 16px;">💰 0</div>
             </div>
 
             <!-- Right Sidebar: Zaino, Reset -->
-            <div id="right-sidebar-ui" style="position: absolute; top: 50%; left: calc(50% + (var(--map-scaled-width) / 2)); transform: translateY(-50%); pointer-events: auto; display: flex; flex-direction: column; align-items: flex-start; gap: 15px;">
+            <div id="right-sidebar-ui" style="position: absolute; top: 50%; left: calc(50% + (var(--map-scaled-width) / 2) + 20px); transform: translateY(-50%); pointer-events: auto; display: flex; flex-direction: column; align-items: flex-start; gap: 15px;">
                 
                 <!-- Zaino Persistente (Quadrato) -->
                 <div id="pannello-zaino-persistente" class="ui-box-moderno" style="height: 50vh; aspect-ratio: 1 / 1; max-width: calc(50vw - (var(--map-scaled-width) / 2) - 40px); max-height: calc(50vw - (var(--map-scaled-width) / 2) - 40px); display: flex; flex-direction: column; padding: 0; overflow: hidden; position: relative; align-items: stretch; width: 100%;">
@@ -372,15 +372,20 @@
             <!-- FASE 1: Scelta iniziale (cura o negozio).
                  display:none di default — apriCentroMedico() lo mette a flex -->
             <div id="centro-fase-scelta">
-                <button class="centro-scelta-btn" onclick="scegliCura()">
+                <button id="btn-cura-squadra" class="centro-scelta-btn" onclick="scegliCura()">
                     <span class="scelta-emoji">🩹</span>
                     <span>CURA SQUADRA</span>
-                    <span style="font-size: 12px; font-weight: normal; color: #718093;">Ripristina tutti gli HP</span>
+                    <span id="testo-cura-squadra" style="font-size: 12px; font-weight: normal; color: #718093;">Ripristina tutti gli HP</span>
                 </button>
                 <button class="centro-scelta-btn btn-negozio" onclick="apriNegozio()">
                     <span class="scelta-emoji">🛒</span>
                     <span>NEGOZIO</span>
                     <span style="font-size: 12px; font-weight: normal; color: #856a00;">Acquista item con le monete</span>
+                </button>
+                <button class="centro-scelta-btn" onclick="tornaAllaMappaDaCentro()" style="background: #2d3436; color: #dfe6e9; border: 2px solid #636e72;">
+                    <span class="scelta-emoji">🚪</span>
+                    <span>ESCI DAL CENTRO</span>
+                    <span style="font-size: 12px; font-weight: normal; color: #b2bec3;">Torna alla mappa</span>
                 </button>
             </div>
 
@@ -452,6 +457,8 @@
                         <div>HP: <span id="dettaglio-hp">-/-</span></div>
                         <div>ATK: <span id="dettaglio-atk">-</span></div>
                         <div>DEF: <span id="dettaglio-def">-</span></div>
+                        <div>ATK SP.: <span id="dettaglio-spatk">-</span></div>
+                        <div>DIF SP.: <span id="dettaglio-spdef">-</span></div>
                         <div>VEL: <span id="dettaglio-vel">-</span></div>
                         <div style="margin-top: 8px; font-size: 15px; color: #1e272e;">MOSSA: <span id="dettaglio-mossa" style="color: #2ecc71; font-weight: bold;">-</span></div>
                     </div>
@@ -822,6 +829,47 @@
 
     <!-- Audio del gioco -->
     <audio id="musica-gioco" src="../Audio/lobby.mp3"></audio>
+
+    <!-- ============= MODALE AVVISO CUSTOM ============= -->
+    <div id="custom-alert-modal" class="schermata" style="display:none; z-index: 9999; justify-content: center; align-items: center; background: rgba(0,0,0,0.8);">
+        <div style="background: #1e272e; border: 4px solid #3498db; border-radius: 12px; padding: 25px; max-width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.8); animation: fadeInScale 0.3s ease-out;">
+            <div style="font-size: 30px; margin-bottom: 10px;">⚠️</div>
+            <div id="custom-alert-msg" style="color: white; font-family: 'Courier New', Courier, monospace; font-size: 16px; font-weight: bold; margin-bottom: 20px; line-height: 1.4;">
+                Messaggio di prova
+            </div>
+            <button onclick="chiudiAvviso()" style="background: #e74c3c; color: white; border: 2px solid #c0392b; border-radius: 8px; padding: 10px 25px; font-family: monospace; font-size: 16px; font-weight: bold; cursor: pointer; transition: transform 0.1s, background 0.2s;">
+                OK
+            </button>
+        </div>
+    </div>
+    
+    <!-- ============= MODALE VITTORIA FINALE ============= -->
+    <div id="modal-vittoria-finale" class="schermata" style="display:none; z-index: 10000; justify-content: center; align-items: center; background: rgba(0,0,0,0.9);">
+        <div style="background: #27ae60; border: 4px solid #f1c40f; border-radius: 12px; padding: 40px; max-width: 500px; text-align: center; box-shadow: 0 10px 35px rgba(241,196,15,0.4); animation: fadeInScale 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+            <div style="font-size: 60px; margin-bottom: 20px;">🏆</div>
+            <h2 style="color: white; font-family: 'Courier New', Courier, monospace; font-size: 28px; font-weight: bold; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">RUN COMPLETATA!</h2>
+            <div style="color: #ecf0f1; font-family: 'Courier New', Courier, monospace; font-size: 16px; margin-bottom: 30px; line-height: 1.5;">
+                Congratulazioni, hai sconfitto tutte le minacce e completato l'intero percorso! Sei un vero maestro.
+            </div>
+            <button onclick="tornaAllaLobbyDaVittoria()" style="background: #f1c40f; color: #2c3e50; border: 2px solid #f39c12; border-radius: 8px; padding: 15px 30px; font-family: monospace; font-size: 18px; font-weight: bold; cursor: pointer; transition: transform 0.1s, background 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                TORNA ALLA LOBBY
+            </button>
+        </div>
+    </div>
+    
+    <style>
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        #custom-alert-modal button:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+        #custom-alert-modal button:active {
+            transform: scale(0.95);
+        }
+    </style>
 
     <!-- =============================================
          MODULI JS — ordine di caricamento:

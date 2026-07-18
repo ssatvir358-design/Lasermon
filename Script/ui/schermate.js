@@ -2,13 +2,26 @@
 // schermate.js \u2014 Gestione navigazione tra schermate e UI generale
 // Estratto da script.js (righe 466-503, 1256-1354, 1427-1438, 1481-1545)
 // Dipendenze: stato.js, pokemon_factory.js, audio.js
-// Array globale per contenere temporaneamente i Pok\u00e9mon generati per la scelta
+// Array globale per contenere temporaneamente i Pokémon generati per la scelta
 let opzioniSceltaPokemon = [];
 
+// ==========================================================
+// FUNZIONI MODALE DI AVVISO CUSTOM
+// ==========================================================
+function mostraAvviso(messaggio) {
+    const modale = document.getElementById("custom-alert-modal");
+    const testom = document.getElementById("custom-alert-msg");
+    if (testom) testom.innerHTML = messaggio;
+    if (modale) modale.style.display = "flex";
+}
 
+function chiudiAvviso() {
+    const modale = document.getElementById("custom-alert-modal");
+    if (modale) modale.style.display = "none";
+}
 
-// Cambia visibilit\u00e0 tra due schermate (aggiunge/rimuove classe "attiva")
-// Viene poi "wrappata" pi\u00f9 in basso per agganciare la musica automatica
+// Cambia visibilità tra due schermate (aggiunge/rimuove classe "attiva")
+// Viene poi "wrappata" più in basso per agganciare la musica automatica
 function cambiaSchermata(idNascondi, idMostra) {
     const elementoNascondi = document.getElementById(idNascondi);
     const elementoMostra = document.getElementById(idMostra);
@@ -119,9 +132,10 @@ function generaOpzioniPokemon(quanti, isStarter) {
         
         let configGenerata = calcolaLivelloEMossaMappa(pianoAttuale);
         
-        // Calcolo livello reclutamento: Math.max(Lvl_iniziale_mappa_del_pg_max_del_team, livello_max_lvl_team - 1)
+        // Calcolo livello reclutamento: Math.max(Lvl_iniziale_mappa_del_pg_max_del_team, livello_max_lvl_team - 20%)
         let maxLvlTeam = miaSquadra.length > 0 ? Math.max(...miaSquadra.filter(m => m).map(m => m.livello)) : 1;
-        let lvlReclutamento = Math.max(maxLvlTeamInizioMappa, maxLvlTeam - 1);
+        let decurtazione = Math.round(maxLvlTeam * 0.20);
+        let lvlReclutamento = Math.max(maxLvlTeamInizioMappa, maxLvlTeam - decurtazione);
 
         let p = creaPokemon(infoBase, lvlReclutamento, configGenerata.livelloMossa);
         opzioniSceltaPokemon[i] = p;
@@ -243,6 +257,10 @@ function aggiornaPannelloZainoMappa() {
     // Generiamo esattamente 20 celle (maxSlot) per mantenere l'ordine visivo
     for (let i = 0; i < maxSlot; i++) {
         const cella = document.createElement("div");
+        const wrapper = document.createElement("div");
+        wrapper.style.position = "relative";
+        wrapper.style.height = "70px";
+        wrapper.style.width = "100%";
         
         if (i < zaino.length) {
             // Cella piena
@@ -251,6 +269,7 @@ function aggiornaPannelloZainoMappa() {
             const quantitaStr = item.quantita && item.quantita > 1 ? `x${item.quantita}` : "x1";
             const itemNome = fullItem ? fullItem.nome : "Sconosciuto";
             const itemCat = fullItem ? fullItem.categoria : "";
+            const itemDesc = fullItem && fullItem.descrizione ? fullItem.descrizione : "";
             
             cella.className = "zaino-cella piena";
             if (itemCat === "equipaggiabile") {
@@ -258,8 +277,11 @@ function aggiornaPannelloZainoMappa() {
             }
             
             cella.innerHTML = `
-                <div class="zaino-cella-nome">${itemNome}</div>
-                <div class="zaino-cella-qty">${quantitaStr}</div>
+                <div class="zaino-cella-header">
+                    <div class="zaino-cella-nome">${itemNome}</div>
+                    <div class="zaino-cella-qty">${quantitaStr}</div>
+                </div>
+                <div class="zaino-cella-desc">${itemDesc}</div>
             `;
         } else {
             // Cella vuota
@@ -267,7 +289,8 @@ function aggiornaPannelloZainoMappa() {
             cella.innerHTML = `<div style="color: rgba(255,255,255,0.2); font-size: 20px;">+</div>`;
         }
         
-        contenitore.appendChild(cella);
+        wrapper.appendChild(cella);
+        contenitore.appendChild(wrapper);
     }
 }
 
@@ -327,13 +350,18 @@ function confermaAssegnazioneOggetto(indexZaino, indexPokemon) {
     if (!p) return;
     
     if (!p.oggetti) p.oggetti = [];
-    if (p.oggetti.length >= 3) {
-        alert("Questo Pokémon ha già il massimo degli oggetti equipaggiati (3)!");
+    if (p.oggetti.length >= 1) {
+        mostraAvviso("Questo Pokémon ha già il massimo degli oggetti equipaggiati (1)!");
         return;
     }
     
     // Equipaggia
     p.oggetti.push(fullItem);
+    
+    // Ricalcola le statistiche e i bonus
+    if (typeof applicaBonusOggetti === "function") {
+        applicaBonusOggetti(p);
+    }
     
     // Notifica visiva (opzionale)
     let log = document.getElementById("console-log-zaino") || document.getElementById("console-log");
@@ -396,8 +424,8 @@ function resettaRunConStarter() {
     nodoSceltoAttuale = 0;
     mappaAttuale = "mappa1";
     monete = 0;
-    ZainoItems = [];
-    PerkAttivi = [];
+    zaino = [];
+    if (typeof PerkAttivi !== "undefined") PerkAttivi = [];
     isSkipAttivo = false;
     
     // Aggiorna UI
@@ -450,10 +478,14 @@ function aggiornaSquadraMappa() {
         quadratino.setAttribute("data-rarita", p.raritaTipo);
         
         let col = p.elemento ? mapElementoColore[p.elemento.toLowerCase()] || p.colore : p.colore;
-        quadratino.style.borderColor = col;
-        // Glow molto intenso sia all'esterno che all'interno del bordo
-        quadratino.style.boxShadow = `0 0 25px 8px ${col}, inset 0 0 15px ${col}`;
-        quadratino.style.backgroundImage = `url('${p.immagine}')`;
+        
+        quadratino.innerHTML = `
+            <div class="icona-squadra-info">
+                <div class="info-nome">${p.nome}</div>
+                <div class="info-dettagli">Lv.${p.livello} &bull; ${p.elemento ? p.elemento.toUpperCase() : "???"}</div>
+            </div>
+            <div class="icona-squadra-img" style="border-color: ${col}; box-shadow: 0 0 25px 8px ${col}, inset 0 0 15px ${col}; background-image: url('${p.immagine}');"></div>
+        `;
         quadratino.style.opacity = p.hpAttuali <= 0 ? "0.4" : "1"; 
         
         // Rendi l'icona trascinabile (Drag & Drop)
@@ -569,6 +601,13 @@ function mostraDettaglioPokemon(index) {
     document.getElementById("dettaglio-hp").innerText = `${p.hpAttuali}/${getStatString("hp", p.hpMax)}`;
     document.getElementById("dettaglio-atk").innerText = getStatString("atk", p.atk);
     document.getElementById("dettaglio-def").innerText = getStatString("def", p.def);
+    
+    // ATK SP. and DIF SP. (if elements exist)
+    let elSpAtk = document.getElementById("dettaglio-spatk");
+    if (elSpAtk) elSpAtk.innerText = getStatString("atkSpec", p.atkSpec);
+    let elSpDef = document.getElementById("dettaglio-spdef");
+    if (elSpDef) elSpDef.innerText = getStatString("defSpec", p.defSpec);
+    
     document.getElementById("dettaglio-vel").innerText = getStatString("vel", p.vel);
     
     document.getElementById("dettaglio-mossa").innerText = `${getNomeMossaAttuale(p)} (Lvl ${p.livelloMossa})`;
