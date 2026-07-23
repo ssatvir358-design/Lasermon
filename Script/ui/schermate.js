@@ -516,6 +516,7 @@ function resettaRunConStarter() {
     zaino = [];
     if (typeof PerkAttivi !== "undefined") PerkAttivi = [];
     isSkipAttivo = false;
+    if (typeof tentativiSenzaLeggendari !== "undefined") tentativiSenzaLeggendari = 0;
     
     // Aggiorna UI
     const moneteDispMappa = document.getElementById("monete-display-mappa");

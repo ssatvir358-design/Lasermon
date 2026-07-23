@@ -350,9 +350,8 @@
     top: 0 !important;
     left: 0 !important;
     box-sizing: border-box !important;
-    background: #2f3640 !important;
+    background-color: #2f3640 !important;
     z-index: 9999 !important;
-    background-image: url('../../Sprite/UI/Combattimento/Combattimento2.png') !important;
     background-size: cover;
     background-position: center !important;
     background-repeat: no-repeat !important;
@@ -374,7 +373,7 @@
     justify-content: space-between !important; 
     width: 100% !important; 
     height: 100% !important; 
-    background-color: #f5f6fa !important; 
+    background-color: transparent !important; 
     margin: 0 !important;
     padding: 0 !important;
     box-sizing: border-box !important;
@@ -391,10 +390,7 @@
     min-height: 0 !important; /* PREVIENE CHE I BOTTONI VENGANO SPINTI FUORI SCHERMO */
     
     /* IMPOSTAZIONE IMMAGINE DI SFONDO */
-    background-image: url("../../Sprite/UI/Combattimento/Combattimento2.png") !important;
-    background-size: cover;             /* Fa in modo che l'immagine copra tutta l'arena senza deformarsi */
-    background-position: center !important;         /* Centra l'immagine nello schermo */
-    background-repeat: no-repeat !important;        /* Evita che l'immagine si duplichi se lo schermo è troppo grande */
+    background: transparent !important;
     
     padding: 40px !important; 
     box-sizing: border-box !important;
