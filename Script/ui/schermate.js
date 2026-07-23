@@ -672,7 +672,7 @@ function mostraDettaglioPokemon(index) {
     
     indicePokemonInDettaglio = index;
 
-    document.getElementById("dettaglio-img").src = p.immagine; 
+    document.getElementById("dettaglio-img").src = p.immagineVS; 
     document.getElementById("dettaglio-nome").innerText = p.nome;
     document.getElementById("dettaglio-rarita").innerText = p.raritaTipo.toUpperCase();
     

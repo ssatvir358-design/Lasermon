@@ -1,7 +1,10 @@
 // ==========================================================
-// battaglia.js \u2014 Sistema di combattimento
+// battaglia.js — Sistema di combattimento
 // Dipendenze: stato.js, pokemon_factory.js, schermate.js, audio.js, negozio.js
 // ==========================================================
+
+// Helper globale: normalizza il nome cartella/file per gli sprite
+const getSpriteName = (nome) => nome ? nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3').replace(/\s+/g, '') : '';
 
 // ==========================================================
 // CONFIGURAZIONE LEVEL-UP POST-INCONTRO
@@ -10,7 +13,7 @@
 const CONFIG_LEVEL_UP = {
     cespuglio: 1,  // +1 livello dopo erba alta
     npc:       2,  // +2 livelli dopo sfida allenatore
-    boss:      3   // +3 livelli dopo boss
+    boss:      1   // +1 livello dopo boss
 };
 
 
@@ -285,10 +288,10 @@ function preparaIncontroBattaglia(tipoEvento, elementoFiltro = null) {
     const latoGio  = document.querySelector(".lato-giocatore");
     const latoNem  = document.querySelector(".lato-nemico");
 
-    const folderGio = mioPokemon.nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3');
-    const folderNem = nemicoPokemon.nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3');
-    imgVSGio.src = `../Sprite/personaggi/${folderGio}/${mioPokemon.nome}VS.png`;
-    imgVSNem.src = `../Sprite/personaggi/${folderNem}/${nemicoPokemon.nome}VS.png`;
+    const folderGio = getSpriteName(mioPokemon.nome);
+    const folderNem = getSpriteName(nemicoPokemon.nome);
+    imgVSGio.src = `../Sprite/personaggi/${folderGio}/${folderGio}VS.png`;
+    imgVSNem.src = `../Sprite/personaggi/${folderNem}/${folderNem}VS.png`;
 
     latoGio.classList.remove("entra");
     latoNem.classList.remove("entra");
@@ -693,8 +696,8 @@ function gestisciKOGiocatore() {
     // Mostra immagine KO del Pok\u00e9mon corrente
     const imgGiocatore = document.getElementById("img-giocatore");
     if (imgGiocatore && mioPokemon) {
-        const folderGio = mioPokemon.nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3');
-        imgGiocatore.src = `../Sprite/personaggi/${folderGio}/${mioPokemon.nome}KO.jpeg`;
+        const folderGio = getSpriteName(mioPokemon.nome);
+        imgGiocatore.src = `../Sprite/personaggi/${folderGio}/${folderGio}KO.jpeg`;
     }
 
     // --- PERK SALVAVITA ---
@@ -762,7 +765,7 @@ function gestisciVittoriaIncontro() {
     if (isBossFight) {
         livUpGuadagnati = CONFIG_LEVEL_UP.boss;
     } else if (tipoEventoAttuale === "miniboss") {
-        livUpGuadagnati = 4; // I mini boss danno +4 livelli a tutta la squadra
+        livUpGuadagnati = 3; // I mini boss danno +3 livelli a tutta la squadra
     } else if (tipoEventoAttuale === "cespuglio") {
         livUpGuadagnati = CONFIG_LEVEL_UP.cespuglio;
     } else if (tipoEventoAttuale === "npc") {
@@ -903,8 +906,8 @@ function eseguiAnimazioneUlt(pokemon, idElementoImg, callbackDanno) {
 
     function mostraProssimoFrame() {
         if (currentFrame <= totalFrames) {
-            const folder = pokemon.nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3');
-            elementoImg.src = `../Sprite/personaggi/${folder}/${pokemon.nome}Ult${currentFrame}.jpeg`;
+            const folder = getSpriteName(pokemon.nome);
+            elementoImg.src = `../Sprite/personaggi/${folder}/${folder}Ult${currentFrame}.jpeg`;
             currentFrame++;
             setTimeout(mostraProssimoFrame, isSkipAttivo ? 500 : 1000);
         } else {
@@ -958,9 +961,15 @@ function avviaBossBattle(idBoss) {
         const configLivelli = CONFIG_LIVELLI_MAPPE[indiceMappa] || CONFIG_LIVELLI_MAPPE[1];
         let lvIngresso = configLivelli.ingresso;
         let lvBossConfig = configLivelli.boss;
-        let delta_livello = lvBossConfig - lvIngresso;
+        
+        let maxTeamLvl = (typeof maxLvlTeamInizioMappa !== "undefined") ? maxLvlTeamInizioMappa : 1;
+        if (maxTeamLvl === 1 && typeof miaSquadra !== "undefined" && miaSquadra.length > 0) {
+            maxTeamLvl = Math.max(...miaSquadra.filter(p => p).map(p => p.livello));
+        }
+        
+        let delta_livello = 16;
         let variazione_seed = (typeof variazioneSeedMappa !== "undefined") ? variazioneSeedMappa : 0;
-        let lvBossCalculated = Math.floor(lvIngresso + delta_livello + variazione_seed);
+        let lvBossCalculated = Math.floor(maxTeamLvl + delta_livello + variazione_seed);
         
         let finalLvl = lvBossCalculated || lvl;
         if (mappaAttuale === "mappa9") {
@@ -1091,9 +1100,9 @@ function fugaBattaglia() {
 
 
 function gestisciKONemico() {
-    const folderNem = nemicoPokemon.nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3');
+    const folderNem = getSpriteName(nemicoPokemon.nome);
     document.getElementById("img-nemico").src =
-        `../Sprite/personaggi/${folderNem}/${nemicoPokemon.nome}KO.jpeg`;
+        `../Sprite/personaggi/${folderNem}/${folderNem}KO.jpeg`;
 
     setTimeout(() => {
         if (nemiciIncontro.length > 0) {

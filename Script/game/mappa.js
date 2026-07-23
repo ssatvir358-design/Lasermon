@@ -60,18 +60,15 @@ function generaMappaProcedurale() {
             let tipoEvento;
 
             if (pianoIndex === 0) {
-                // Piano START: nessun evento, gestito come radice visiva
-                tipoEvento = "start";
-
+                // Nodo radice (START)
+                tipoEvento = "start"; // Dummy
             } else if (pianoIndex === ultimoPiano) {
                 // Ultimo piano: sempre boss
                 tipoEvento = "boss";
-
             } else if (pianoIndex === penultimoPiano) {
                 // Penultimo piano: un unico centro-medico, gli altri npc
                 tipoEvento = (i === indiceMedicoUnico) ? "centro-medico" : "npc";
                 contatoreEventi["npc"] = (contatoreEventi["npc"] || 0) + (tipoEvento === "npc" ? 1 : 0);
-
             } else if (pianoIndex === 1) {
                 // Primo piano giocabile: estremo sinistro pokeball, estremo destro cespuglio, centro random
                 if (i === 0) {
@@ -82,16 +79,17 @@ function generaMappaProcedurale() {
                     tipoEvento = selezionaEventoPerPiano(pianoIndex, contatoreEventi);
                 }
                 contatoreEventi[tipoEvento] = (contatoreEventi[tipoEvento] || 0) + 1;
-
-            } else if (pianoIndex === 7 && [2, 4, 6, 8].includes(parseInt(mappaAttuale.replace("mappa", "")) || 1)) {
-                // Piano 8 (indice 7) nelle mappe 2, 4, 6, 8: nodo centrale è il miniboss
-                if (i === Math.floor(numNodi / 2)) {
+            } else if (pianoIndex === 7) {
+                // Piano 8 (indice 7): miniboss SOLO al centro e SOLO su mappe 2,4,6,8
+                const numMappaCorrente = parseInt(mappaAttuale.replace("mappa", ""));
+                const mappeConMiniboss = [2, 4, 6, 8];
+                if (mappeConMiniboss.includes(numMappaCorrente) && i === Math.floor(numNodi / 2)) {
                     tipoEvento = "miniboss";
+                    console.log(`[MiniBoss] Spawned su ${mappaAttuale} al piano ${pianoIndex}, nodo ${i}`);
                 } else {
                     tipoEvento = selezionaEventoPerPiano(pianoIndex, contatoreEventi);
                 }
                 contatoreEventi[tipoEvento] = (contatoreEventi[tipoEvento] || 0) + 1;
-
             } else {
                 // Piani intermedi: usa il DB_EVENTI_NODI
                 tipoEvento = selezionaEventoPerPiano(pianoIndex, contatoreEventi);
@@ -183,6 +181,8 @@ function selezionaEventoPerPiano(pianoIndex, contatoreEventi) {
     // 1. Costruisce il pool degli eventi eligibili per questo piano
     const poolEligibili = Object.keys(DB_EVENTI_NODI).filter(tipo => {
         const cfg = DB_EVENTI_NODI[tipo];
+        // Escludi esplicitamente eventi che non devono apparire casualmente
+        if (cfg.Peso === 0) return false;
         // Deve rientrare nel range di piani
         if (pianoIndex < cfg.PianoMin || pianoIndex > cfg.PianoMax) return false;
         // Deve non aver ancora raggiunto il limite randomizzato

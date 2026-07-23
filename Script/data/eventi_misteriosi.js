@@ -29,7 +29,7 @@ const DB_EVENTI_MISTERIOSI = [
                     let pg = miaSquadra[0];
                     if (pg) {
                         pg.hpAttuali = Math.max(1, pg.hpAttuali - 3);
-                        aggiungiOggettoAlloZaino("SNACK AL VOLO", 1);
+                        aggiungiAZaino("SNACK AL VOLO", 1);
                         mostraEsitoMistero(`Hai ottenuto 1x SNACK AL VOLO. Ma ${pg.nome} perde 3 PV per la fame!`);
                     } else {
                         mostraEsitoMistero("Non hai Pokémon per farlo.");
@@ -146,7 +146,7 @@ const DB_EVENTI_MISTERIOSI = [
             {
                 testo: "LO FAI PRESENTE A KONGFIL",
                 azione: function() {
-                    aggiungiOggettoAlloZaino("CAFFE' ALLA MACCHINETTA", 1);
+                    aggiungiAZaino("CAFFE' ALLA MACCHINETTA", 1);
                     mostraEsitoMistero("Ricevi un premio aziendale: 1x CAFFE' DELLA MACCHINETTA.");
                 }
             },
@@ -214,7 +214,7 @@ const DB_EVENTI_MISTERIOSI = [
                 testo: "FIRMA E PRENDILO",
                 azione: function() {
                     if (Math.random() < 0.5) {
-                        aggiungiOggettoAlloZaino("ANELLO DEL LEONE", 1);
+                        aggiungiAZaino("equip_1");
                         mostraEsitoMistero("Fortuna! Ottieni 1x ANELLO DEL LEONE.");
                     } else {
                         miaSquadra.forEach(p => {
@@ -232,7 +232,7 @@ const DB_EVENTI_MISTERIOSI = [
                 azione: function() {
                     if (monete >= 3) {
                         monete -= 3;
-                        aggiungiOggettoAlloZaino("ACQUA FRESCA", 1);
+                        aggiungiAZaino("cons_6");
                         mostraEsitoMistero("Hai pagato 3 monete e hai ottenuto 1x ACQUA FRESCA.");
                     } else {
                         mostraEsitoMistero("Non hai abbastanza monete per pagare la spedizione.");
@@ -257,7 +257,7 @@ const DB_EVENTI_MISTERIOSI = [
             {
                 testo: "SVUOTA IL VASSOIO DI FOCACCE",
                 azione: function() {
-                    aggiungiOggettoAlloZaino("SNACK AL VOLO", 2);
+                    aggiungiAZaino("SNACK AL VOLO", 2);
                     miaSquadra.forEach(p => {
                         if (p) aggiungiBuffTemporaneoNextFight(p.idUnico, 'spd', -0.10);
                     });
@@ -337,7 +337,7 @@ const DB_EVENTI_MISTERIOSI = [
                 testo: "CALCIO BEN ASSESTATO",
                 azione: function() {
                     if (Math.random() < 0.5) {
-                        aggiungiOggettoAlloZaino("CAFFE' ALLA MACCHINETTA", 1);
+                        aggiungiAZaino("CAFFE' ALLA MACCHINETTA", 1);
                         mostraEsitoMistero("Il colpo funziona! Il distributore sputa 1x CAFFE' ALLA MACCHINETTA.");
                     } else {
                         let p = miaSquadra[0];
@@ -352,7 +352,7 @@ const DB_EVENTI_MISTERIOSI = [
                     if (monete >= 2) {
                         monete -= 2;
                         monete += 1; // Resto di cortesia
-                        aggiungiOggettoAlloZaino("BRIOCHE CALDA", 1);
+                        aggiungiAZaino("BRIOCHE CALDA", 1);
                         mostraEsitoMistero("Spendi 2 monete. L'azienda ti regala 1 moneta di resto e 1x BRIOCHE CALDA!");
                     } else {
                         mostraEsitoMistero("Non hai monete per chiamare.");
@@ -389,7 +389,7 @@ const DB_EVENTI_MISTERIOSI = [
                 azione: function() {
                     if (Math.random() < 0.40) {
                         monete += 8;
-                        aggiungiOggettoAlloZaino("T-SHIRT LASER", 1);
+                        aggiungiAZaino("T-SHIRT LASER", 1);
                         mostraEsitoMistero("Vittoria! Ottieni 8 monete cash e 1x T-SHIRT LASER!");
                     } else {
                         let p = miaSquadra[0];
@@ -460,7 +460,7 @@ const DB_EVENTI_MISTERIOSI = [
                 testo: "AVVIA COMANDO 'FORMAT C:'",
                 azione: function() {
                     if (Math.random() < 0.40) {
-                        aggiungiOggettoAlloZaino("DISCO MOSSA", 1);
+                        aggiungiAZaino("DISCO MOSSA", 1);
                         mostraEsitoMistero("Miracolo informatico! Il backend si ripulisce e sblocchi 1x DISCO MOSSA gratis.");
                     } else {
                         miaSquadra.forEach(p => {
@@ -510,7 +510,7 @@ const DB_EVENTI_MISTERIOSI = [
             {
                 testo: "ESIBISCI FALDONE SINDACATI",
                 azione: function() {
-                    aggiungiOggettoAlloZaino("TESSERA DEL SINDACATO", 1);
+                    aggiungiAZaino("TESSERA DEL SINDACATO", 1);
                     mostraEsitoMistero("Scudo legale attivato. Ottieni 1x TESSERA DEL SINDACATO da equipaggiare.");
                 }
             },
@@ -630,7 +630,7 @@ const DB_EVENTI_MISTERIOSI = [
             {
                 testo: "ATTIVA VPN E SMART WORKING",
                 azione: function() {
-                    aggiungiOggettoAlloZaino("SMART WORKING FORZATO", 1);
+                    aggiungiAZaino("SMART WORKING FORZATO", 1);
                     mostraEsitoMistero("Ti isoli a casa. Ottieni l'oggetto SMART WORKING FORZATO (MALEDETTO)!");
                 }
             },

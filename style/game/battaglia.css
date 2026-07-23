@@ -106,7 +106,7 @@
     max-width: 55vw;
     max-height: 90vh;
     object-fit: contain;
-    transform: scale(0.9);
+    transform: scale(0.7);
     transition: transform 4s ease-out; /* Slow zoom anime */
     filter: drop-shadow(0 0 15px rgba(0,0,0,0.8));
     transform-origin: bottom left;
@@ -120,14 +120,14 @@
     max-width: 55vw;
     max-height: 90vh;
     object-fit: contain;
-    transform: scale(0.9);
+    transform: scale(0.7);
     transition: transform 4s ease-out; /* Slow zoom anime */
     filter: drop-shadow(0 0 15px rgba(0,0,0,0.8));
     transform-origin: top right;
 }
 
 .sfondo-vs-custom.anime-style.attiva .vs-panel .vs-sprite-pokemon {
-    transform: scale(1.1); /* L'immagine si ingrandisce minacciosamente */
+    transform: scale(0.85); /* L'immagine si ingrandisce minacciosamente */
 }
 
 /* Linea diagonale bianca glowing al centro */
@@ -353,7 +353,7 @@
     background: #2f3640 !important;
     z-index: 9999 !important;
     background-image: url('../../Sprite/UI/Combattimento/Combattimento2.png') !important;
-    background-size: cover !important;
+    background-size: cover;
     background-position: center !important;
     background-repeat: no-repeat !important;
     /* Assicura che lo sfondo sia sempre sotto gli altri elementi */
@@ -392,7 +392,7 @@
     
     /* IMPOSTAZIONE IMMAGINE DI SFONDO */
     background-image: url("../../Sprite/UI/Combattimento/Combattimento2.png") !important;
-    background-size: cover !important;             /* Fa in modo che l'immagine copra tutta l'arena senza deformarsi */
+    background-size: cover;             /* Fa in modo che l'immagine copra tutta l'arena senza deformarsi */
     background-position: center !important;         /* Centra l'immagine nello schermo */
     background-repeat: no-repeat !important;        /* Evita che l'immagine si duplichi se lo schermo è troppo grande */
     
@@ -721,7 +721,7 @@
 
 @keyframes comparsaScrittaBoss {
     0% { transform: scale(0); opacity: 0; }
-    70% { transform: scale(1.1); opacity: 1; }
+    70% { transform: scale(0.85); opacity: 1; }
     100% { transform: scale(1); opacity: 1; }
 }
 

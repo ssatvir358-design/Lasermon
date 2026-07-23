@@ -71,10 +71,15 @@ function calcolaLivelloEMossaMappa(piano, tipoEvento) {
     let lvIngresso = configLivelli.ingresso;
     let lvBossConfig = configLivelli.boss;
     
-    // calcolo livello boss per ogni mappa = Math.floor(LvL_MIN_Mappa + delta_livello + variazione_seed)
-    let delta_livello = lvBossConfig - lvIngresso;
+    // calcolo livello boss per ogni mappa = Math.floor(LvL_MAX_Mappa + delta_livello + variazione_seed)
+    let maxTeamLvl = (typeof maxLvlTeamInizioMappa !== "undefined") ? maxLvlTeamInizioMappa : 1;
+    if (maxTeamLvl === 1 && typeof miaSquadra !== "undefined" && miaSquadra.length > 0) {
+        maxTeamLvl = Math.max(...miaSquadra.filter(p => p).map(p => p.livello));
+    }
+    
+    let delta_livello = 16;
     let variazione_seed = (typeof variazioneSeedMappa !== "undefined") ? variazioneSeedMappa : 0;
-    let lvBoss = Math.floor(lvIngresso + delta_livello + variazione_seed);
+    let lvBoss = Math.floor(maxTeamLvl + delta_livello + variazione_seed);
     
     let livelloGenerato = 1;
     
@@ -200,6 +205,7 @@ function creaPokemon(infoBase, livello, livelloMossa = 1) {
         raritaTipo:   infoBase.raritaTipo,
         elemento:     elementoPkm,
         immagine:     infoBase.immagine,
+        immagineVS:   "../Sprite/personaggi/" + (infoBase.nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3').replace(/\s+/g, '')) + "/" + (infoBase.nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3').replace(/\s+/g, '')) + "VS.png",
         immagineAtk:  infoBase.immagineAtk,
         frameAtk:     infoBase.frameAtk || 1,
         mossaLvl1:    infoBase.mossaLvl1,
@@ -533,7 +539,7 @@ function pescaPokemonCasuale(esclusioniNomi = [], elementoFiltro = null) {
     // Pesi base per rarit\u00e0 (pi\u00f9 \u00e8 raro, meno probabile \u00e8)
     const pesi = { "comune": 22, "non comune": 18, "raro": 16, "epico": 14, "leggendario": 12, "special": 10, "bombers": 8 };
 
-    let poolDisponibili = pokemonDatabase.filter(p => !p.boss && !p.isEvoluzione && !esclusioniNomi.includes(p.nome));
+    let poolDisponibili = pokemonDatabase.filter(p => !p.boss && !p.isMiniboss && !p.isEvoluzione && !esclusioniNomi.includes(p.nome));
 
     // Applica il filtro per elemento se specificato
     if (elementoFiltro) {
@@ -564,7 +570,7 @@ function pescaPokemonCasuale(esclusioniNomi = [], elementoFiltro = null) {
 
     // Paracadute: se il pool \u00e8 ancora vuoto, usa tutti i non-boss
     if (poolDisponibili.length === 0) {
-        poolDisponibili = pokemonDatabase.filter(p => !p.boss && !p.isEvoluzione);
+        poolDisponibili = pokemonDatabase.filter(p => !p.boss && !p.isMiniboss && !p.isEvoluzione);
     }
 
     // Selezione pesata: estrae un elemento rispettando i pesi di rarit\u00e0
@@ -650,6 +656,7 @@ function pescaPokemonPokeball(esclusioniNomi = []) {
     // Filtra il database
     let pool = pokemonDatabase.filter(p => 
         !p.boss && 
+        !p.isMiniboss && 
         !p.isEvoluzione && 
         p.raritaTipo.toLowerCase() === rarScelta && 
         !esclusioniNomi.includes(p.nome)
@@ -658,6 +665,7 @@ function pescaPokemonPokeball(esclusioniNomi = []) {
     if (pool.length === 0) {
         pool = pokemonDatabase.filter(p => 
             !p.boss && 
+            !p.isMiniboss && 
             !p.isEvoluzione && 
             p.raritaTipo.toLowerCase() === rarScelta
         );

@@ -212,6 +212,7 @@
 .evento-scambio { background-image: url("../../Sprite/nodi/scambio.png") !important; }
 .evento-mistero { background-image: url("../../Sprite/nodi/mistery.png") !important; }
 .evento-item { background-image: url("../../Sprite/nodi/item.png") !important; }
+.evento-miniboss { background-image: url("../../Sprite/nodi/mini-boss.png") !important; }
 
 /* Griglia squadra (usiamo squadra-moderna ora) */
 #griglia-squadra {

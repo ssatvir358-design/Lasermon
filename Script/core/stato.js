@@ -102,7 +102,7 @@ let effettiAttivi = {
 };
 
 // --- Mappa procedurale ---
-const schemaAlbero = [1, 3, 4, 5, 4, 5, 4, 5, 4, 5, 4, 5, 4, 3, 1]; // Nodi per piano
+let schemaAlbero = [1, 3, 4, 5, 4, 5, 4, 5, 4, 5, 4, 5, 4, 3, 1]; // Nodi per piano
 let alberoMappa = [];
 let pianoAttuale = 0;
 let nodoSceltoAttuale = 0;
