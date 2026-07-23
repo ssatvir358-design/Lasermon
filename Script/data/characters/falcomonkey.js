@@ -1,0 +1,2 @@
+// ===== FALCOMONKEY =====
+const CHAR_FALCOMONKEY = { nome: "Falco Monkey", hpBase: 4, atkBase: 2, defBase: 4, atkSpec: 3, defSpec: 3, velBase: 8, raritaTipo: "raro", elemento: "erba", immagine: "../Sprite/personaggi/Falco Monkey/Falco Monkey.jpeg", immagineAtk: "../Sprite/personaggi/Falco Monkey/Falco Monkey_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "|", boss: false, isEvoluzione: true, lore: "" };

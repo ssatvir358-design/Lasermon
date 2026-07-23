@@ -12,6 +12,202 @@
     overflow: hidden;
 }
 
+/* --- NUOVA SCHERMATA VS (ANIME STYLE) --- */
+.sfondo-vs-custom.anime-style {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    background-color: #000;
+    z-index: 12;
+}
+
+.vs-panel {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Taglio diagonale: da top-right a bottom-left */
+.vs-panel-player {
+    clip-path: polygon(0 0, 65% 0, 35% 100%, 0 100%);
+    transform: translate(-100%, -100%);
+    z-index: 2;
+    filter: drop-shadow(5px 5px 25px rgba(0, 116, 217, 1));
+}
+
+.vs-panel-enemy {
+    clip-path: polygon(65% 0, 100% 0, 100% 100%, 35% 100%);
+    transform: translate(100%, 100%);
+    z-index: 1;
+}
+
+/* Quando si attiva, i pannelli sbattono al centro */
+.sfondo-vs-custom.anime-style.attiva .vs-panel-player {
+    transform: translate(0, 0);
+}
+
+.sfondo-vs-custom.anime-style.attiva .vs-panel-enemy {
+    transform: translate(0, 0);
+}
+
+/* Effetto di scossa quando i pannelli sbattono */
+.sfondo-vs-custom.anime-style.attiva {
+    animation: shakeScreenAnime 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) 0.4s both;
+}
+
+@keyframes shakeScreenAnime {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    15% { transform: translate(-10px, 8px) rotate(-1deg); }
+    30% { transform: translate(10px, -8px) rotate(1deg); }
+    45% { transform: translate(-8px, -6px) rotate(-0.5deg); }
+    60% { transform: translate(8px, 6px) rotate(0.5deg); }
+    75% { transform: translate(-4px, 4px) rotate(-0.2deg); }
+    90% { transform: translate(4px, -4px) rotate(0.2deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+/* Sfondi dinamici per i due lati */
+.vs-bg-effect {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    z-index: -1;
+    background-size: 100px 100px;
+    animation: bgAnimeMove 2s linear infinite;
+}
+
+.vs-bg-blue {
+    background-image: repeating-linear-gradient(45deg, #001f3f, #001f3f 20px, #0074D9 20px, #0074D9 40px);
+}
+
+.vs-bg-red {
+    background-image: repeating-linear-gradient(45deg, #4a0000, #4a0000 20px, #d30000 20px, #d30000 40px);
+}
+
+@keyframes bgAnimeMove {
+    0% { background-position: 0px 0px; }
+    100% { background-position: 100px 100px; }
+}
+
+/* Posizionamento dei personaggi nei rispettivi triangoli */
+.vs-panel-player .vs-sprite-pokemon {
+    position: absolute;
+    bottom: 0%;
+    left: 5%;
+    max-width: 55vw;
+    max-height: 90vh;
+    object-fit: contain;
+    transform: scale(0.9);
+    transition: transform 4s ease-out; /* Slow zoom anime */
+    filter: drop-shadow(0 0 15px rgba(0,0,0,0.8));
+    transform-origin: bottom left;
+}
+
+.vs-panel-enemy .vs-sprite-pokemon {
+    position: absolute;
+    bottom: 0%;
+    top: auto;
+    right: 5%;
+    max-width: 55vw;
+    max-height: 90vh;
+    object-fit: contain;
+    transform: scale(0.9);
+    transition: transform 4s ease-out; /* Slow zoom anime */
+    filter: drop-shadow(0 0 15px rgba(0,0,0,0.8));
+    transform-origin: top right;
+}
+
+.sfondo-vs-custom.anime-style.attiva .vs-panel .vs-sprite-pokemon {
+    transform: scale(1.1); /* L'immagine si ingrandisce minacciosamente */
+}
+
+/* Linea diagonale bianca glowing al centro */
+.vs-slash-line {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background: transparent;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    opacity: 0;
+}
+
+.sfondo-vs-custom.anime-style.attiva .vs-slash-line {
+    opacity: 1;
+    transition: opacity 0.3s ease-out 0.3s;
+}
+
+.vs-slash-line::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    clip-path: polygon(64.5% 0, 65.5% 0, 35.5% 100%, 34.5% 100%);
+    filter: drop-shadow(0 0 15px #fff) drop-shadow(0 0 30px #0074D9);
+    transform: scaleY(0);
+    transform-origin: center;
+}
+
+.sfondo-vs-custom.anime-style.attiva .vs-slash-line::after {
+    transform: scaleY(1);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s;
+}
+
+/* Center VS logo */
+.logo-vs-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 15;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo-vs-image {
+    max-width: 500px;
+    width: 25vw;
+    height: auto;
+    opacity: 0;
+    transform: scale(4) rotate(-60deg);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.3) 0.6s, opacity 0.2s ease-out 0.6s;
+    filter: drop-shadow(0 0 30px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 60px rgba(255, 255, 255, 0.8));
+}
+
+.sfondo-vs-custom.anime-style.attiva .logo-vs-image {
+    opacity: 1;
+    transform: scale(1) rotate(-10deg);
+}
+
+/* ==========================================================
+   SCHERMATA INTRO VS ANIMATA (ISOLATA)
+   ========================================================== */
+#intro-vs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    z-index: 99999; /* Sopra a tutto il resto del gioco */
+    overflow: hidden;
+}
+
 .sfondo-vs-custom {
     width: 100%;
     height: 100%;
@@ -58,15 +254,13 @@
     left: 0;
     background-image: url('../../Sprite/UI/Combattimento/Blocco_blu.png');
     transform: translate(-100%, -50%);
-    padding-right: 12%;                /* Centra lo sprite nella parte solida del blocco */
-}
+    }
 
 .blocco-vs-rosso {
     right: 0;
     background-image: url('../../Sprite/UI/Combattimento/Blocco_rosso.png');
     transform: translate(100%, -50%);
-    padding-left: 12%;                 /* Centra lo sprite nella parte solida del blocco */
-}
+    }
 
 .blocco-vs-blu.entra {
     transform: translate(0, -50%);
@@ -78,20 +272,40 @@
 
 /* Character sprite inside blocks */
 .blocco-vs .vs-sprite-pokemon {
-    max-width: 75% !important;         /* Sprite più grande dentro il blocco */
-    max-height: 90% !important;
-    height: auto !important;
-    width: auto !important;
-    object-fit: contain !important;
+    position: absolute;
+    height: 81% !important;
+    width: 70% !important;
+    object-fit: cover !important;
     filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.6));
     opacity: 0;
-    transform: scale(0.6) translateY(20px);
     transition: transform 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.25), opacity 0.5s ease-out;
     transition-delay: 0.2s;
 }
 
 .blocco-vs.entra .vs-sprite-pokemon {
     opacity: 1;
+}
+
+
+.blocco-vs-blu .vs-sprite-pokemon {
+    top: 9%;
+    left: 3%;
+    clip-path: polygon(0 0, 100% 0, 75% 100%, 0% 100%);
+    border-radius: 8px 0 0 8px;
+    transform: scale(0.6) translateY(20px);
+}
+.blocco-vs-blu.entra .vs-sprite-pokemon {
+    transform: scale(1) translateY(0);
+}
+
+.blocco-vs-rosso .vs-sprite-pokemon {
+    top: 9.5%;
+    right: 3%;
+    clip-path: polygon(25% 0, 100% 0, 100% 100%, 0% 100%);
+    border-radius: 0 8px 8px 0;
+    transform: scale(0.6) translateY(20px);
+}
+.blocco-vs-rosso.entra .vs-sprite-pokemon {
     transform: scale(1) translateY(0);
 }
 
@@ -155,7 +369,7 @@
 }
 
 #gioco-container-arena { 
-    display: flex !important; 
+    display: flex; 
     flex-direction: column !important; 
     justify-content: space-between !important; 
     width: 100% !important; 
@@ -169,7 +383,7 @@
 
 /* Sfondo del campo di battaglia a tutto schermo con immagine custom */
 #arena-diagonale { 
-    display: flex !important; 
+    display: flex; 
     flex-direction: column !important; 
     justify-content: space-between !important; 
     flex-grow: 1 !important;
@@ -188,7 +402,7 @@
 
 /* Le singole schede fluttuanti dei pokemon */
 .scheda-arena {
-    display: flex !important;
+    display: flex;
     flex-direction: column-reverse !important;
     gap: 15px !important;
     width: 100% !important;
@@ -270,7 +484,7 @@
 }
 
 .sotto-barra {
-    display: flex !important;
+    display: flex;
     justify-content: flex-end !important;
     align-items: center !important;
     font-size: 14px !important;
@@ -292,7 +506,7 @@
     min-width: 200px !important;
     height: 10vh !important; /* Mantiene un'altezza minima per non distruggere il flex */
     position: relative !important; /* Per poter usare absolute sulle immagini */
-    display: flex !important;
+    display: flex;
     justify-content: center !important;
     align-items: flex-end !important;
     
@@ -344,7 +558,7 @@
    SEZIONE CRUSCOTTO INFERIORE (A TUTTO SCHERMO)
    ========================================================== */
 .interfaccia-centrale-arena { 
-    display: flex !important;
+    display: flex;
     flex-direction: row !important;
     width: 100% !important;
     height: 180px !important; /* Leggermente più alto per display grandi */
@@ -457,7 +671,7 @@
     position: relative !important;
     width: 100% !important;
     height: 100% !important;
-    display: flex !important;
+    display: flex;
     justify-content: center !important;
     align-items: center !important;
 }
@@ -481,7 +695,7 @@
 .scritta-boss-container {
     position: relative !important;
     z-index: 10 !important;
-    display: flex !important;
+    display: flex;
     justify-content: center !important;
     align-items: center !important;
     margin-top: 900px !important; /* Aumenta questo valore (es. 120px o 150px) se vuoi abbassarla ancora di più */
@@ -521,7 +735,7 @@
     border: 3px solid #718093 !important;
     border-radius: 12px !important;
     padding: 10px 30px !important;
-    display: flex !important;
+    display: flex;
     align-items: center !important;
     gap: 15px !important;
     z-index: 10 !important;
@@ -542,7 +756,7 @@
     image-rendering: pixelated !important;
 }
 .btn-action {
-    display: flex !important;
+    display: flex;
     align-items: center !important;
     justify-content: center !important;
     gap: 8px !important;

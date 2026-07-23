@@ -1,0 +1,2 @@
+// ===== FALCOMAJIN =====
+const CHAR_FALCOMAJIN = { nome: "Falco Majin", hpBase: 4, atkBase: 5, defBase: 5, atkSpec: 2, defSpec: 4, velBase: 4, raritaTipo: "raro", elemento: "veleno", immagine: "../Sprite/personaggi/Falco Majin/Falco Majin.jpeg", immagineAtk: "../Sprite/personaggi/Falco Majin/Falco Majin_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "|", boss: false, isEvoluzione: true, lore: "" };

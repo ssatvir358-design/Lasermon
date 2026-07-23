@@ -38,9 +38,32 @@ function generaHtmlPokeball(conteggio) {
 
 // Aggiorna tutta la grafica dell'arena (barre HP, nomi, immagini, contatori)
 function aggiornaGrafica() {
+    function generaStatusEmojiHTML(targetId) {
+        let html = "";
+        if (effettiAttivi && effettiAttivi[targetId]) {
+            let eff = effettiAttivi[targetId];
+            if (eff.bruciatura) html += "🔥";
+            if (eff.veleno) html += "☠️";
+            if (eff.semeSanguisuga) html += "🌱";
+            if (eff.paralisi) html += "⚡";
+            if (eff.congelamento) html += "❄️";
+            if (eff.cecita) html += "🪨";
+            if (eff.paura) html += "🌑";
+            if (eff.velRidotta) html += "💧";
+            if (eff.provocato) html += "😡";
+            if (eff.difesaRidotta) html += "✨";
+        }
+        return html ? `<span style="margin-left: 5px; font-size: 1.2em;">${html}</span>` : "";
+    }
+
     if (mioPokemon) {
+        let statusG = generaStatusEmojiHTML("giocatore");
+        if (mioPokemon.bruciato && (!effettiAttivi || !effettiAttivi.giocatore || !effettiAttivi.giocatore.bruciatura)) {
+            statusG = `<span style="margin-left: 5px; font-size: 1.2em;">🔥</span>` + statusG;
+        }
+
         document.getElementById("nome-giocatore").innerHTML = `
-            ${mioPokemon.nome} ${getHtmlElemento(mioPokemon.elemento)}
+            ${mioPokemon.nome} ${getHtmlElemento(mioPokemon.elemento)} ${statusG}
             <span class="lvl-tag">Lvl.${mioPokemon.livello}</span><br>
             <span class="mossa-tag">Mossa: ${getNomeMossaAttuale(mioPokemon)}</span>
         `;
@@ -58,15 +81,16 @@ function aggiornaGrafica() {
         const vivi = Math.max(0, miaSquadra.filter(p => p.hpAttuali > 0).length - 1);
         document.getElementById("rimanenti-giocatore").innerHTML = generaHtmlPokeball(vivi);
         
-        // Evita di resettare lo sprite se \u00e8 KO
+        // Evita di resettare lo sprite se è KO
         if (mioPokemon.hpAttuali > 0) {
             document.getElementById("img-giocatore").src = mioPokemon.immagine;
         }
     }
 
     if (nemicoPokemon) {
+        let statusN = generaStatusEmojiHTML("nemico");
         document.getElementById("nome-nemico").innerHTML = `
-            ${nemicoPokemon.nome} ${getHtmlElemento(nemicoPokemon.elemento)}
+            ${nemicoPokemon.nome} ${getHtmlElemento(nemicoPokemon.elemento)} ${statusN}
             <span class="lvl-tag">Lvl.${nemicoPokemon.livello}</span><br>
             <span class="mossa-tag">Mossa: ${getNomeMossaAttuale(nemicoPokemon)}</span>
         `;
@@ -83,7 +107,7 @@ function aggiornaGrafica() {
 
         document.getElementById("rimanenti-nemico").innerHTML = generaHtmlPokeball(nemiciIncontro.length);
         
-        // Evita di resettare lo sprite se \u00e8 KO
+        // Evita di resettare lo sprite se è KO
         if (nemicoPokemon.hpAttuali > 0) {
             document.getElementById("img-nemico").src = nemicoPokemon.immagine;
         }
@@ -102,7 +126,17 @@ function mandaInCampoMioPokemon() {
     }
 
     document.getElementById("schermata-gameover").style.display = "none";
-    document.getElementById("btn-attacco").style.display        = "inline-block";
+    if (typeof isRunVeloce !== "undefined" && isRunVeloce) {
+        document.getElementById("btn-attacco").style.display = "none";
+        if (document.getElementById("btn-item")) document.getElementById("btn-item").style.display = "none";
+        if (document.getElementById("btn-pokemon")) document.getElementById("btn-pokemon").style.display = "none";
+        if (document.getElementById("btn-fuga")) document.getElementById("btn-fuga").style.display = "";
+    } else {
+        document.getElementById("btn-attacco").style.display = "";
+        if (document.getElementById("btn-item")) document.getElementById("btn-item").style.display = "";
+        if (document.getElementById("btn-pokemon")) document.getElementById("btn-pokemon").style.display = "";
+        if (document.getElementById("btn-fuga")) document.getElementById("btn-fuga").style.display = "";
+    }
     document.getElementById("btn-attacco").disabled             = false;
     document.getElementById("img-giocatore").src                = mioPokemon.immagine;
     return true;
@@ -113,10 +147,26 @@ function mandaInCampoMioPokemon() {
 // Da chiamare ogni volta che ritorna il turno al giocatore.
 // ----------------------------------------------------------
 function abilitaControlliGiocatore() {
+    if (typeof isRunVeloce !== "undefined" && isRunVeloce) {
+        // Nascondi pulsanti per sicurezza in Auto-Battle
+        document.getElementById("btn-attacco").style.display = "none";
+        if (document.getElementById("btn-item")) document.getElementById("btn-item").style.display = "none";
+        if (document.getElementById("btn-pokemon")) document.getElementById("btn-pokemon").style.display = "none";
+        if (document.getElementById("btn-fuga")) document.getElementById("btn-fuga").style.display = "";
+        
+        // Sblocca i pulsanti per far funzionare l'auto-attacco e la fuga
+        document.getElementById("btn-attacco").disabled = false;
+        if (document.getElementById("btn-fuga")) document.getElementById("btn-fuga").disabled = false;
+
+        // Esegui automaticamente il turno con piccolo ritardo
+        setTimeout(turnoGiocatore, isSkipAttivo ? 500 : 1000);
+        return;
+    }
+
     document.getElementById("btn-attacco").disabled = false;
     document.getElementById("btn-pokemon").disabled = false;
     document.getElementById("btn-fuga").disabled = false;
-    resettaItemTurno();      // Resetta il flag "item gi\u00e0 usato"
+    resettaItemTurno();      // Resetta il flag "item già usato"
     aggiornaStatoBtnItem();  // Aggiorna stato bottone item
 }
 
@@ -149,7 +199,7 @@ function preparaIncontroBattaglia(tipoEvento, elementoFiltro = null) {
         ? alberoMappa[pianoAttuale][nodoSceltoAttuale] 
         : null;
         
-    if (nodoObj && nodoObj.livello) {
+    if (nodoObj && nodoObj.livello && (tipoEvento === "npc" || tipoEvento === "cespuglio")) {
         livNemico = nodoObj.livello;
         livMossaNemico = nodoObj.livelloMossa || 1;
     } else {
@@ -161,9 +211,56 @@ function preparaIncontroBattaglia(tipoEvento, elementoFiltro = null) {
     if (tipoEvento === "cespuglio") {
         nemiciIncontro.push(creaPokemon(pescaPokemonCasuale(), livNemico, livMossaNemico));
     } else if (tipoEvento === "npc") {
-        for (let i = 0; i < 2; i++) {
+        const npcChibiMap = {
+            "acqua": "Evren",
+            "drago": "Maelis",
+            "elettro": "Elyra",
+            "erba": "Aster",
+            "folletto": "Bob",
+            "fuoco": "Soraya",
+            "ghiaccio": "Nerys",
+            "lotta": "Kit",
+            "normale": "Nelly",
+            "psico": "Virea",
+            "terra": "Mauro",
+            "veleno": "Caelum",
+            "vento": "Mariel"
+        };
+        
+        const elemento = elementoFiltro ? elementoFiltro.toLowerCase() : "";
+        const nomeChibi = npcChibiMap[elemento];
+        let pChibi = null;
+        
+        if (nomeChibi) {
+            pChibi = pokemonDatabase.find(p => p.nome.toLowerCase() === nomeChibi.toLowerCase());
+        }
+        
+        if (pChibi) {
+            nemiciIncontro.push(creaPokemon(pChibi, livNemico, livMossaNemico));
+        } else {
             nemiciIncontro.push(creaPokemon(pescaPokemonCasuale([], elementoFiltro), livNemico, livMossaNemico));
         }
+        
+        // Secondo personaggio è casuale, ma escludiamo il chibi appena inserito
+        const esclusioni = pChibi ? [pChibi.nome] : [];
+        nemiciIncontro.push(creaPokemon(pescaPokemonCasuale(esclusioni, elementoFiltro), livNemico, livMossaNemico));
+    } else if (tipoEvento === "miniboss") {
+        let numMappa = 1;
+        if (typeof mappaAttuale !== "undefined" && mappaAttuale.startsWith("mappa")) {
+            numMappa = parseInt(mappaAttuale.replace("mappa", "")) || 1;
+        }
+        // Nomi esatti dal DB (senza suffisso F1 — le versioni base si chiamano semplicemente col nome)
+        let idMiniboss = "Maccioni";
+        if (numMappa === 2) idMiniboss = Math.random() < 0.5 ? "Danilo" : "Graziani";
+        else if (numMappa === 4) idMiniboss = "Mattia";
+        else if (numMappa === 6) idMiniboss = "Savina";
+        else if (numMappa === 8) idMiniboss = "Maccioni";
+        
+        let mb = creaPokemon(idMiniboss, livNemico, livMossaNemico);
+        if (!mb) mb = creaPokemon(pescaPokemonCasuale(), livNemico, livMossaNemico);
+        mb.isMiniboss = true;
+        mb.inFase2 = false;
+        nemiciIncontro.push(mb);
     } else {
         nemiciIncontro.push(creaPokemon(pescaPokemonCasuale(), livNemico, livMossaNemico));
     }
@@ -190,21 +287,24 @@ function preparaIncontroBattaglia(tipoEvento, elementoFiltro = null) {
 
     const folderGio = mioPokemon.nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3');
     const folderNem = nemicoPokemon.nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3');
-    imgVSGio.src = `../Sprite/personaggi/${folderGio}/${mioPokemon.nome}VS.jpeg`;
-    imgVSNem.src = `../Sprite/personaggi/${folderNem}/${nemicoPokemon.nome}VS.jpeg`;
+    imgVSGio.src = `../Sprite/personaggi/${folderGio}/${mioPokemon.nome}VS.png`;
+    imgVSNem.src = `../Sprite/personaggi/${folderNem}/${nemicoPokemon.nome}VS.png`;
 
     latoGio.classList.remove("entra");
     latoNem.classList.remove("entra");
     testoVS.classList.remove("attiva");
+    document.querySelector(".sfondo-vs-custom").classList.remove("attiva");
     divVS.style.display = "block";
 
     setTimeout(() => {
         latoGio.classList.add("entra");
         latoNem.classList.add("entra");
         testoVS.classList.add("attiva");
+        document.querySelector(".sfondo-vs-custom").classList.add("attiva");
     }, 50);
 
     setTimeout(() => {
+        document.querySelector(".sfondo-vs-custom").classList.remove("attiva");
         divVS.style.display = "none";
         cambiaSchermata("schermata-mappa", "schermata-gioco");
         mandaInCampoMioPokemon();
@@ -266,12 +366,10 @@ function turnoGiocatore() {
     }
 
     // Attacco normale
-    document.getElementById("img-giocatore").src = mioPokemon.immagineAtk;
-    setTimeout(() => {
-        document.getElementById("img-giocatore").src = mioPokemon.immagine;
+    eseguiAnimazioneAttaccoNormale(mioPokemon, true, () => {
         const moltMossa = CONFIG_MOSSE[mioPokemon.livelloMossa] || 1.0;
         calcolaEdEseguiDannoGiocatore(moltMossa, getNomeMossaAttuale(mioPokemon));
-    }, isSkipAttivo ? 750 : 1500);
+    });
 }
 
 
@@ -380,12 +478,52 @@ function calcolaEdEseguiDannoGiocatore(moltMossa, nomeMossaUsata) {
 
     processaEffettiFineTurno(mioPokemon, false);
     
+    // Controlla trigger Fase 2 Mini Boss
+    if (nemicoPokemon.isMiniboss && !nemicoPokemon.inFase2 && nemicoPokemon.hpAttuali > 0 && nemicoPokemon.hpAttuali <= (nemicoPokemon.hpMax / 2)) {
+        if (attivaFase2MiniBoss()) {
+            return; // Interrompe il normale flusso (la fase 2 gestirà il proseguo)
+        }
+    }
+    
     if (nemicoPokemon.hpAttuali <= 0 || mioPokemon.hpAttuali <= 0) {
         if (nemicoPokemon.hpAttuali <= 0) gestisciKONemico();
         if (mioPokemon.hpAttuali <= 0) gestisciKOGiocatore();
     } else {
         setTimeout(turnoNemico, isSkipAttivo ? 500 : 1000);
     }
+}
+
+// Funzione per attivare la Fase 2 del Mini Boss
+function attivaFase2MiniBoss() {
+    let idF2 = null;
+    if (nemicoPokemon.nome === "Maccioni") idF2 = "Maccione F2";
+    else if (nemicoPokemon.nome === "Savina") idF2 = "Savina F2";
+    else if (nemicoPokemon.nome === "Mattia") idF2 = "Mattia F2";
+    else if (nemicoPokemon.nome === "Danilo") idF2 = "Danilo F2";
+    
+    if (!idF2) return false; // Graziani o altri senza F2
+    
+    // Crea il nuovo pokemon F2
+    let f2 = creaPokemon(idF2, nemicoPokemon.livello, nemicoPokemon.livelloMossa);
+    f2.isMiniboss = true;
+    f2.inFase2 = true;
+    
+    // Mantiene la stessa percentuale di HP
+    let perc = nemicoPokemon.hpAttuali / nemicoPokemon.hpMax;
+    f2.hpAttuali = Math.max(1, Math.round(f2.hpMax * perc));
+    
+    // Sostituisce il nemico
+    nemicoPokemon = f2;
+    resettaEffettiSuTarget("nemico");
+    
+    document.getElementById("console-log").innerHTML = 
+        `<span style="color: #e74c3c; font-weight: bold; font-size: 1.2em;">\u26A0\uFE0F IL MINI BOSS PASSA ALLA FASE 2! \u26A0\uFE0F</span><br>Le sue statistiche e il suo elemento sono cambiati!`;
+        
+    aggiornaGrafica();
+    
+    // Prosegue col turno nemico
+    setTimeout(turnoNemico, isSkipAttivo ? 1000 : 2000);
+    return true;
 }
 
 function turnoNemico() {
@@ -428,7 +566,7 @@ function turnoNemico() {
                     atk: Math.round(datiFase2.atkBase * (1 + (lvl * 0.2))),
                     def: Math.round(datiFase2.defBase * (1 + (lvl * 0.2))),
                     vel: Math.round(datiFase2.velBase * (1 + (lvl * 0.2))),
-                    immagine: datiFase2.immagine, immagineAtk: datiFase2.immagineAtk,
+                    immagine: datiFase2.immagine, immagineAtk: datiFase2.immagineAtk, frameAtk: datiFase2.frameAtk || 1,
                     mossaLvl1: datiFase2.mossaLvl1, mossaLvl2: datiFase2.mossaLvl2,
                     mossaLvl3: datiFase2.mossaLvl3,
                     mossaULT:  datiFase2.mossaULT || datiFase2.mossaLvl3,
@@ -449,15 +587,11 @@ function turnoNemico() {
 
     } else {
         // Attacco normale
-        if (nemicoPokemon.immagineAtk) {
-            document.getElementById("img-nemico").src = nemicoPokemon.immagineAtk;
-        }
-        setTimeout(() => {
+        eseguiAnimazioneAttaccoNormale(nemicoPokemon, false, () => {
             if (!mioPokemon) return;
-            document.getElementById("img-nemico").src = nemicoPokemon.immagine;
             const moltMossa = CONFIG_MOSSE[nemicoPokemon.livelloMossa] || 1.0;
             calcolaEdEseguiDannoNemico(moltMossa, getNomeMossaAttuale(nemicoPokemon));
-        }, isSkipAttivo ? 750 : 1500);
+        });
     }
 }
 
@@ -627,6 +761,8 @@ function gestisciVittoriaIncontro() {
     let livUpGuadagnati = 0;
     if (isBossFight) {
         livUpGuadagnati = CONFIG_LEVEL_UP.boss;
+    } else if (tipoEventoAttuale === "miniboss") {
+        livUpGuadagnati = 4; // I mini boss danno +4 livelli a tutta la squadra
     } else if (tipoEventoAttuale === "cespuglio") {
         livUpGuadagnati = CONFIG_LEVEL_UP.cespuglio;
     } else if (tipoEventoAttuale === "npc") {
@@ -657,6 +793,8 @@ function gestisciVittoriaIncontro() {
     let moneteGuadagnate = 0;
     if (isBossFight) {
         moneteGuadagnate = CONFIG_MONETE_GUADAGNO.boss.fisso;
+    } else if (tipoEventoAttuale === "miniboss") {
+        moneteGuadagnate = 10; // I miniboss danno un bel po' di monete
     } else if (tipoEventoAttuale === "cespuglio") {
         const { min, max } = CONFIG_MONETE_GUADAGNO.cespuglio;
         moneteGuadagnate = Math.floor(Math.random() * (max - min + 1)) + min;
@@ -665,6 +803,13 @@ function gestisciVittoriaIncontro() {
         moneteGuadagnate = Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    if (nemicoPokemon && nemicoPokemon.isElite) {
+        moneteGuadagnate *= 2;
+    }
+
+    if (isRunVeloce) {
+        moneteGuadagnate = 0;
+    }
     monete += moneteGuadagnate;
     aggiornaDisplayMonete();
 
@@ -735,10 +880,10 @@ function gestisciVittoriaIncontro() {
             aggiornaGrafica();
             aggiornaSquadraMappa();
             generaMappaAlbero();
-            document.getElementById("btn-attacco").style.display    = "inline-block";
-            document.getElementById("btn-item").style.display       = "inline-block";
-            document.getElementById("btn-pokemon").style.display    = "inline-block";
-            document.getElementById("btn-fuga").style.display       = "inline-block";
+            document.getElementById("btn-attacco").style.display = "";
+            document.getElementById("btn-item").style.display = "";
+            document.getElementById("btn-pokemon").style.display = "";
+            document.getElementById("btn-fuga").style.display = "";
             // Torna alla mappa rimosso in quanto buggato e automatico
         });
     }, isSkipAttivo ? 1500 : 3000);
@@ -1134,5 +1279,42 @@ function processaEffettiFineTurno(pokemon, isNemico) {
     if (msg !== "") {
         document.getElementById("console-log").innerHTML += msg;
         aggiornaGrafica();
+    }
+}
+
+// Funzione per animazione multi-frame o singola
+function eseguiAnimazioneAttaccoNormale(pokemon, isGiocatore, callback) {
+    const totalFrames = pokemon.frameAtk || 1;
+    const imgElement = document.getElementById(isGiocatore ? "img-giocatore" : "img-nemico");
+    const durataTotale = isSkipAttivo ? 750 : 1500;
+    
+    if (totalFrames <= 1) {
+        if (pokemon.immagineAtk) {
+            imgElement.src = pokemon.immagineAtk;
+        }
+        setTimeout(() => {
+            imgElement.src = pokemon.immagine;
+            if (callback) callback();
+        }, durataTotale);
+    } else {
+        // Multi-frame
+        const frameDuration = Math.max(50, Math.floor(durataTotale / (totalFrames + 1)));
+        let currentFrame = 1;
+        
+        let basePath = pokemon.immagineAtk;
+        let extIndex = basePath.lastIndexOf('.');
+        let baseName = basePath.substring(0, extIndex);
+        let ext = basePath.substring(extIndex);
+        
+        let interval = setInterval(() => {
+            if (currentFrame <= totalFrames) {
+                imgElement.src = baseName + currentFrame + ext;
+                currentFrame++;
+            } else {
+                clearInterval(interval);
+                imgElement.src = pokemon.immagine;
+                if (callback) callback();
+            }
+        }, frameDuration);
     }
 }

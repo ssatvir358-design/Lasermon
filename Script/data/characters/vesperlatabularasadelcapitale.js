@@ -1,0 +1,2 @@
+// ===== VESPERLATABULARASADELCAPITALE =====
+const CHAR_VESPERLATABULARASADELCAPITALE = { nome: "VESPER, LA TABULA RASA DEL CAPITALE", hpBase: 5, atkBase: 7, defBase: 8, atkSpec: 1, defSpec: 4, velBase: 5, raritaTipo: "leggendario", elemento: "veleno", immagine: "../Sprite/personaggi/VESPER,LATABULARASADELCAPITALE/VESPER,LATABULARASADELCAPITALE.jpeg", immagineAtk: "../Sprite/personaggi/VESPER,LATABULARASADELCAPITALE/VESPER,LATABULARASADELCAPITALE_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "|", boss: false, isEvoluzione: true, lore: "" };

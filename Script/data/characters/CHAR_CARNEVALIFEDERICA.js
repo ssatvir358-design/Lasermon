@@ -1,2 +1,0 @@
-// ===== CARNEVALI FEDERICA =====
-const CHAR_CARNEVALIFEDERICA = { nome: "Carnevali Federica", hpBase: 4, atkBase: 2, defBase: 4, atkSpec: 3, defSpec: 3, velBase: 2, raritaTipo: "comune", elemento: "erba", immagine: "../Sprite/personaggi/CarnevaliFederica/CarnevaliFederica.jpeg", immagineAtk: "../Sprite/personaggi/CarnevaliFederica/CarnevaliFederica_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "Attacco 3", boss: false };

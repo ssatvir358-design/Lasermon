@@ -1,0 +1,2 @@
+// ===== FALCOMALFALK =====
+const CHAR_FALCOMALFALK = { nome: "Falco Malfalk", hpBase: 4, atkBase: 3, defBase: 5, atkSpec: 3, defSpec: 5, velBase: 4, raritaTipo: "raro", elemento: "terra", immagine: "../Sprite/personaggi/Falco Malfalk/Falco Malfalk.jpeg", immagineAtk: "../Sprite/personaggi/Falco Malfalk/Falco Malfalk_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "|", boss: false, isEvoluzione: true, lore: "" };

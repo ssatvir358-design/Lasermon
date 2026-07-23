@@ -1,0 +1,2 @@
+// ===== FALCONITSU =====
+const CHAR_FALCONITSU = { nome: "Falconitsu", hpBase: 2, atkBase: 3, defBase: 2, atkSpec: 6, defSpec: 4, velBase: 7, raritaTipo: "raro", elemento: "elettro", immagine: "../Sprite/personaggi/Falconitsu/Falconitsu.jpeg", immagineAtk: "../Sprite/personaggi/Falconitsu/Falconitsu_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "|", boss: false, isEvoluzione: true, lore: "" };

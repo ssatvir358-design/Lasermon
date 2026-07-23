@@ -1,0 +1,2 @@
+// ===== FALCODRAGON =====
+const CHAR_FALCODRAGON = { nome: "Falco Dragon", hpBase: 4, atkBase: 6, defBase: 4, atkSpec: 2, defSpec: 3, velBase: 5, raritaTipo: "raro", elemento: "drago", immagine: "../Sprite/personaggi/Falco Dragon/Falco Dragon.jpeg", immagineAtk: "../Sprite/personaggi/Falco Dragon/Falco Dragon_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "|", boss: false, isEvoluzione: true, lore: "" };

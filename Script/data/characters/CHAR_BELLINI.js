@@ -1,2 +1,0 @@
-// ===== BELLINI =====
-const CHAR_BELLINI = { nome: "Bellini", hpBase: 4, atkBase: 3, defBase: 5, atkSpec: 3, defSpec: 5, velBase: 4, raritaTipo: "non comune", elemento: "acqua", immagine: "../Sprite/personaggi/Bellini/Bellini.jpeg", immagineAtk: "../Sprite/personaggi/Bellini/Bellini_atk.jpeg", mossaLvl1: "Attacco snack", mossaLvl2: "Non sei un bodybuilder", mossaLvl3: "Richiesta consulenza tecn. interni", boss: false };

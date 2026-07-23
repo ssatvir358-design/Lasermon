@@ -99,8 +99,8 @@ function eseguiScambioDiretto(indexDaScambiare) {
         });
     }
 
-    let bonusLivelli = 2; // Il nuovo Pok\u00e9mon riceve +2 livelli rispetto a quello ceduto
-    let nuovoLivello = vecchioPkm.livello + bonusLivelli;
+    let bonusLivelli = 2; // Il nuovo Pokmon riceve +2 livelli rispetto a quello ceduto
+    let nuovoLivello = Math.min(100, vecchioPkm.livello + bonusLivelli);
 
     let nuovoInfoBase = pescaPokemonCasuale([vecchioPkm.nome]); 
     let mossaLvl = calcolaLivelloEMossaMappa(pianoAttuale).livelloMossa;
@@ -182,10 +182,128 @@ function avviaEventoMisterioso() {
     document.getElementById("mistero-titolo-evento").innerText = eventoEstratto.nome;
     document.getElementById("mistero-descrizione").innerText = eventoEstratto.descrizione;
     
-    // Applica l'effetto dell'evento (es. cura, boost atk, level up)
-    if (eventoEstratto.azione) eventoEstratto.azione();
+    // Reset UI
+    const scelteContainer = document.getElementById("mistero-scelte-container");
+    const esitoTesto = document.getElementById("mistero-esitotesto");
+    const btnContinua = document.getElementById("btn-mistero-continua");
+    
+    scelteContainer.innerHTML = "";
+    esitoTesto.style.display = "none";
+    btnContinua.style.display = "none";
+    scelteContainer.style.display = "flex";
+    
+    if (eventoEstratto.scelte && eventoEstratto.scelte.length > 0) {
+        eventoEstratto.scelte.forEach((scelta, index) => {
+            const btn = document.createElement("button");
+            btn.className = "btn-battle";
+            btn.style.backgroundColor = "#2c3e50";
+            btn.style.color = "white";
+            btn.innerText = scelta.testo;
+            btn.onclick = () => {
+                // Esegui azione e nascondi pulsanti
+                scelteContainer.style.display = "none";
+                if (scelta.azione) scelta.azione();
+            };
+            scelteContainer.appendChild(btn);
+        });
+    } else {
+        // Fallback per vecchi eventi senza scelte
+        if (eventoEstratto.azione) eventoEstratto.azione();
+        mostraEsitoMistero("Evento completato.");
+    }
     
     cambiaSchermata("schermata-mappa", "schermata-mistero");
+}
+
+function mostraEsitoMistero(testo, isFight = false, fightCallback = null) {
+    const esitoTesto = document.getElementById("mistero-esitotesto");
+    const btnContinua = document.getElementById("btn-mistero-continua");
+    
+    esitoTesto.innerText = testo;
+    esitoTesto.style.display = "block";
+    esitoTesto.style.backgroundColor = isFight ? "#e74c3c" : "#2ecc71";
+    
+    btnContinua.style.display = "block";
+    
+    if (isFight && fightCallback) {
+        btnContinua.innerText = "Affronta il Nemico!";
+        btnContinua.style.backgroundColor = "#e74c3c";
+        btnContinua.onclick = () => {
+            document.getElementById("schermata-mistero").style.display = "none";
+            fightCallback();
+        };
+    } else {
+        btnContinua.innerText = "Continua il Cammino";
+        btnContinua.style.backgroundColor = "#9b59b6";
+        btnContinua.onclick = chiudiEventoMistero;
+    }
+}
+
+// Funzione generica per selezionare un bersaglio
+function apriModaleBersaglio(titolo, callbackConIndice) {
+    const modal = document.getElementById("modal-selezione-bersaglio");
+    const titoloEl = document.getElementById("bersaglio-titolo");
+    const container = document.getElementById("bersaglio-squadra-container");
+    
+    titoloEl.innerText = titolo;
+    container.innerHTML = "";
+    
+    miaSquadra.forEach((pg, i) => {
+        if (!pg) return;
+        const btn = document.createElement("div");
+        btn.style.background = "#34495e";
+        btn.style.border = "2px solid #95a5a6";
+        btn.style.borderRadius = "8px";
+        btn.style.padding = "10px";
+        btn.style.cursor = "pointer";
+        btn.style.color = "white";
+        btn.style.textAlign = "center";
+        btn.style.minWidth = "120px";
+        
+        btn.innerHTML = `<img src="${pg.iconaChibi || pg.immagine}" style="width:60px; height:60px; object-fit:contain;"><br><b>${pg.nome}</b><br>Lv.${pg.livello}`;
+        
+        btn.onclick = () => {
+            modal.style.display = "none";
+            callbackConIndice(i);
+        };
+        
+        container.appendChild(btn);
+    });
+    
+    modal.style.display = "flex";
+}
+
+function avviaIncontroMiniBossOAllenatoreCasuale() {
+    avviaIncontroAllenatore();
+}
+
+function avviaIncontroAllenatore() {
+    document.getElementById("schermata-mistero").style.display = "none";
+    cambiaSchermata("schermata-mistero", "schermata-gioco");
+    document.getElementById("titolo-incontro").innerText = `ALLARME SCATTATO\n-- PIANO ${pianoAttuale} --`;
+    preparaIncontroBattaglia("npc");
+}
+
+function avviaIncontroMiniBossElitè() {
+    document.getElementById("schermata-mistero").style.display = "none";
+    cambiaSchermata("schermata-mistero", "schermata-gioco");
+    document.getElementById("titolo-incontro").innerText = `SCONTRO ELITÉ\n-- PIANO ${pianoAttuale} --`;
+    
+    // Configura un miniboss elitè
+    let baseLvl = calcolaLivelloEMossaMappa(pianoAttuale, "miniboss").livello;
+    let baseMossa = calcolaLivelloEMossaMappa(pianoAttuale, "miniboss").livelloMossa;
+    
+    // Usa il nome esatto dal DB (MAX F2 \u00e8 in maiuscolo nel database)
+    // L'overpotenziamento avviene dopo preparaIncontroBattaglia
+    
+    // Hack: facciamo spawnare un boss invece per questo scontro, gestito tramite un override
+    preparaIncontroBattaglia("miniboss");
+    nemicoPokemon.hpMax = Math.round(nemicoPokemon.hpMax * 1.5);
+    nemicoPokemon.hpAttuali = nemicoPokemon.hpMax;
+    nemicoPokemon.atk += 2;
+    nemicoPokemon.def += 2;
+    nemicoPokemon.isElite = true; // Per raddoppiare l'oro a fine fight
+    aggiornaGrafica();
 }
 
 // Chiude la schermata evento misterioso e aggiorna la mappa
@@ -272,3 +390,28 @@ function saltaEventoItem() {
     aggiornaSquadraMappa();
     generaMappaAlbero();
 }
+
+// Aggiunge un buff/debuff permanente (indicato come temporaneo negli eventi) a un pokemon
+window.aggiungiBuffTemporaneoNextFight = function(idUnico, statKey, amount) {
+    if (typeof miaSquadra === 'undefined') return;
+    let p = miaSquadra.find(x => x && x.idUnico === idUnico);
+    if (!p) {
+        p = miaSquadra[0]; // fallback se id non corrisponde
+        if (!p) return;
+    }
+    
+    // Mappa le chiavi ('spd' -> 'vel', 'spa' -> 'atkSpec', ecc.)
+    let keyMap = {
+        'spd': 'vel',
+        'spa': 'atkSpec',
+        'atk': 'atk',
+        'def': 'def'
+    };
+    let realKey = keyMap[statKey] || statKey;
+    
+    if (typeof p[realKey] !== 'undefined') {
+        let oldVal = p[realKey];
+        p[realKey] = Math.max(1, Math.round(p[realKey] * (1 + amount)));
+        console.log(`[Buff Mistero] ${realKey} modificata da ${oldVal} a ${p[realKey]} (${Math.round(amount * 100)}%)`);
+    }
+};

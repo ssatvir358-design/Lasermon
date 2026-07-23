@@ -63,7 +63,7 @@ function toggleMuto(isMuto) {
         audio.volume = 0;
         slider.value = 0;
     } else {
-        audio.volume = volumePrecedente > 0 ? volumePrecedente : 0.5;
+        audio.volume = volumePrecedente > 0 ? volumePrecedente : 0.25;
         slider.value = audio.volume;
     }
 }
@@ -90,3 +90,10 @@ document.addEventListener("click", function() {
         audio.play().catch(e => {});
     }
 }, { once: true });
+
+document.addEventListener("DOMContentLoaded", function() {
+    const audio = document.getElementById("musica-gioco");
+    if (audio) {
+        audio.volume = 0.25; // Default iniziale dimezzato
+    }
+});

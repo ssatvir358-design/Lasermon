@@ -1,0 +1,2 @@
+// ===== FALCOCHAN =====
+const CHAR_FALCOCHAN = { nome: "Falco Chan", hpBase: 4, atkBase: 2, defBase: 4, atkSpec: 4, defSpec: 6, velBase: 4, raritaTipo: "raro", elemento: "folletto", immagine: "../Sprite/personaggi/Falco Chan/Falco Chan.jpeg", immagineAtk: "../Sprite/personaggi/Falco Chan/Falco Chan_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "|", boss: false, isEvoluzione: true, lore: "" };

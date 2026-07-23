@@ -1,2 +1,0 @@
-// ===== VALENTINA FANTI =====
-const CHAR_VALENTINAFANTI = { nome: "Valentina Fanti", hpBase: 4, atkBase: 4, defBase: 5, atkSpec: 3, defSpec: 4, velBase: 4, raritaTipo: "non comune", elemento: "acqua", immagine: "../Sprite/personaggi/ValentinaFanti/ValentinaFanti.jpeg", immagineAtk: "../Sprite/personaggi/ValentinaFanti/ValentinaFanti_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "Attacco 3", boss: false };

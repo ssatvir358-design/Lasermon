@@ -1,0 +1,2 @@
+// ===== RIVENA =====
+const CHAR_RIVENA = { nome: "RIVENA", hpBase: 4, atkBase: 3, defBase: 2, atkSpec: 5, defSpec: 4, velBase: 3, raritaTipo: "non comune", elemento: "folletto", immagine: "../Sprite/personaggi/Rivena/Rivena.jpeg", immagineAtk: "../Sprite/personaggi/Rivena/Rivena_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "|", boss: false, isEvoluzione: false, lore: "" };

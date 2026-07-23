@@ -1,0 +1,2 @@
+// ===== MACCIONEF2 =====
+const CHAR_MACCIONEF2 = { nome: "Maccione F2", hpBase: 5, atkBase: 4, defBase: 5, atkSpec: 5, defSpec: 5, velBase: 3, raritaTipo: "epico", elemento: "luce", immagine: "../Sprite/personaggi/MaccioneF2/MaccioneF2.jpeg", immagineAtk: "../Sprite/personaggi/MaccioneF2/MaccioneF2_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "|", boss: false, isEvoluzione: true, lore: "" };

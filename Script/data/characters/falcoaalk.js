@@ -1,0 +1,2 @@
+// ===== FALCOAALK =====
+const CHAR_FALCOAALK = { nome: "Falcoaalk", hpBase: 2, atkBase: 6, defBase: 3, atkSpec: 3, defSpec: 3, velBase: 7, raritaTipo: "raro", elemento: "vento", immagine: "../Sprite/personaggi/Falcoaalk/Falcoaalk.jpeg", immagineAtk: "../Sprite/personaggi/Falcoaalk/Falcoaalk_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "|", boss: false, isEvoluzione: true, lore: "" };

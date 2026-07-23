@@ -3,17 +3,17 @@
 // Estratto da script.js (righe 65-112 + 214-222)
 // ==========================================================
 
-const CONFIG_STARTER = ["Fabio", "Gian", "Arman"];
+const CONFIG_STARTER = ["NYSSA", "CASSIAN", "KIORA"];
 
 // Moltiplicatore globale per rarit\u00e0: pi\u00f9 raro = cresce pi\u00f9 in fretta per livello
 const CONFIG_MOLTIPLICATORE_RARITA = {
-    "comune": 1.00,
-    "non comune": 1.12,
-    "raro": 1.30,
-    "epico": 1.55,
-    "leggendario": 1.80,
-    "bombers": 2.10,
-    "special": 2.30
+    "comune": 1.03,
+    "non comune": 1.06,
+    "raro": 1.10,
+    "epico": 1.13,
+    "leggendario": 1.15,
+    "bombers": 1.18,
+    "special": 1.20
 };
 
 // Scaling delle statistiche base in funzione dell'elemento
@@ -37,19 +37,19 @@ const CONFIG_STAT_ELEMENTO = {
 
 // Moltiplicatori di danno (Attaccante >> Difensore)
 const CONFIG_DEBOLEZZE = {
-    "normale": { "luce": 0.75 },
-    "fuoco": { "acqua": 0.5, "erba": 1.5, "ghiaccio": 1.5, "lotta": 0.5, "veleno": 1.5, "terra": 0.5, "luce": 0.75 },
-    "acqua": { "fuoco": 1.5, "erba": 0.5, "ghiaccio": 1.5, "veleno": 0.5, "terra": 1.5, "vento": 0, "luce": 0.75 },
-    "erba": { "fuoco": 0.5, "acqua": 1.5, "lotta": 1.5, "terra": 0.5, "vento": 1.5, "psico": 0, "folletto": 0.5, "luce": 0.75 },
-    "elettro": { "ghiaccio": 0.5, "lotta": 1.5, "terra": 0, "vento": 1.5, "psico": 1.5, "drago": 0.5, "luce": 0.75 },
-    "ghiaccio": { "fuoco": 0.5, "acqua": 0.5, "elettro": 1.5, "vento": 1.5, "psico": 1.5, "drago": 0.5, "folletto": 0, "luce": 0.75 },
-    "lotta": { "normale": 1.5, "fuoco": 1.5, "erba": 0.5, "elettro": 0.5, "veleno": 0.5, "psico": 1.5, "luce": 0.75 },
-    "veleno": { "fuoco": 0.5, "acqua": 1.5, "lotta": 1.5, "terra": 0.5, "drago": 0, "folletto": 1.5, "luce": 0.75 },
-    "terra": { "fuoco": 1.5, "acqua": 0.5, "erba": 1.5, "elettro": 1.5, "veleno": 1.5, "vento": 0, "folletto": 0.5, "luce": 0.75 },
-    "vento": { "acqua": 1.5, "erba": 0.5, "elettro": 1.5, "ghiaccio": 0.5, "terra": 0, "psico": 0.5, "drago": 1.5, "luce": 0.75 },
-    "psico": { "elettro": 0.5, "ghiaccio": 0.5, "lotta": 0, "vento": 1.5, "drago": 1.5, "folletto": 1.5, "luce": 0.75 },
-    "drago": { "elettro": 1.5, "ghiaccio": 1.5, "veleno": 1.5, "vento": 0.5, "psico": 0.5, "folletto": 0.5, "luce": 0.75 },
-    "folletto": { "erba": 1.5, "veleno": 0.5, "terra": 1.5, "psico": 0.5, "drago": 1.5, "luce": 0.75 },
+    "normale": { "folletto": 1.5, "luce": 0.75 },
+    "fuoco": { "acqua": 0.5, "erba": 1.5, "ghiaccio": 1.5, "drago": 0.5, "luce": 0.75 },
+    "acqua": { "fuoco": 1.5, "erba": 0.5, "terra": 1.5, "drago": 0.5, "luce": 0.75 },
+    "erba": { "fuoco": 0.5, "acqua": 1.5, "veleno": 0.5, "terra": 1.5, "vento": 0.5, "drago": 0.5, "luce": 0.75 },
+    "elettro": { "acqua": 1.5, "erba": 0.5, "elettro": 0.5, "terra": 0, "vento": 1.5, "drago": 0.5, "luce": 0.75 },
+    "ghiaccio": { "fuoco": 0.5, "acqua": 0.5, "ghiaccio": 0.5, "terra": 1.5, "vento": 1.5, "drago": 1.5, "luce": 0.75 },
+    "lotta": { "normale": 1.5, "ghiaccio": 1.5, "vento": 0.5, "psico": 0.5, "luce": 0.75 },
+    "veleno": { "erba": 1.5, "veleno": 0.5, "terra": 0.5, "vento": 1.5, "luce": 0.75 },
+    "terra": { "fuoco": 1.5, "erba": 0.5, "elettro": 1.5, "veleno": 1.5, "vento": 0, "luce": 0.75 },
+    "vento": { "erba": 1.5, "elettro": 0.5, "lotta": 1.5, "luce": 0.75 },
+    "psico": { "lotta": 1.5, "veleno": 1.5, "psico": 1.5, "folletto": 1.5, "luce": 0.75 },
+    "drago": { "ghiaccio": 0.5, "drago": 1.5, "folletto": 0, "luce": 0.75 },
+    "folletto": { "normale": 0, "lotta": 1.5, "veleno": 0.5, "psico": 1.5, "drago": 1.5, "luce": 0.75 },
     "luce": { "buio": 2 },
     "buio": { 
         "normale": 1.25, "fuoco": 1.25, "acqua": 1.25, "erba": 1.25, "elettro": 1.25, "ghiaccio": 1.25,
@@ -58,7 +58,7 @@ const CONFIG_DEBOLEZZE = {
     }
 };
 
-// Probabilit\u00e0 di spawn e colore badge per ogni rarit\u00e0
+// Probabilità di spawn e colore badge per ogni rarità
 const CONFIG_RARITA = {
     "comune": { chance: 0.22, colore: "#9e9e9e" },
     "non comune": { chance: 0.18, colore: "#4caf50" },
@@ -66,7 +66,7 @@ const CONFIG_RARITA = {
     "epico": { chance: 0.14, colore: "#9c27b0" },
     "leggendario": { chance: 0.12, colore: "#ffeb3b" },
     "bombers": { chance: 0.10, colore: "#ff0000" },
-    "special": { chance: 0.08, colore: "#ff9800" }
+    "special": { chance: 0.05, colore: "#ff9800" }
 };
 
 // Moltiplicatori danno per livello mossa (1 = normale, 2 = potenziato, 3 = massimo)
@@ -76,7 +76,7 @@ const CONFIG_MOSSE = {
     3: 1.25 //Invece dell'aumento, un effetto speciale della mossa in base al tipo del pg
 };
 
-// Dizionario di conversione rarit\u00e0 \u2192 numero (per confronti matematici nei filtri mappa)
+// Dizionario di conversione rarità → numero (per confronti matematici nei filtri mappa)
 const SCALA_RARITA_MAPPA = {
     "comune": 1,
     "non comune": 2,

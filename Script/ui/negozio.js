@@ -9,14 +9,37 @@
 // Il zaino \u00e8 un array di { dbId: string, quantita: number }.
 // ==========================================================
 
-/** Restituisce la quantit\u00e0 posseduta di un item nello zaino (0 se assente). */
+// Il zaino è un array di { dbId: string, quantita: number }.
+// ==========================================================
+
+/** Restituisce la quantità posseduta di un item nello zaino (0 se assente). */
 function getQuantitaZaino(dbId) {
     const entry = zaino.find(e => e.dbId === dbId);
     return entry ? entry.quantita : 0;
 }
 
-/** Aggiunge 1 unit\u00e0 di un item allo zaino (raggruppa con eventuali esistenti). */
+/** Aggiunge 1 unità di un item allo zaino (raggruppa con eventuali esistenti). */
 function aggiungiAZaino(dbId) {
+    if (typeof isRunVeloce !== "undefined" && isRunVeloce) {
+        const itemObj = getOggettoDb(dbId);
+        if (itemObj && itemObj.categoria === "consumabile") {
+            // Cerca il primo pokemon vivo (che abbia bisogno di cure se possibile)
+            let target = miaSquadra.find(p => p.hpAttuali > 0 && p.hpAttuali < p.hpMax);
+            if (!target) target = miaSquadra.find(p => p.hpAttuali > 0); // fallback al primo vivo
+            
+            if (target) {
+                const msg = applicaEffettoItem(itemObj, target);
+                // Aggiorna l'esito a schermo (per eventi mistero)
+                const misteroText = document.getElementById("mistero-esitotesto");
+                if (misteroText) {
+                    misteroText.innerHTML += `<br>✨ (Run Veloce) Hai usato subito ${itemObj.nome}! ${msg}`;
+                }
+                aggiornaGrafica();
+                return; // Non aggiunge allo zaino
+            }
+        }
+    }
+
     const entry = zaino.find(e => e.dbId === dbId);
     if (entry) {
         entry.quantita++;
@@ -90,6 +113,12 @@ function apriCentroMedico() {
     document.getElementById("centro-fase-scelta").style.display = "flex";
     document.getElementById("centro-fase-cura").style.display   = "none";
     
+    // Nascondi o mostra il negozio
+    const btnNegozio = document.querySelector(".btn-negozio");
+    if (btnNegozio) {
+        btnNegozio.style.display = (typeof isRunVeloce !== "undefined" && isRunVeloce) ? "none" : "";
+    }
+
     // Ripristina stato pulsante cura
     haCuratoInVisita = false;
     const btnCura = document.getElementById("btn-cura-squadra");
@@ -190,9 +219,13 @@ function apriNegozio() {
     const numMappa = parseInt(mappaAttuale.replace("mappa", "")) || 1;
 
     // Filtra gli item acquistabili e disponibili in questa mappa
-    const itemDisponibili = DB_OGGETTI.filter(o =>
+    let itemDisponibili = DB_OGGETTI.filter(o =>
         o.acquistabile && o.mappeAbilitate.includes(numMappa)
     );
+
+    if (typeof isRunVeloce !== "undefined" && isRunVeloce) {
+        return; // Il negozio è completamente disabilitato in Run Veloce
+    }
 
     _popolaListaNegozio(itemDisponibili);
     _svuotaDettaglioNegozio();

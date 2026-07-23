@@ -1,0 +1,2 @@
+// ===== FALCOSING =====
+const CHAR_FALCOSING = { nome: "Falcosing", hpBase: 3, atkBase: 4, defBase: 4, atkSpec: 4, defSpec: 5, velBase: 4, raritaTipo: "raro", elemento: "psico", immagine: "../Sprite/personaggi/Falcosing/Falcosing.jpeg", immagineAtk: "../Sprite/personaggi/Falcosing/Falcosing_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "|", boss: false, isEvoluzione: true, lore: "" };

@@ -1,2 +1,0 @@
-// ===== DINICOLA =====
-const CHAR_DINICOLA = { nome: "DiNicola", hpBase: 5, atkBase: 6, defBase: 5, atkSpec: 13, defSpec: 6, velBase: 7, raritaTipo: "leggendario", elemento: "fuoco", immagine: "../Sprite/personaggi/DiNicola/DiNicola.jpeg", immagineAtk: "../Sprite/personaggi/DiNicola/DiNicola_atk.jpeg", mossaLvl1: "Stronzata micidiale", mossaLvl2: "Ingegneria fasulla", mossaLvl3: "Urlata in faccia", boss: true, mossaULT: "Collasso Strutturale", numFrameUlt: 3 };

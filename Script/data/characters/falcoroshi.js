@@ -1,0 +1,2 @@
+// ===== FALCOROSHI =====
+const CHAR_FALCOROSHI = { nome: "Falco Roshi", hpBase: 5, atkBase: 2, defBase: 6, atkSpec: 2, defSpec: 5, velBase: 4, raritaTipo: "raro", elemento: "acqua", immagine: "../Sprite/personaggi/Falco Roshi/Falco Roshi.jpeg", immagineAtk: "../Sprite/personaggi/Falco Roshi/Falco Roshi_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "|", boss: false, isEvoluzione: true, lore: "" };

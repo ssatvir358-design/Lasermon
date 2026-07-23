@@ -1,0 +1,2 @@
+// ===== CASSIAN =====
+const CHAR_CASSIAN = { nome: "CASSIAN", hpBase: 5, atkBase: 2, defBase: 4, atkSpec: 3, defSpec: 5, velBase: 2, raritaTipo: "non comune", elemento: "acqua", immagine: "../Sprite/personaggi/Cassian/Cassian.jpeg", immagineAtk: "../Sprite/personaggi/Cassian/Cassian_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "|", boss: false, isEvoluzione: false, lore: "" };

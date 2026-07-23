@@ -86,6 +86,15 @@ function calcolaLivelloEMossaMappa(piano, tipoEvento) {
         let baseCalc = lvIngresso + (((lvBoss - lvIngresso) / 6) * piano * 0.45);
         let calc = Math.round(baseCalc) + randomOffset;
         livelloGenerato = Math.min(lvBoss - 5, calc);
+    } else if (tipoEvento === "miniboss") {
+        let maxTeamLvl = (typeof maxLvlTeamInizioMappa !== "undefined") ? maxLvlTeamInizioMappa : 1;
+        if (typeof miaSquadra !== "undefined" && miaSquadra.length > 0) {
+            maxTeamLvl = Math.max(...miaSquadra.filter(p => p).map(p => p.livello));
+        }
+        let randomOffset = Math.floor(Math.random() * 2); // 0 or +1
+        let baseCalc = lvIngresso + (((lvBoss - lvIngresso) / 6) * piano * 0.70);
+        let calc = Math.round(baseCalc) + randomOffset;
+        livelloGenerato = Math.max(1, Math.min(Math.max(1, maxTeamLvl - 2), calc));
     } else {
         // Erba o default (cespuglio, ecc.)
         // MIN(LV_BOSS-7; ROUND(LV_INGRESSO + (((LV_BOSS- LV_INGRESSO)/6)*P*0,15))+RANDOM(-1;0))
@@ -139,6 +148,21 @@ function getHtmlElemento(elementoNome, isGrande = false) {
  * @returns {object}            - Istanza Pok\u00e9mon pronta all'uso
  */
 function creaPokemon(infoBase, livello, livelloMossa = 1) {
+    // Supporto per chiamate con stringa nome: converte in oggetto dal DB
+    if (typeof infoBase === "string") {
+        const nomeCercato = infoBase;
+        infoBase = (typeof pokemonDatabase !== "undefined")
+            ? pokemonDatabase.find(p => p.nome === nomeCercato)
+            : null;
+        if (!infoBase) {
+            console.error(`[creaPokemon] Personaggio non trovato nel DB: "${nomeCercato}"`);
+            return null;
+        }
+    }
+    if (!infoBase || !infoBase.raritaTipo) {
+        console.error("[creaPokemon] infoBase non valido:", infoBase);
+        return null;
+    }
     const molRar    = CONFIG_MOLTIPLICATORE_RARITA[infoBase.raritaTipo.toLowerCase()] || 1.0;
     const elementoPkm = (infoBase.elemento || "fuoco").toLowerCase();
     const statsElem = CONFIG_STAT_ELEMENTO[elementoPkm] || { hp: 1, atk: 1, def: 1, vel: 1 };
@@ -154,6 +178,7 @@ function creaPokemon(infoBase, livello, livelloMossa = 1) {
     const vel   = calcolaStat(infoBase.velBase, livello, statsElem.vel, molRar, molEvo);
 
     const p = {
+        idUnico:      Date.now() + "_" + Math.random().toString(36).substr(2, 9),
         nome:         infoBase.nome,
         livello:      livello,
         livelloMossa: livelloMossa,
@@ -176,6 +201,7 @@ function creaPokemon(infoBase, livello, livelloMossa = 1) {
         elemento:     elementoPkm,
         immagine:     infoBase.immagine,
         immagineAtk:  infoBase.immagineAtk,
+        frameAtk:     infoBase.frameAtk || 1,
         mossaLvl1:    infoBase.mossaLvl1,
         mossaLvl2:    infoBase.mossaLvl2,
         mossaLvl3:    infoBase.mossaLvl3,

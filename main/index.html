@@ -4,13 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini Poke-Clone Roguelike v4</title>
-    <link rel="stylesheet" href="../style/style.css">
+    <link rel="stylesheet" href="../style/style.css?v=1784835393">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- ============= OVERLAY GLOBALI (sopra tutto) ============= -->
+    
+    <!-- Modal Impostazioni Globale -->
+    <div id="modal-impostazioni" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 360px; background: rgba(15, 15, 20, 0.98); border: 4px solid #3498db; box-shadow: 0 0 30px rgba(52, 152, 219, 0.5); border-radius: 20px; z-index: 9999999; color: white; font-family: monospace; padding: 25px; box-sizing: border-box; flex-direction: column;">
+        <!-- X Close Button -->
+        <button onclick="chiudiModalImpostazioni()" style="position: absolute; top: 12px; right: 18px; background: none; border: none; color: #e74c3c; font-size: 30px; font-weight: bold; cursor: pointer; transition: transform 0.2s, color 0.2s; z-index: 120;" onmouseover="this.style.transform='scale(1.2)'; this.style.color='#f39c12';" onmouseout="this.style.transform='scale(1)'; this.style.color='#e74c3c';">&times;</button>
+        
+        <h3 style="margin: 0 0 20px 0; text-align: center; color: #f1c40f; font-size: 22px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); font-weight: bold; letter-spacing: 1px;">⚙️ IMPOSTAZIONI</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 20px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <label style="font-weight: bold; color: #3498db; font-size: 14px;">Volume Musica:</label>
+                <input type="range" id="slider-volume" min="0" max="1" step="0.1" value="0.25" oninput="regolaVolume(this.value)" style="width: 100%; margin: 0; padding: 0; box-sizing: border-box; cursor: pointer; accent-color: #3498db;">
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 5px;">
+                <label style="display: flex; align-items: center; gap: 10px; font-size: 15px; cursor: pointer; user-select: none;">
+                    <input type="checkbox" id="chk-muto" onchange="toggleMuto(this.checked)" style="width: 18px; height: 18px; cursor: pointer; accent-color: #3498db;"> Muta Audio
+                </label>
+                
+                <label style="display: flex; align-items: center; gap: 10px; font-size: 15px; cursor: pointer; user-select: none;">
+                    <input type="checkbox" id="chk-autoskip" onchange="toggleAutoskip(this.checked)" style="width: 18px; height: 18px; cursor: pointer; accent-color: #3498db;"> 2x Auto
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Conferma Lobby Globale -->
+    <div id="modal-conferma-lobby" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 9999999; justify-content: center; align-items: center;">
+        <div style="width: 380px; background: rgba(15, 15, 20, 0.98); border: 4px solid #e74c3c; box-shadow: 0 0 30px rgba(231, 76, 60, 0.5); border-radius: 20px; color: white; font-family: monospace; padding: 25px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; text-align: center;">
+            <h3 style="margin: 0 0 15px 0; color: #e74c3c; font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); font-weight: bold; letter-spacing: 1px;">ATTENZIONE</h3>
+            <p style="margin: 0 0 25px 0; font-size: 16px; color: #ecf0f1; line-height: 1.5;">Vuoi davvero abbandonare la run in corso e tornare alla lobby?<br><br><span style="color: #e74c3c; font-weight: bold;">I progressi andranno persi.</span></p>
+            <div style="display: flex; gap: 15px; width: 100%;">
+                <button onclick="document.getElementById('modal-conferma-lobby').style.display = 'none'" class="btn-battle" style="flex: 1; background-color: #7f8c8d; font-size: 16px; padding: 12px; cursor: pointer; color: white; border: none; border-radius: 8px;">Annulla</button>
+                <button onclick="location.reload()" class="btn-battle" style="flex: 1; background-color: #e74c3c; font-size: 16px; padding: 12px; cursor: pointer; color: white; border: none; border-radius: 8px;">Lobby</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Intro boss fight -->
     <div id="intro-boss" style="display: none;">
@@ -22,18 +59,24 @@
         </div>
     </div>
 
-    <!-- Schermata VS pre-battaglia -->
+        <!-- Schermata VS pre-battaglia (Anime Style) -->
     <div id="intro-vs" style="display: none;">
-        <div class="sfondo-vs-custom">
-            <!-- Blocco Blu (Left) + Player Pokemon -->
-            <div class="blocco-vs blocco-vs-blu lato-giocatore">
+        <div class="sfondo-vs-custom anime-style">
+            
+            <!-- Pannello Player (Top Left) -->
+            <div class="vs-panel vs-panel-player lato-giocatore">
+                <div class="vs-bg-effect vs-bg-blue"></div>
                 <img id="img-vs-giocatore" src="" alt="Giocatore" class="vs-sprite-pokemon">
             </div>
             
-            <!-- Blocco Rosso (Right) + Enemy Pokemon -->
-            <div class="blocco-vs blocco-vs-rosso lato-nemico">
+            <!-- Pannello Nemico (Bottom Right) -->
+            <div class="vs-panel vs-panel-enemy lato-nemico">
+                <div class="vs-bg-effect vs-bg-red"></div>
                 <img id="img-vs-nemico" src="" alt="Nemico" class="vs-sprite-pokemon">
             </div>
+
+            <!-- Linea Diagonale -->
+            <div class="vs-slash-line"></div>
             
             <!-- Center VS Logo -->
             <div class="logo-vs-container scritta-vs">
@@ -126,30 +169,7 @@
             <div id="info-griglia-schede" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; overflow-y: auto; flex: 1; padding-right: 8px; scroll-behavior: smooth;"></div>
         </div>
 
-        <!-- Modal Impostazioni -->
-        <div id="modal-impostazioni" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 360px; background: rgba(15, 15, 20, 0.98); border: 4px solid #3498db; box-shadow: 0 0 30px rgba(52, 152, 219, 0.5); border-radius: 20px; z-index: 20000; color: white; font-family: monospace; padding: 25px; box-sizing: border-box; flex-direction: column;">
-            <!-- X Close Button -->
-            <button onclick="chiudiModalImpostazioni()" style="position: absolute; top: 12px; right: 18px; background: none; border: none; color: #e74c3c; font-size: 30px; font-weight: bold; cursor: pointer; transition: transform 0.2s, color 0.2s; z-index: 120;" onmouseover="this.style.transform='scale(1.2)'; this.style.color='#f39c12';" onmouseout="this.style.transform='scale(1)'; this.style.color='#e74c3c';">&times;</button>
-            
-            <h3 style="margin: 0 0 20px 0; text-align: center; color: #f1c40f; font-size: 22px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); font-weight: bold; letter-spacing: 1px;">⚙️ IMPOSTAZIONI</h3>
-            
-            <div style="display: flex; flex-direction: column; gap: 20px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
-                <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <label style="font-weight: bold; color: #3498db; font-size: 14px;">Volume Musica:</label>
-                    <input type="range" id="slider-volume" min="0" max="1" step="0.1" value="0.5" oninput="regolaVolume(this.value)" style="width: 100%; cursor: pointer; accent-color: #3498db;">
-                </div>
-                
-                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 5px;">
-                    <label style="display: flex; align-items: center; gap: 10px; font-size: 15px; cursor: pointer; user-select: none;">
-                        <input type="checkbox" id="chk-muto" onchange="toggleMuto(this.checked)" style="width: 18px; height: 18px; cursor: pointer; accent-color: #3498db;"> Muta Audio
-                    </label>
-                    
-                    <label style="display: flex; align-items: center; gap: 10px; font-size: 15px; cursor: pointer; user-select: none;">
-                        <input type="checkbox" id="chk-autoskip" onchange="toggleAutoskip(this.checked)" style="width: 18px; height: 18px; cursor: pointer; accent-color: #3498db;"> 2x Auto
-                    </label>
-                </div>
-            </div>
-        </div>
+
 
         <!-- Main Content Wrapper -->
         <div class="lobby-content">
@@ -160,27 +180,27 @@
             <div class="lobby-showcase">
                 <!-- Character 1 (Left) -->
                 <div class="showcase-card left-card">
-                    <img src="../Sprite/personaggi/Gian/Gian.jpeg" alt="Gian" class="showcase-img">
-                    <span class="showcase-name">GIAN</span>
+                    <img src="../Sprite/\personaggi\Gio/GioVS2.png" alt="Gian" class="showcase-img">
+                    <span class="showcase-name">GIO</span>
                 </div>
 
                 <!-- Central Action Area -->
                 <div class="lobby-action-area">
-                    <button id="btn-start" onclick="mostraSelezione()">PLAY NOW</button>
+                    <button id="btn-start" onclick="apriSelezioneModalita()">PLAY NOW</button>
                     <div class="lobby-subtitle">AUTOBATTLER ROGUELIKE</div>
                 </div>
 
                 <!-- Character 2 (Right) -->
                 <div class="showcase-card right-card">
-                    <img src="../Sprite/personaggi/Arman/Arman.jpeg" alt="Arman" class="showcase-img">
-                    <span class="showcase-name">ARMAN</span>
+                    <img src="../Sprite/personaggi/Sat/SatVS3.png" alt="Arman" class="showcase-img">
+                    <span class="showcase-name">SAT</span>
                 </div>
             </div>
         </div>
 
         <!-- Bottom Footer -->
         <div class="lobby-footer">
-            <span>LASER POKE &copy; 2026</span>
+            <span>LASERMON &copy; 2026</span>
         </div>
     </div>
 
@@ -190,12 +210,28 @@
         <div id="contenitore-starter"></div>
         <button id="btn-torna-lobby" onclick="cambiaSchermata('schermata-selezione', 'schermata-start')" class="btn-battle" style="margin: 20px auto 0 auto; display: none; background-color: #e74c3c; width: 100%; max-width: 300px; font-size: 18px;">Torna alla Lobby</button>
     </div>
-    <div id="schermata-mistero" class="schermata" style="background-color: #111;">
+
+     <div id="schermata-mistero" class="schermata" style="background-color: #111;">
         <div class="contenitore-selezione-retro" style="border-color: #9b59b6; width: 90%; max-width: 680px; text-align: center;">
             <h1 class="titolo-selezione-retro" style="color: #9b59b6;">❓ EVENTO MISTERIOSO ❓</h1>
             <h2 id="mistero-titolo-evento" style="font-family: monospace; color: #2f3640; font-size: 24px; margin-top: 20px;">-</h2>
             <p id="mistero-descrizione" style="font-family: monospace; font-size: 16px; background: #f5f6fa; padding: 20px; border: 2px dashed #9b59b6; border-radius: 8px; margin: 20px 0;"></p>
-            <button class="btn-battle" onclick="chiudiEventoMistero()" style="background-color: #9b59b6; color: white; width: 100%; max-width: 300px; margin: 0 auto; display: block;">Continua il Cammino</button>
+            <div id="mistero-scelte-container" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                <!-- Pulsanti scelte riempiti via JS -->
+            </div>
+            <p id="mistero-esitotesto" style="display: none; font-family: monospace; font-size: 16px; background: #2ecc71; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px;"></p>
+            <button id="btn-mistero-continua" class="btn-battle" onclick="chiudiEventoMistero()" style="display: none; background-color: #9b59b6; color: white; width: 100%; max-width: 300px; margin: 0 auto;">Continua il Cammino</button>
+        </div>
+    </div>
+    
+    <!-- Modale Selezione Bersaglio -->
+    <div id="modal-selezione-bersaglio" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:#2c3e50; border:3px solid #f1c40f; border-radius:10px; width:90%; max-width:600px; padding:20px; text-align:center;">
+            <h2 id="bersaglio-titolo" style="color:#f1c40f; margin-bottom:15px; font-family:monospace;">SELEZIONA BERSAGLIO</h2>
+            <div id="bersaglio-squadra-container" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
+                <!-- Riempiuto da JS -->
+            </div>
+            <button class="btn-battle" onclick="document.getElementById('modal-selezione-bersaglio').style.display='none'" style="margin-top:20px; background:#e74c3c;">Annulla</button>
         </div>
     </div>
 
@@ -217,6 +253,16 @@
         <!-- UI ESTERNA (non scalata, occupa tutto lo schermo) -->
         <div id="ui-esterna-mappa" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50;">
             
+            <!-- Top Left: Menu Buttons -->
+            <div id="top-left-ui" style="position: absolute; top: 20px; left: calc(50% - (var(--map-scaled-width) / 2) - 80px); pointer-events: auto; display: flex; flex-direction: column; gap: 15px;">
+                <button class="lobby-menu-btn" onclick="tornaALobbyDaMappa()" title="Torna alla Lobby" style="font-size: 24px; padding: 10px;">
+                    🚪
+                </button>
+                <button class="lobby-menu-btn" onclick="apriModalImpostazioni()" title="Impostazioni">
+                    <img src="../Sprite/UI/Lobby/impostazioni.png" alt="Impostazioni">
+                </button>
+            </div>
+
             <!-- Top Right: Monete -->
             <div id="top-right-ui" style="position: absolute; top: 20px; left: calc(50% + (var(--map-scaled-width) / 2) + 20px); pointer-events: auto;">
                 <div id="monete-display-mappa" class="ui-box-moderno" style="padding: 5px 15px; font-size: 16px;">💰 0</div>
@@ -240,7 +286,7 @@
 
                     <!-- Vista Assegnazione (Nascosta) -->
                     <div id="zaino-vista-assegnazione" style="display: none; flex-direction: column; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 15, 26, 0.95); z-index: 10; padding: 10px; box-sizing: border-box;">
-                        <div style="color: #f1c40f; font-weight: bold; text-align: center; margin-bottom: 10px; font-size: 14px;">ASSEGNA A:</div>
+                        <div id="zaino-assegnazione-titolo" style="color: #f1c40f; font-weight: bold; text-align: center; margin-bottom: 10px; font-size: 14px;">ASSEGNA A:</div>
                         <div id="zaino-assegnazione-lista" class="custom-scrollbar" style="flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
                             <!-- riempito via JS -->
                         </div>
@@ -883,109 +929,200 @@
          ============================================= -->
 
     <!-- 1. Dati statici -->
-    <script src="../Script/data/config.js"></script>
-    <script src="../Script/data/characters/alex.js"></script>
-    <script src="../Script/data/characters/altimani.js"></script>
-    <script src="../Script/data/characters/mori.js"></script>
-    <script src="../Script/data/characters/arman.js"></script>
-    <script src="../Script/data/characters/babbonatale.js"></script>
-    <script src="../Script/data/characters/bacchi.js"></script>
-    <script src="../Script/data/characters/bellini.js"></script>
-    <script src="../Script/data/characters/bonacina.js"></script>
-    <script src="../Script/data/characters/bottardi.js"></script>
-    <script src="../Script/data/characters/bottura.js"></script>
-    <script src="../Script/data/characters/bussolotti.js"></script>
-    <script src="../Script/data/characters/matteo.js"></script>
-    <script src="../Script/data/characters/capiluppi.js"></script>
-    <script src="../Script/data/characters/carnevali.js"></script>
-    <script src="../Script/data/characters/carra.js"></script>
-    <script src="../Script/data/characters/contini.js"></script>
-    <script src="../Script/data/characters/danilo.js"></script>
-    <script src="../Script/data/characters/danilof2.js"></script>
-    <script src="../Script/data/characters/dinicola.js"></script>
-    <script src="../Script/data/characters/donato.js"></script>
-    <script src="../Script/data/characters/edo.js"></script>
-    <script src="../Script/data/characters/fabio.js"></script>
-    <script src="../Script/data/characters/falco.js"></script>
-    <script src="../Script/data/characters/filippo.js"></script>
-    <script src="../Script/data/characters/ghandu.js"></script>
-    <script src="../Script/data/characters/gian.js"></script>
-    <script src="../Script/data/characters/gio.js"></script>
-    <script src="../Script/data/characters/giulia.js"></script>
-    <script src="../Script/data/characters/giulio.js"></script>
-    <script src="../Script/data/characters/graziani.js"></script>
-    <script src="../Script/data/characters/kul.js"></script>
-    <script src="../Script/data/characters/lanza.js"></script>
-    <script src="../Script/data/characters/loconsole.js"></script>
-    <script src="../Script/data/characters/maccioni.js"></script>
-    <script src="../Script/data/characters/maccionif2.js"></script>
-    <script src="../Script/data/characters/manuela.js"></script>
-    <script src="../Script/data/characters/mattia.js"></script>
-    <script src="../Script/data/characters/mattiaf2.js"></script>
-    <script src="../Script/data/characters/marini.js"></script>
-    <script src="../Script/data/characters/max.js"></script>
-    <script src="../Script/data/characters/maxf2.js"></script>
-    <script src="../Script/data/characters/maxf3.js"></script>
-    <script src="../Script/data/characters/monica.js"></script>
-    <script src="../Script/data/characters/nicolas.js"></script>
-    <script src="../Script/data/characters/nicolo.js"></script>
-    <script src="../Script/data/characters/nico.js"></script>
-    <script src="../Script/data/characters/nonamedonna.js"></script>
-    <script src="../Script/data/characters/nonameuomo.js"></script>
-    <script src="../Script/data/characters/paola.js"></script>
-    <script src="../Script/data/characters/paolo.js"></script>
-    <script src="../Script/data/characters/paroni.js"></script>
-    <script src="../Script/data/characters/rauf.js"></script>
-    <script src="../Script/data/characters/re_merlino.js"></script>
-    <script src="../Script/data/characters/ruggiero.js"></script>
-    <script src="../Script/data/characters/saad.js"></script>
-    <script src="../Script/data/characters/salvatore.js"></script>
-    <script src="../Script/data/characters/sat.js"></script>
-    <script src="../Script/data/characters/savina.js"></script>
-    <script src="../Script/data/characters/savinaf2.js"></script>
-    <script src="../Script/data/characters/serghej.js"></script>
-    <script src="../Script/data/characters/menza.js"></script>
-    <script src="../Script/data/characters/solieri.js"></script>
-    <script src="../Script/data/characters/tania.js"></script>
-    <script src="../Script/data/characters/telemaco.js"></script>
-    <script src="../Script/data/characters/tudor.js"></script>
-    <script src="../Script/data/characters/valentina.js"></script>
-    <script src="../Script/data/characters/venturini.js"></script>
-    <script src="../Script/data/characters/index.js"></script>
+    <script src="../Script/data/config.js?v=1784837450"></script>
+    <script src="../Script/data/characters/alex.js?v=1784837450"></script>
+    <script src="../Script/data/characters/altimani.js?v=1784837450"></script>
+    <script src="../Script/data/characters/mori.js?v=1784837450"></script>
+    <script src="../Script/data/characters/arman.js?v=1784837450"></script>
+    <script src="../Script/data/characters/babbonatale.js?v=1784837450"></script>
+    <script src="../Script/data/characters/bacchi.js?v=1784837450"></script>
+    <script src="../Script/data/characters/bellini.js?v=1784837450"></script>
+    <script src="../Script/data/characters/bonacina.js?v=1784837450"></script>
+    <script src="../Script/data/characters/bottardi.js?v=1784837450"></script>
+    <script src="../Script/data/characters/bottura.js?v=1784837450"></script>
+    <script src="../Script/data/characters/bussolotti.js?v=1784837450"></script>
+    <script src="../Script/data/characters/matteo.js?v=1784837450"></script>
+    <script src="../Script/data/characters/capiluppi.js?v=1784837450"></script>
+    <script src="../Script/data/characters/carnevali.js?v=1784837450"></script>
+    <script src="../Script/data/characters/carra.js?v=1784837450"></script>
+    <script src="../Script/data/characters/contini.js?v=1784837450"></script>
+    <script src="../Script/data/characters/danilo.js?v=1784837450"></script>
+    <script src="../Script/data/characters/danilof2.js?v=1784837450"></script>
+    <script src="../Script/data/characters/dinicola.js?v=1784837450"></script>
+    <script src="../Script/data/characters/donato.js?v=1784837450"></script>
+    <script src="../Script/data/characters/edo.js?v=1784837450"></script>
+    <script src="../Script/data/characters/fabio.js?v=1784837450"></script>
+    <script src="../Script/data/characters/falco.js?v=1784837450"></script>
+    <script src="../Script/data/characters/filippo.js?v=1784837450"></script>
+    <script src="../Script/data/characters/ghandu.js?v=1784837450"></script>
+    <script src="../Script/data/characters/gian.js?v=1784837450"></script>
+    <script src="../Script/data/characters/gio.js?v=1784837450"></script>
+    <script src="../Script/data/characters/giulia.js?v=1784837450"></script>
+    <script src="../Script/data/characters/giulio.js?v=1784837450"></script>
+    <script src="../Script/data/characters/graziani.js?v=1784837450"></script>
+    <script src="../Script/data/characters/kul.js?v=1784837450"></script>
+    <script src="../Script/data/characters/lanza.js?v=1784837450"></script>
+    <script src="../Script/data/characters/loconsole.js?v=1784837450"></script>
+    <script src="../Script/data/characters/maccioni.js?v=1784837450"></script>
+    <script src="../Script/data/characters/maccionif2.js?v=1784837450"></script>
+    <script src="../Script/data/characters/manuela.js?v=1784837450"></script>
+    <script src="../Script/data/characters/mattia.js?v=1784837450"></script>
+    <script src="../Script/data/characters/mattiaf2.js?v=1784837450"></script>
+    <script src="../Script/data/characters/mariel.js?v=1784837450"></script>
+    <script src="../Script/data/characters/max.js?v=1784837450"></script>
+    <script src="../Script/data/characters/maxf2.js?v=1784837450"></script>
+    <script src="../Script/data/characters/maxf3.js?v=1784837450"></script>
+    <script src="../Script/data/characters/monica.js?v=1784837450"></script>
+    <script src="../Script/data/characters/nicolas.js?v=1784837450"></script>
+    <script src="../Script/data/characters/nicolo.js?v=1784837450"></script>
+    <script src="../Script/data/characters/nico.js?v=1784837450"></script>
+    <script src="../Script/data/characters/nonamedonna.js?v=1784837450"></script>
+    <script src="../Script/data/characters/nonameuomo.js?v=1784837450"></script>
+    <script src="../Script/data/characters/paola.js?v=1784837450"></script>
+    <script src="../Script/data/characters/paolo.js?v=1784837450"></script>
+    <script src="../Script/data/characters/paroni.js?v=1784837450"></script>
+    <script src="../Script/data/characters/rauf.js?v=1784837450"></script>
+    <script src="../Script/data/characters/re_merlino.js?v=1784837450"></script>
+    <script src="../Script/data/characters/ruggiero.js?v=1784837450"></script>
+    <script src="../Script/data/characters/saad.js?v=1784837450"></script>
+    <script src="../Script/data/characters/salvatore.js?v=1784837450"></script>
+    <script src="../Script/data/characters/sat.js?v=1784837450"></script>
+    <script src="../Script/data/characters/savina.js?v=1784837450"></script>
+    <script src="../Script/data/characters/savinaf2.js?v=1784837450"></script>
+    <script src="../Script/data/characters/serghej.js?v=1784837450"></script>
+    <script src="../Script/data/characters/menza.js?v=1784837450"></script>
+    <script src="../Script/data/characters/solieri.js?v=1784837450"></script>
+    <script src="../Script/data/characters/tania.js?v=1784837450"></script>
+    <script src="../Script/data/characters/telemaco.js?v=1784837450"></script>
+    <script src="../Script/data/characters/tudor.js?v=1784837450"></script>
+    <script src="../Script/data/characters/valentina.js?v=1784837450"></script>
+    <script src="../Script/data/characters/venturini.js?v=1784837450"></script>
+        <script src="../Script/data/characters/valen.js?v=1784837450"></script>
+    <script src="../Script/data/characters/nyssa.js?v=1784837450"></script>
+    <script src="../Script/data/characters/cassian.js?v=1784837450"></script>
+    <script src="../Script/data/characters/kiora.js?v=1784837450"></script>
+    <script src="../Script/data/characters/zareen.js?v=1784837450"></script>
+    <script src="../Script/data/characters/elys.js?v=1784837450"></script>
+    <script src="../Script/data/characters/lucien.js?v=1784837450"></script>
+    <script src="../Script/data/characters/vesper.js?v=1784837450"></script>
+    <script src="../Script/data/characters/vesperlatabularasadelcapitale.js?v=1784837450"></script>
+    <script src="../Script/data/characters/ryden.js?v=1784837450"></script>
+    <script src="../Script/data/characters/van.js?v=1784837450"></script>
+    <script src="../Script/data/characters/mireya.js?v=1784837450"></script>
+    <script src="../Script/data/characters/darius.js?v=1784837450"></script>
+    <script src="../Script/data/characters/rivena.js?v=1784837450"></script>
+    <script src="../Script/data/characters/icer.js?v=1784837450"></script>
+    <script src="../Script/data/characters/evren.js?v=1784837450"></script>
+    <script src="../Script/data/characters/maelis.js?v=1784837450"></script>
+    <script src="../Script/data/characters/elyra.js?v=1784837450"></script>
+    <script src="../Script/data/characters/aster.js?v=1784837450"></script>
+    <script src="../Script/data/characters/bob.js?v=1784837450"></script>
+    <script src="../Script/data/characters/soraya.js?v=1784837450"></script>
+    <script src="../Script/data/characters/nerys.js?v=1784837450"></script>
+    <script src="../Script/data/characters/kit.js?v=1784837450"></script>
+    <script src="../Script/data/characters/nelly.js?v=1784837450"></script>
+    <script src="../Script/data/characters/virea.js?v=1784837450"></script>
+    <script src="../Script/data/characters/mauro.js?v=1784837450"></script>
+    <script src="../Script/data/characters/caelum.js?v=1784837450"></script>
+    <script src="../Script/data/characters/falcogenryusai.js?v=1784837450"></script>
+    <script src="../Script/data/characters/falcoroshi.js?v=1784837450"></script>
+    <script src="../Script/data/characters/falcomonkey.js?v=1784837450"></script>
+    <script src="../Script/data/characters/falcoaalk.js?v=1784837450"></script>
+    <script src="../Script/data/characters/falcomajin.js?v=1784837450"></script>
+    <script src="../Script/data/characters/falcoshoto.js?v=1784837450"></script>
+    <script src="../Script/data/characters/falcohero.js?v=1784837450"></script>
+    <script src="../Script/data/characters/falcochan.js?v=1784837450"></script>
+    <script src="../Script/data/characters/falcodragon.js?v=1784837450"></script>
+    <script src="../Script/data/characters/falconitsu.js?v=1784837450"></script>
+    <script src="../Script/data/characters/falcomalfalk.js?v=1784837450"></script>
+    <script src="../Script/data/characters/falcosing.js?v=1784837450"></script>
+    <script src="../Script/data/characters/marini.js?v=1784837450"></script>
+    <script src="../Script/data/characters/ilie.js?v=1784837450"></script>
+    <script src="../Script/data/characters/mattiasped.js?v=1784837450"></script>
+    <script src="../Script/data/characters/index.js?v=1784837450"></script>
+    <script src="../Script/data/database_veloce.js?v=1784837450"></script>
     <!-- Personaggi: un file per ciascuno (aggiungi qui nuovi personaggi) -->
     <!-- Index che assembla pokemonDatabase dai file sopra -->
-    <script src="../Script/data/mappe.js"></script>
-    <script src="../Script/data/boss.js"></script>
-    <script src="../Script/data/eventi_nodi.js"></script>
-    <script src="../Script/data/eventi_misteriosi.js"></script>
-    <script src="../Script/data/oggetti.js"></script>
-    <script src="../Script/data/perks.js"></script>
+    <script src="../Script/data/mappe.js?v=1784837450"></script>
+    <script src="../Script/data/boss.js?v=1784837450"></script>
+    <script src="../Script/data/eventi_nodi.js?v=1784837450"></script>
+    <script src="../Script/data/eventi_misteriosi.js?v=1784837450"></script>
+    <script src="../Script/data/oggetti.js?v=1784837450"></script>
+    <script src="../Script/data/perks.js?v=1784837450"></script>
 
     <!-- 2. Core -->
-    <script src="../Script/core/stato.js"></script>
-    <script src="../Script/core/pokemon_factory.js"></script>
+    <script src="../Script/core/stato.js?v=1784837450"></script>
+    <script src="../Script/core/pokemon_factory.js?v=1784837450"></script>
 
     <!-- 3. UI Audio -->
-    <script src="../Script/ui/audio.js"></script>
+    <script src="../Script/ui/audio.js?v=1784837450"></script>
 
     <!-- 4. UI Schermate -->
-    <script src="../Script/ui/schermate.js"></script>
+    <script src="../Script/ui/schermate.js?v=1784837450"></script>
 
     <!-- 5. UI Negozio / Zaino -->
-    <script src="../Script/ui/negozio.js"></script>
+    <script src="../Script/ui/negozio.js?v=1784837450"></script>
 
     <!-- 5b. UI Perk -->
-    <script src="../Script/ui/perk_ui.js"></script>
+    <script src="../Script/ui/perk_ui.js?v=1784837450"></script>
 
     <!-- 5c. Sandbox / Debugger (carica DOPO stato.js, pokemon_factory.js e perk_ui.js) -->
-    <script src="../Script/sandbox/sandbox.js"></script>
+    <script src="../Script/sandbox/sandbox.js?v=1784837450"></script>
 
     <!-- 6. Game -->
-    <script src="../Script/game/mappa.js"></script>
-    <script src="../Script/game/battaglia.js"></script>
+    <script src="../Script/game/mappa.js?v=1784837450"></script>
+    <script src="../Script/game/battaglia.js?v=1784837450"></script>
 
     <!-- 7. UI Eventi -->
-    <script src="../Script/ui/eventi.js"></script>
+    <script src="../Script/ui/eventi.js?v=1784837450"></script>
+
+    <!-- ============= MODALE SELEZIONE MODALITA' ============= -->
+    <div id="modal-selezione-modalita" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); z-index: 30000; justify-content: center; align-items: center; flex-direction: column; font-family: monospace;">
+        <h1 style="color: #f1c40f; font-size: 36px; text-shadow: 0 0 20px rgba(241,196,15,0.5); margin-bottom: 10px; letter-spacing: 3px;">⚔️ SCEGLI LA MODALITÀ</h1>
+        <p style="color: #bdc3c7; font-size: 14px; margin-bottom: 40px; text-align: center; max-width: 600px;">Seleziona il tipo di run che vuoi affrontare</p>
+
+        <div style="display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; padding: 0 20px;">
+
+            <!-- CARD RUN NORMALE -->
+            <div id="card-run-normale" onclick="scegliModalita('normale')" style="width: 280px; padding: 30px 25px; background: linear-gradient(145deg, #1a1a2e, #16213e); border: 3px solid #3498db; border-radius: 20px; cursor: pointer; transition: all 0.3s ease; text-align: center; position: relative; overflow: hidden;"
+                onmouseover="this.style.transform='translateY(-8px) scale(1.03)'; this.style.boxShadow='0 15px 40px rgba(52,152,219,0.4)'; this.style.borderColor='#5dade2';"
+                onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='none'; this.style.borderColor='#3498db';">
+                <div style="font-size: 50px; margin-bottom: 15px;">🗡️</div>
+                <h2 style="color: #3498db; font-size: 22px; margin: 0 0 12px 0; letter-spacing: 2px;">RUN NORMALE</h2>
+                <p style="color: #95a5a6; font-size: 13px; line-height: 1.6; margin: 0;">
+                    La modalità completa con tutte le meccaniche.<br><br>
+                    ✅ 6 Statistiche<br>
+                    ✅ Cambio Pokémon<br>
+                    ✅ Consumabili & Zaino<br>
+                    ✅ Controllo manuale
+                </p>
+                <div style="position: absolute; top: 10px; right: 10px; background: #3498db; color: white; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold;">CLASSICA</div>
+            </div>
+
+            <!-- CARD RUN VELOCE -->
+            <div id="card-run-veloce" onclick="scegliModalita('veloce')" style="width: 280px; padding: 30px 25px; background: linear-gradient(145deg, #1a1a2e, #2d1b2e); border: 3px solid #e74c3c; border-radius: 20px; cursor: pointer; transition: all 0.3s ease; text-align: center; position: relative; overflow: hidden;"
+                onmouseover="this.style.transform='translateY(-8px) scale(1.03)'; this.style.boxShadow='0 15px 40px rgba(231,76,60,0.4)'; this.style.borderColor='#f1948a';"
+                onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='none'; this.style.borderColor='#e74c3c';">
+                <div style="font-size: 50px; margin-bottom: 15px;">⚡</div>
+                <h2 style="color: #e74c3c; font-size: 22px; margin: 0 0 12px 0; letter-spacing: 2px;">RUN VELOCE</h2>
+                <p style="color: #95a5a6; font-size: 13px; line-height: 1.6; margin: 0;">
+                    Combattimenti automatici e rapidi!<br><br>
+                    ⚡ 4 Statistiche<br>
+                    ⚡ Auto-Battle<br>
+                    ⚡ Niente consumabili<br>
+                    ⚡ Azione non-stop
+                </p>
+                <div style="position: absolute; top: 10px; right: 10px; background: #e74c3c; color: white; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold;">SPEED</div>
+            </div>
+        </div>
+
+        <!-- Bottone Indietro -->
+        <button onclick="document.getElementById('modal-selezione-modalita').style.display='none';" style="margin-top: 35px; background: none; border: 2px solid #7f8c8d; color: #7f8c8d; padding: 10px 30px; border-radius: 10px; font-family: monospace; font-size: 14px; cursor: pointer; transition: all 0.3s;"
+            onmouseover="this.style.borderColor='#ecf0f1'; this.style.color='#ecf0f1';"
+            onmouseout="this.style.borderColor='#7f8c8d'; this.style.color='#7f8c8d';">
+            ← Torna alla Lobby
+        </button>
+    </div>
 
 </body>
 </html>

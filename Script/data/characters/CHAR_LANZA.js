@@ -1,2 +1,0 @@
-// ===== LANZA =====
-const CHAR_LANZA = { nome: "Lanza", hpBase: 6, atkBase: 5, defBase: 10, atkSpec: 4, defSpec: 12, velBase: 5, raritaTipo: "leggendario", elemento: "acqua", immagine: "../Sprite/personaggi/Lanza/Lanza.jpeg", immagineAtk: "../Sprite/personaggi/Lanza/Lanza_atk.jpeg", mossaLvl1: "Lavata di capo", mossaLvl2: "Precedenza a Cagna", mossaLvl3: "Cago il cazzo", boss: true, mossaULT: "Rimprovero Infinito", numFrameUlt: 7 };

@@ -12,6 +12,11 @@ let sandboxConfig = {
     nemicoPokemon: null
 };
 
+// ==========================================================
+// VARIABILI MODALITA' RUN VELOCE (AUTO-BATTLE)
+// ==========================================================
+let isRunVeloce = false;
+
 // ----------------------------------------------------------
 // CONFIGURAZIONE SLOT ITEM PER POK\u00c9MON
 // Cambia questo numero per variare gli slot item equipaggiabili
@@ -110,7 +115,7 @@ let tentativiSenzaLeggendari = 0;
 // --- UI / Impostazioni ---
 let isSkipAttivo         = false;
 let isAutoskipAbilitato  = false;
-let volumePrecedente     = 0.5;
+let volumePrecedente     = 0.25;
 let indicePokemonInDettaglio = null;
 
 // --- Stato scambio ---

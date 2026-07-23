@@ -1,0 +1,2 @@
+// ===== FALCOGENRYUSAI =====
+const CHAR_FALCOGENRYUSAI = { nome: "Falco Genryusai", hpBase: 4, atkBase: 6, defBase: 3, atkSpec: 3, defSpec: 3, velBase: 5, raritaTipo: "raro", elemento: "fuoco", immagine: "../Sprite/personaggi/Falco Genryusai/Falco Genryusai.jpeg", immagineAtk: "../Sprite/personaggi/Falco Genryusai/Falco Genryusai_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "|", boss: false, isEvoluzione: true, lore: "" };

@@ -1,2 +1,0 @@
-// ===== PAOLO =====
-const CHAR_PAOLO = { nome: "Paolo", hpBase: 8, atkBase: 4, defBase: 7, atkSpec: 6, defSpec: 13, velBase: 4, raritaTipo: "leggendario", elemento: "veleno", immagine: "../Sprite/personaggi/Paolo/Paolo.jpeg", immagineAtk: "../Sprite/personaggi/Paolo/Paolo_atk.jpeg", mossaLvl1: "Giovaneehh il telefonoooh", mossaLvl2: "Forfora Beam", mossaLvl3: "Alitata", boss: true, mossaULT: "Urlo del Capo Supremo", numFrameUlt: 4 };

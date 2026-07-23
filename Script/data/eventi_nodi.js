@@ -28,14 +28,16 @@ const DB_EVENTI_NODI = {
     // ---- EVENTI INFINITI (riempitivi garantiti) ----
 
     "cespuglio": {
-        PianoMin:          1,   // Appare dal primo piano
-        PianoMax:          99,  // Senza limite superiore
-        QuantitaMaxPerMappa: -1 // Nessun limite: \u00e8 l'evento di default
+        PianoMin:          1,
+        PianoMax:          99,
+        QuantitaMaxPerMappa: -1,
+        Peso: 15
     },
     "npc": {
         PianoMin:          1,
         PianoMax:          99,
-        QuantitaMaxPerMappa: -1 // Nessun limite: \u00e8 un evento di default
+        QuantitaMaxPerMappa: -1,
+        Peso: 5
     },
 
     // ---- EVENTI LIMITATI ----
@@ -43,27 +45,38 @@ const DB_EVENTI_NODI = {
     "pokeball": {
         PianoMin:          1,
         PianoMax:          99,
-        QuantitaMaxPerMappa: -1
+        QuantitaMaxPerMappa: 8,
+        Peso: 3
     },
     "scambio": {
         PianoMin:          1,
         PianoMax:          99,
-        QuantitaMaxPerMappa: -1
+        QuantitaMaxPerMappa: 5,
+        Peso: 2
     },
     "disco": {
         PianoMin:          1,
         PianoMax:          99,
-        QuantitaMaxPerMappa: -1
+        QuantitaMaxPerMappa: 4,
+        Peso: 2
     },
     "mistero": {
         PianoMin:          1,
         PianoMax:          99,
-        QuantitaMaxPerMappa: -1
+        QuantitaMaxPerMappa: 5,
+        Peso: 2
     },
     "item": {
         PianoMin:          1,   
         PianoMax:          99,
-        QuantitaMaxPerMappa: -1
+        QuantitaMaxPerMappa: 5,
+        Peso: 3
+    },
+    "miniboss": {
+        PianoMin:          8,
+        PianoMax:          8,
+        QuantitaMaxPerMappa: 1,
+        Peso: 0 // Non spawnato casualmente, solo forzato dalla logica mappa
     }
 
     // ---- TEMPLATE PER NUOVI EVENTI ----

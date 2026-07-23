@@ -1,2 +1,0 @@
-// ===== NO NAME DONNA =====
-const CHAR_NONAMEDONNA = { nome: "No name donna", hpBase: 4, atkBase: 4, defBase: 3, atkSpec: 8, defSpec: 4, velBase: 7, raritaTipo: "raro", elemento: "elettro", immagine: "../Sprite/personaggi/Nonamedonna/Nonamedonna.jpeg", immagineAtk: "../Sprite/personaggi/Nonamedonna/Nonamedonna_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "Attacco 3", boss: false };

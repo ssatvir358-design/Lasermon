@@ -51,13 +51,49 @@ cambiaSchermata = function(idNascondi, idMostra) {
     }
     if (idMostra === "schermata-gioco") {
         // Riproduce la musica normale SOLO se non \u00e8 una Boss Fight
+        // Riproduce la musica normale SOLO se non è una Boss Fight
         if (!isBossFight) {
             riproduciMusica("combattimento.mp3");
         }
     }
 };
 
-// Mostra la schermata di selezione starter (i primi 3 Pok\u00e9mon del DB)
+// Apre la modale di selezione modalità (Run Normale / Run Veloce)
+function apriSelezioneModalita() {
+    // Se il giocatore ha già una squadra, torna direttamente alla mappa
+    if (typeof miaSquadra !== "undefined" && miaSquadra.length > 0) {
+        cambiaSchermata("schermata-start", "schermata-mappa");
+        return;
+    }
+    // Mostra la modale
+    const modal = document.getElementById("modal-selezione-modalita");
+    if (modal) {
+        modal.style.display = "flex";
+    }
+}
+
+// Sceglie la modalità e procede alla selezione starter
+function scegliModalita(tipo) {
+    const modal = document.getElementById("modal-selezione-modalita");
+    if (modal) modal.style.display = "none";
+
+    if (tipo === "veloce") {
+        isRunVeloce = true;
+        applicaOverrideRunVeloce();
+        console.log("[Modalità] Run Veloce selezionata.");
+        const topRightUi = document.getElementById("top-right-ui");
+        if (topRightUi) topRightUi.style.display = "none";
+    } else {
+        isRunVeloce = false;
+        console.log("[Modalità] Run Normale selezionata.");
+        const topRightUi = document.getElementById("top-right-ui");
+        if (topRightUi) topRightUi.style.display = "block";
+    }
+
+    mostraSelezione();
+}
+
+// Mostra la schermata di selezione starter (i primi 3 Pokémon del DB)
 function mostraSelezione() {
     if (typeof miaSquadra !== "undefined" && miaSquadra.length > 0) {
         cambiaSchermata("schermata-start", "schermata-mappa");
@@ -146,7 +182,7 @@ function generaOpzioniPokemon(quanti, isStarter) {
         let bloccoAzioneHTML = "";
         if (miaSquadra.length >= 6) {
             // Squadra piena: mostra select per scegliere chi sostituire
-            let opzioniSostituzione = `<option value="keep">Lascia nella Pokéball (Tienilo così)</option>`;
+            let opzioniSostituzione = "";
             miaSquadra.forEach((membro, idx) => {
                 let elemento = membro.elemento ? membro.elemento.toUpperCase() : "FUOCO";
                 opzioniSostituzione += `<option value="${idx}">Sostituisci ${membro.nome} (${elemento}) | Lvl.${membro.livello} | HP:${membro.hpAttuali}/${membro.hpMax} | ATK:${membro.atk} DEF:${membro.def} VEL:${membro.vel} SP.ATK:${membro.atkSpec} SP.DEF:${membro.defSpec}</option>`;
@@ -272,8 +308,11 @@ function aggiornaPannelloZainoMappa() {
             const itemDesc = fullItem && fullItem.descrizione ? fullItem.descrizione : "";
             
             cella.className = "zaino-cella piena";
+            let isConsumabileCura = itemCat === "consumabile" && fullItem.stat === "hp" && (!fullItem.effettoSpeciale || !fullItem.effettoSpeciale.includes("rimuovi"));
             if (itemCat === "equipaggiabile") {
-                cella.onclick = () => apriAssegnazioneOggetto(i);
+                cella.onclick = () => apriAssegnazioneOggetto(i, false);
+            } else if (isConsumabileCura) {
+                cella.onclick = () => apriAssegnazioneOggetto(i, true);
             }
             
             cella.innerHTML = `
@@ -297,7 +336,7 @@ function aggiornaPannelloZainoMappa() {
 // ----------------------------------------------------------
 // VISTA ASSEGNAZIONE OGGETTO (DENTRO LO ZAINO)
 // ----------------------------------------------------------
-function apriAssegnazioneOggetto(indexZaino) {
+function apriAssegnazioneOggetto(indexZaino, isCura = false) {
     const vistaPrincipale = document.getElementById("zaino-mappa-lista");
     const vistaAssegnazione = document.getElementById("zaino-vista-assegnazione");
     const listaAssegnazione = document.getElementById("zaino-assegnazione-lista");
@@ -307,6 +346,11 @@ function apriAssegnazioneOggetto(indexZaino) {
     vistaPrincipale.style.display = "none";
     vistaAssegnazione.style.display = "flex";
     
+    const titolo = document.getElementById("zaino-assegnazione-titolo");
+    if (titolo) {
+        titolo.innerText = isCura ? "USA SU:" : "ASSEGNA A:";
+    }
+    
     listaAssegnazione.innerHTML = "";
     
     miaSquadra.forEach((p, i) => {
@@ -314,10 +358,10 @@ function apriAssegnazioneOggetto(indexZaino) {
         row.className = "zaino-pokemon-row";
         
         const folder = p.nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3');
-        const iconSrc = `../Sprite/personaggi/${folder}/${p.nome}VS.jpeg`;
+        const iconSrc = `../Sprite/personaggi/${folder}/${p.nome}VS.png`;
         const haItem = p.oggetti && p.oggetti.length > 0 ? " ⭐" : "";
         
-        row.onclick = () => confermaAssegnazioneOggetto(indexZaino, i);
+        row.onclick = () => confermaAssegnazioneOggetto(indexZaino, i, isCura);
         
         row.innerHTML = `
             <div class="zaino-pokemon-icon" style="background-image: url('${iconSrc}');"></div>
@@ -339,33 +383,78 @@ function annullaAssegnazioneOggetto() {
     if (vistaAssegnazione) vistaAssegnazione.style.display = "none";
 }
 
-function confermaAssegnazioneOggetto(indexZaino, indexPokemon) {
+function confermaAssegnazioneOggetto(indexZaino, indexPokemon, isCura = false) {
     let itemInZaino = zaino[indexZaino];
     if (!itemInZaino) return;
     
     let fullItem = itemInZaino.dbId ? (typeof getOggettoDb === "function" ? getOggettoDb(itemInZaino.dbId) : DB_OGGETTI.find(o => o.id === itemInZaino.dbId)) : itemInZaino;
-    if (!fullItem || fullItem.categoria !== "equipaggiabile") return;
 
     let p = miaSquadra[indexPokemon];
     if (!p) return;
     
-    if (!p.oggetti) p.oggetti = [];
-    if (p.oggetti.length >= 1) {
-        mostraAvviso("Questo Pokémon ha già il massimo degli oggetti equipaggiati (1)!");
-        return;
+    if (isCura) {
+        if (fullItem.effettoSpeciale === "revive") {
+            if (p.hpAttuali > 0) {
+                mostraAvviso("Questo Pokémon non è KO!");
+                return;
+            }
+        } else {
+            if (p.hpAttuali <= 0) {
+                mostraAvviso("Questo Pokémon è KO! Usa un oggetto per rianimarlo.");
+                return;
+            }
+            if (p.hpAttuali >= p.hpMax && (!fullItem.effettoSpeciale || !fullItem.effettoSpeciale.includes("rimuovi"))) {
+                mostraAvviso("Questo Pokémon ha già i PS al massimo!");
+                return;
+            }
+        }
+        
+        let cura = fullItem.valore || 0;
+        if (fullItem.valoreType === "percent") {
+            cura = Math.floor(p.hpMax * fullItem.valore);
+        }
+        
+        p.hpAttuali += cura;
+        if (p.hpAttuali > p.hpMax) p.hpAttuali = p.hpMax;
+        
+        let extraMsg = "";
+        if (fullItem.effettoSpeciale) {
+            if (fullItem.effettoSpeciale === "rimuovi_bruciatura") {
+                p.bruciato = false;
+                extraMsg = " (Bruciatura rimossa!)";
+            } else if (fullItem.effettoSpeciale === "rimuovi_debuff") {
+                extraMsg = " (Malus rimossi!)";
+            } else if (fullItem.effettoSpeciale === "rimuovi_tutto") {
+                p.bruciato = false;
+                extraMsg = " (Status rimossi!)";
+            } else if (fullItem.effettoSpeciale === "revive") {
+                extraMsg = " (Rianimato!)";
+            }
+        }
+        
+        let log = document.getElementById("console-log-zaino") || document.getElementById("console-log");
+        if (log) log.innerHTML = `💊 ${fullItem.nome} usato su ${p.nome}!${extraMsg}`;
+    } else {
+        if (!fullItem || fullItem.categoria !== "equipaggiabile") return;
+
+        if (!p.oggetti) p.oggetti = [];
+        if (p.oggetti.length >= 1) {
+            mostraAvviso("Questo Pokémon ha già il massimo degli oggetti equipaggiati (1)!");
+            return;
+        }
+        
+        // Equipaggia
+        p.oggetti.push(fullItem);
+        
+        // Ricalcola le statistiche e i bonus
+        if (typeof applicaBonusOggetti === "function") {
+            applicaBonusOggetti(p);
+        }
+        
+        // Notifica visiva (opzionale)
+        let log = document.getElementById("console-log-zaino") || document.getElementById("console-log");
+        if (log) log.innerHTML = `🛡️ ${fullItem.nome} equipaggiato a ${p.nome}!`;
     }
-    
-    // Equipaggia
-    p.oggetti.push(fullItem);
-    
-    // Ricalcola le statistiche e i bonus
-    if (typeof applicaBonusOggetti === "function") {
-        applicaBonusOggetti(p);
-    }
-    
-    // Notifica visiva (opzionale)
-    let log = document.getElementById("console-log-zaino") || document.getElementById("console-log");
-    if (log) log.innerHTML = `🛡️ ${fullItem.nome} equipaggiato a ${p.nome}!`;
     
     // Rimuovi l'item dallo zaino
     if (itemInZaino.quantita && itemInZaino.quantita > 1) {
@@ -444,6 +533,14 @@ function resettaRunConStarter() {
     if (attive.length > 0) {
         cambiaSchermata(attive[0].id, "schermata-mappa");
     }
+    
+    // Aggiorna pannello zaino
+    if (typeof aggiornaPannelloZainoMappa === "function") {
+        aggiornaPannelloZainoMappa();
+    }
+    if (typeof annullaAssegnazioneOggetto === "function") {
+        annullaAssegnazioneOggetto();
+    }
 }
 
 // Aggiorna la griglia icone della squadra visibile sulla mappa
@@ -483,8 +580,13 @@ function aggiornaSquadraMappa() {
             <div class="icona-squadra-info">
                 <div class="info-nome">${p.nome}</div>
                 <div class="info-dettagli">Lv.${p.livello} &bull; ${p.elemento ? p.elemento.toUpperCase() : "???"}</div>
+                <div class="info-hp" style="font-size: 0.8em; font-weight: bold; margin-top: 2px; color: ${p.hpAttuali <= 0 ? '#e74c3c' : (p.hpAttuali / p.hpMax > 0.5 ? '#2ecc71' : '#f1c40f')};">❤️ ${p.hpAttuali} / ${p.hpMax}</div>
             </div>
-            <div class="icona-squadra-img" style="border-color: ${col}; box-shadow: 0 0 25px 8px ${col}, inset 0 0 15px ${col}; background-image: url('${p.immagine}');"></div>
+            <div class="icona-squadra-img" style="border-color: ${col}; box-shadow: 0 0 25px 8px ${col}, inset 0 0 15px ${col}; background-image: url('${p.immagine}');">
+                <div style="position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); width:70%; height:8px; background:#222; border-radius:4px; border:2px solid #000; overflow:hidden; z-index:10; box-sizing:border-box;">
+                    <div style="height:100%; width:${Math.max(0, (p.hpAttuali / p.hpMax) * 100)}%; background:${p.hpAttuali <= 0 ? '#e74c3c' : (p.hpAttuali / p.hpMax > 0.5 ? '#2ecc71' : '#f1c40f')};"></div>
+                </div>
+            </div>
         `;
         quadratino.style.opacity = p.hpAttuali <= 0 ? "0.4" : "1"; 
         
@@ -735,7 +837,7 @@ function mostraDettaglioScambioBattaglia(index) {
     }
 
     const folder = p.nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3');
-    const immagineVS = `../Sprite/personaggi/${folder}/${p.nome}VS.jpeg`;
+    const immagineVS = `../Sprite/personaggi/${folder}/${p.nome}VS.png`;
 
     dest.innerHTML = `
         <div style="width:240px; height:240px; border-radius:50%; background:url('${immagineVS}') center/cover; border:6px solid ${col}; box-shadow:0 0 25px ${col}; margin-bottom:10px;"></div>
@@ -833,7 +935,8 @@ function tornaAllaMappaDaDisco() {
     if (typeof aggiornaDisplayMonete === "function") aggiornaDisplayMonete();
     document.getElementById("btn-attacco").style.display = "flex";
     document.getElementById("btn-attacco").disabled = false;
-    document.getElementById("btn-torna-mappa").style.display = "none";
+    const btnTornaMappa = document.getElementById("btn-torna-mappa");
+    if (btnTornaMappa) btnTornaMappa.style.display = "none";
     const btnItem = document.getElementById("btn-item");
     if (btnItem) { btnItem.style.display = "flex"; btnItem.disabled = true; }
     const btnPokemon = document.getElementById("btn-pokemon");
@@ -891,7 +994,7 @@ function apriSchermataDiscoMossa() {
     cambiaSchermata("schermata-mappa", "schermata-disco");
 }
 
-// Aumenta il livello mossa di un Pok\u00e9mon (max 3)
+// Aumenta il livello mossa di un Pokémon (max 3)
 function potenziiaMossaPokemon(index) {
     let p = miaSquadra[index];
     if(p.livelloMossa < 3) {
@@ -903,7 +1006,7 @@ function potenziiaMossaPokemon(index) {
 let filtroRaritaPokedex = "tutti";
 let filtroElementoPokedex = "tutti";
 
-// Apre il modal info con il Pok\u{00e9de}x completo
+// Apre il modal info con il Pokédex completo
 function apriModalInfo() {
     const modal = document.getElementById("modal-info");
     const header = document.getElementById("info-header");
@@ -917,17 +1020,8 @@ function apriModalInfo() {
     const selectElem = document.getElementById("filtro-elemento-pokedex");
     if (selectElem) selectElem.value = "tutti";
 
-    // Intestazione con probabilit\u00e0 di rarit\u00e0
-    let stringaRarita = "";
-    Object.keys(CONFIG_RARITA).forEach((chiave, index) => {
-        let info = CONFIG_RARITA[chiave];
-        let percent = (info.chance * 100).toFixed(0) + "%";
-        stringaRarita += `<span style="color: ${info.colore}; font-weight: bold;">${chiave.toUpperCase()}</span>: ${percent}`;
-        if (index < Object.keys(CONFIG_RARITA).length - 1) {
-            stringaRarita += " | ";
-        }
-    });
-    header.innerHTML = stringaRarita;
+    // Pulisci l'header (prima conteneva le percentuali)
+    header.innerHTML = "";
 
     aggiornaTabsRaritaPokedex();
     applicaFiltriPokedex();
@@ -935,7 +1029,7 @@ function apriModalInfo() {
     modal.style.display = "flex";
 }
 
-// Chiude il modal info Pok\u{00e9de}x
+// Chiude il modal info Pokédex
 function chiudiModalInfo() {
     document.getElementById("modal-info").style.display = "none";
 }
@@ -1013,7 +1107,7 @@ function applicaFiltriPokedex() {
         let coloreRarita = CONFIG_RARITA[pBase.raritaTipo]?.colore || "#ffe066";
         
         const folder = pBase.nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3');
-        const immagineVS = `../Sprite/personaggi/${folder}/${pBase.nome}VS.jpeg`;
+        const immagineVS = `../Sprite/personaggi/${folder}/${pBase.nome}VS.png`;
 
         let scheda = document.createElement("div");
         scheda.className = "scheda-info-pokedex";
@@ -1072,3 +1166,21 @@ document.addEventListener("DOMContentLoaded", adattaRisoluzioneGioco);
 
 // Esegui subito all'avvio dello script
 adattaRisoluzioneGioco();
+
+// Ritorno in Lobby
+function tornaALobbyDaMappa() {
+    const modal = document.getElementById('modal-conferma-lobby');
+    if (modal) {
+        modal.style.display = 'flex';
+    } else {
+        // Fallback se il modal non c'è
+        if (confirm('Vuoi davvero abbandonare la run in corso e tornare alla lobby?')) {
+            location.reload();
+        }
+    }
+}
+
+function tornaAllaLobbyDaVittoria() {
+    location.reload();
+}
+

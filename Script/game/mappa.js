@@ -20,6 +20,19 @@ function generaMappaProcedurale() {
     alberoMappa = [];
     mappaEventi = {};
     
+    // Genera limiti randomizzati per la mappa corrente
+    window.limitiEventiRandom = {};
+    if (typeof DB_EVENTI_NODI !== "undefined") {
+        Object.keys(DB_EVENTI_NODI).forEach(tipo => {
+            const maxVal = DB_EVENTI_NODI[tipo].QuantitaMaxPerMappa;
+            if (maxVal > 0) {
+                // Scegli a caso tra met del limite e il limite (es. se max 8, tra 4 e 8)
+                window.limitiEventiRandom[tipo] = Math.floor(Math.random() * (maxVal - Math.ceil(maxVal/2) + 1)) + Math.ceil(maxVal/2);
+            } else {
+                window.limitiEventiRandom[tipo] = maxVal;
+            }
+        });
+    }
     // Salva il livello massimo del team all'inizio della mappa per i reclutamenti
     maxLvlTeamInizioMappa = miaSquadra && miaSquadra.length > 0 
         ? Math.max(...miaSquadra.filter(p => p).map(p => p.livello)) 
@@ -65,6 +78,15 @@ function generaMappaProcedurale() {
                     tipoEvento = "pokeball";
                 } else if (i === numNodi - 1 && numNodi > 1) {
                     tipoEvento = "cespuglio";
+                } else {
+                    tipoEvento = selezionaEventoPerPiano(pianoIndex, contatoreEventi);
+                }
+                contatoreEventi[tipoEvento] = (contatoreEventi[tipoEvento] || 0) + 1;
+
+            } else if (pianoIndex === 7 && [2, 4, 6, 8].includes(parseInt(mappaAttuale.replace("mappa", "")) || 1)) {
+                // Piano 8 (indice 7) nelle mappe 2, 4, 6, 8: nodo centrale è il miniboss
+                if (i === Math.floor(numNodi / 2)) {
+                    tipoEvento = "miniboss";
                 } else {
                     tipoEvento = selezionaEventoPerPiano(pianoIndex, contatoreEventi);
                 }
@@ -163,12 +185,13 @@ function selezionaEventoPerPiano(pianoIndex, contatoreEventi) {
         const cfg = DB_EVENTI_NODI[tipo];
         // Deve rientrare nel range di piani
         if (pianoIndex < cfg.PianoMin || pianoIndex > cfg.PianoMax) return false;
-        // Deve non aver ancora raggiunto il limite (se -1 \u00e8 sempre ok)
-        if (cfg.QuantitaMaxPerMappa !== -1 && contatoreEventi[tipo] >= cfg.QuantitaMaxPerMappa) return false;
+        // Deve non aver ancora raggiunto il limite randomizzato
+        const maxConsentito = (window.limitiEventiRandom && window.limitiEventiRandom[tipo]) ? window.limitiEventiRandom[tipo] : cfg.QuantitaMaxPerMappa;
+        if (cfg.QuantitaMaxPerMappa !== -1 && contatoreEventi[tipo] >= maxConsentito) return false;
         return true;
     });
 
-    // 2. Se il pool \u00e8 vuoto, fallback agli eventi infiniti (QuantitaMaxPerMappa === -1)
+    // 2. Se il pool è vuoto, fallback agli eventi infiniti (QuantitaMaxPerMappa === -1)
     if (poolEligibili.length === 0) {
         const fallback = Object.keys(DB_EVENTI_NODI).filter(tipo =>
             DB_EVENTI_NODI[tipo].QuantitaMaxPerMappa === -1 &&
@@ -181,8 +204,21 @@ function selezionaEventoPerPiano(pianoIndex, contatoreEventi) {
             : "cespuglio";
     }
 
-    // 3. Scelta casuale uniforme tra tutti gli eligibili
-    return poolEligibili[Math.floor(Math.random() * poolEligibili.length)];
+    // 3. Scelta casuale pesata tra tutti gli eligibili
+    let pesoTotale = 0;
+    const pesi = poolEligibili.map(tipo => {
+        const peso = DB_EVENTI_NODI[tipo].Peso || 1;
+        pesoTotale += peso;
+        return { tipo, peso };
+    });
+    
+    let rand = Math.random() * pesoTotale;
+    for (let i = 0; i < pesi.length; i++) {
+        rand -= pesi[i].peso;
+        if (rand <= 0) return pesi[i].tipo;
+    }
+    
+    return poolEligibili[0];
 }
 
 // Controlla se il nodo B (piano+1, indiceB) \u00e8 figlio registrato del nodo A

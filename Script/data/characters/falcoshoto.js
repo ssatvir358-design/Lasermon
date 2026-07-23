@@ -1,0 +1,2 @@
+// ===== FALCOSHOTO =====
+const CHAR_FALCOSHOTO = { nome: "Falco Shoto", hpBase: 4, atkBase: 3, defBase: 5, atkSpec: 3, defSpec: 5, velBase: 4, raritaTipo: "raro", elemento: "ghiaccio", immagine: "../Sprite/personaggi/Falco Shoto/Falco Shoto.jpeg", immagineAtk: "../Sprite/personaggi/Falco Shoto/Falco Shoto_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "|", boss: false, isEvoluzione: true, lore: "" };
