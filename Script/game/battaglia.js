@@ -385,7 +385,10 @@ function calcolaEdEseguiDannoGiocatore(moltMossa, nomeMossaUsata) {
 
     // --- SCHIVATA NEMICO ---
     const isUlt = moltMossa >= 3.0;
-    const schivataNemica = calcolaSchivata(nemicoPokemon);
+    let schivataNemica = calcolaSchivata(nemicoPokemon);
+    if (nemicoPokemon.boss && nemicoPokemon.nome.toLowerCase() === "kul" && nemicoPokemon.kulForm === "gattino") {
+        schivataNemica = 70;
+    }
     if (!isUlt && schivataNemica > 0 && Math.random() * 100 < schivataNemica) {
         document.getElementById("console-log").innerHTML =
             `\u{1f4a8} ${nemicoPokemon.nome} <strong>schiva l'attacco!</strong> (${schivataNemica}% schivata)`;
@@ -432,6 +435,23 @@ function calcolaEdEseguiDannoGiocatore(moltMossa, nomeMossaUsata) {
     if (effettiAttivi.nemico.provocato) modDanno += effettiAttivi.nemico.provocato.percentuale;
     
     let dannoFatto = Math.max(1, Math.round(dannoBase * moltiplicatoreTipo * moltMossa * modDanno));
+
+    // --- MECCANICHE EDO (Gyatt) ---
+    if (nemicoPokemon.boss && nemicoPokemon.nome.toLowerCase() === "edo") {
+        if (dannoFatto > 0) {
+            nemicoPokemon.attacchiSubitiEdo = (nemicoPokemon.attacchiSubitiEdo || 0) + 1;
+            
+            // Para il 10% dei danni
+            const dannoParato = Math.round(dannoFatto * 0.10);
+            dannoFatto -= dannoParato;
+            
+            // Assorbe il 5% del danno (Life Steal)
+            const cura = Math.max(1, Math.round(dannoFatto * 0.05));
+            nemicoPokemon.hpAttuali = Math.min(nemicoPokemon.hpMax, nemicoPokemon.hpAttuali + cura);
+            
+            document.getElementById("console-log").innerHTML += `<br>\u{1f351} Il GYATT di Edo assorbe il colpo! (-${dannoParato} danni, +${cura} HP). Cariche: ${nemicoPokemon.attacchiSubitiEdo}/5`;
+        }
+    }
 
     // Decrementa boost ATK temporaneo (Contratto Determinato) dopo l'attacco
     if (effettiAttivi.giocatore.atkBoost) {
@@ -529,6 +549,57 @@ function attivaFase2MiniBoss() {
     return true;
 }
 
+function cambiaFormaKul(forma) {
+    const baseData = pokemonDatabase.find(p => p.nome.toLowerCase() === "kul");
+    if (!baseData) return;
+    const lvl = nemicoPokemon.livello || 1;
+    // Base stats calculated normally
+    const baseAtk = Math.round(baseData.atkBase * (1 + (lvl * 0.2)));
+    const baseDef = Math.round(baseData.defBase * (1 + (lvl * 0.2)));
+    const baseVel = Math.round(baseData.velBase * (1 + (lvl * 0.2)));
+    const baseAtkSpec = Math.round((baseData.atkSpecBase || baseData.atkBase) * (1 + (lvl * 0.2)));
+    const baseDefSpec = Math.round((baseData.defSpecBase || baseData.defBase) * (1 + (lvl * 0.2)));
+
+    nemicoPokemon.kulForm = forma;
+    
+    if (forma === "gattino") {
+        nemicoPokemon.atk = Math.round(baseAtk * 0.30); // -70%
+        nemicoPokemon.atkSpec = Math.round(baseAtkSpec * 0.30);
+        nemicoPokemon.def = baseDef;
+        nemicoPokemon.defSpec = baseDefSpec;
+        nemicoPokemon.vel = baseVel;
+        nemicoPokemon.immagine = "../Sprite/personaggi/KulF2/KulF2_gattino.jpeg";
+        nemicoPokemon.immagineAtk = "../Sprite/personaggi/KulF2/KulF2_gattino_atk.jpeg";
+        nemicoPokemon.frameAtk = 1;
+        // Recupera 5% HP max
+        const cura = Math.round(nemicoPokemon.hpMax * 0.05);
+        nemicoPokemon.hpAttuali = Math.min(nemicoPokemon.hpMax, nemicoPokemon.hpAttuali + cura);
+        document.getElementById("console-log").innerHTML += `<br>\u{1f408} Kul diventa un <strong>Gattino</strong>! (Schivata+, Attacco---, Recupera ${cura} HP)`;
+    } else if (forma === "jaguar") {
+        nemicoPokemon.atk = Math.round(baseAtk * 1.13); // +13%
+        nemicoPokemon.atkSpec = Math.round(baseAtkSpec * 1.13);
+        nemicoPokemon.def = Math.round(baseDef * 1.10); // +10%
+        nemicoPokemon.defSpec = Math.round(baseDefSpec * 1.10);
+        nemicoPokemon.vel = Math.round(baseVel * 1.25); // +25%
+        nemicoPokemon.immagine = "../Sprite/personaggi/KulF2/KulF2_jaguar.jpeg";
+        nemicoPokemon.immagineAtk = "../Sprite/personaggi/KulF2/KulF2_jaguar_atk.jpeg";
+        nemicoPokemon.frameAtk = 2;
+        document.getElementById("console-log").innerHTML += `<br>\u{1f406} Kul diventa <strong>Jaguar</strong>! (Tutte le stats incrementate)`;
+    } else {
+        // umano
+        nemicoPokemon.atk = baseAtk;
+        nemicoPokemon.atkSpec = baseAtkSpec;
+        nemicoPokemon.def = baseDef;
+        nemicoPokemon.defSpec = baseDefSpec;
+        nemicoPokemon.vel = baseVel;
+        nemicoPokemon.immagine = baseData.immagine;
+        nemicoPokemon.immagineAtk = baseData.immagineAtk;
+        nemicoPokemon.frameAtk = baseData.frameAtk || 1;
+        document.getElementById("console-log").innerHTML += `<br>\u{1f468}\u200d\u{1f4bc} Kul resta nella sua <strong>Forma Umana</strong>!`;
+    }
+    aggiornaGrafica();
+}
+
 function turnoNemico() {
     if (!nemicoPokemon || nemicoPokemon.hpAttuali <= 0 || !mioPokemon) return;
 
@@ -536,9 +607,21 @@ function turnoNemico() {
     let messaggioSpeciale = "";
 
     // Logica gimmick boss
-    if (nemicoPokemon.boss === true && !haUsatoUltNemico) {
+    if (nemicoPokemon.boss === true && (!haUsatoUltNemico || nemicoPokemon.nome.toLowerCase().startsWith("max"))) {
         const nomeBoss = nemicoPokemon.nome.toLowerCase();
-        if (nomeBoss === "filippo" || nomeBoss === "filippo fase 2") {
+        
+        // --- MECCANICHE KUL ---
+        if (nomeBoss === "kul") {
+            const rnd = Math.random();
+            if (rnd < 0.40) {
+                cambiaFormaKul("gattino");
+            } else if (rnd < 0.80) {
+                cambiaFormaKul("umano");
+            } else {
+                cambiaFormaKul("jaguar");
+            }
+            // Kul non ha Phase 2 (niente ult)
+        } else if (nomeBoss === "filippo" || nomeBoss === "filippo fase 2") {
             const ceCarraNelTeam = miaSquadra.some(p => p && p.nome.toLowerCase() === "carra");
             if (ceCarraNelTeam) {
                 usaUlt = true;
@@ -548,6 +631,21 @@ function turnoNemico() {
             }
         } else if (nomeBoss === "lanza" || nomeBoss === "lanza fase 2") {
             if (nemicoPokemon.hpAttuali <= nemicoPokemon.hpMax * 0.15) usaUlt = true;
+        } else if (nomeBoss === "sat") {
+            if (nemicoPokemon.hpAttuali <= nemicoPokemon.hpMax / 2) {
+                usaUlt = true;
+                messaggioSpeciale = "<br>\u2694\ufe0f <strong>Sat sfodera la sua Katana e passa alla Fase 2!</strong>";
+            }
+        } else if (nomeBoss === "edo") {
+            if (nemicoPokemon.attacchiSubitiEdo >= 5 && !nemicoPokemon.edoInFase2) {
+                usaUlt = true;
+                messaggioSpeciale = "<br>\u2728 <strong>Il GYATT di Edo sprigiona energia e si trasforma in Oro e Rosa!</strong>";
+            }
+        } else if (nomeBoss === "gio") {
+            if (nemicoPokemon.hpAttuali <= nemicoPokemon.hpMax / 2) {
+                usaUlt = true;
+                messaggioSpeciale = "<br>\u2728 <strong>Gio afferra la sua Lancia e passa alla Fase 2!</strong>";
+            }
         } else {
             if (nemicoPokemon.hpAttuali <= nemicoPokemon.hpMax / 2) usaUlt = true;
         }
@@ -555,9 +653,75 @@ function turnoNemico() {
 
     if (usaUlt) {
         haUsatoUltNemico = true;
+        let fase2Attivata = false;
 
         // Trasformazione Fase 2
-        if (!nemicoPokemon.nome.includes("Fase 2")) {
+        if (nemicoPokemon.nome.toLowerCase().startsWith("max")) {
+            if (!nemicoPokemon.maxFase3 && nemicoPokemon.hpAttuali <= nemicoPokemon.hpMax * (1/3)) {
+                nemicoPokemon.maxFase3 = true;
+                const datiFase3 = pokemonDatabase.find(p => p.nome.toLowerCase() === "max f3");
+                if (datiFase3) {
+                    const nuovoP = creaPokemon(datiFase3, nemicoPokemon.livello, nemicoPokemon.livelloMossa);
+                    const vecchiHpMax = nemicoPokemon.hpMax;
+                    const vecchiHpAttuali = nemicoPokemon.hpAttuali;
+                    Object.assign(nemicoPokemon, {
+                        nome: "MAX F3",
+                        atk: nuovoP.atk, atkSpec: nuovoP.atkSpec, def: nuovoP.def, defSpec: nuovoP.defSpec, vel: nuovoP.vel,
+                        hpMax: nuovoP.hpMax, elemento: nuovoP.elemento,
+                        immagine: nuovoP.immagine, immagineAtk: nuovoP.immagineAtk, frameAtk: 1, mossaULT: datiFase3.mossaLvl3 || "Attacco 1"
+                    });
+                    nemicoPokemon.hpAttuali = Math.max(1, Math.round((vecchiHpAttuali / vecchiHpMax) * nemicoPokemon.hpMax));
+                }
+                fase2Attivata = true;
+            } else if (!nemicoPokemon.maxFase2 && !nemicoPokemon.maxFase3) {
+                nemicoPokemon.maxFase2 = true;
+                const datiFase2 = pokemonDatabase.find(p => p.nome.toLowerCase() === "max f2");
+                if (datiFase2) {
+                    const nuovoP = creaPokemon(datiFase2, nemicoPokemon.livello, nemicoPokemon.livelloMossa);
+                    const vecchiHpMax = nemicoPokemon.hpMax;
+                    const vecchiHpAttuali = nemicoPokemon.hpAttuali;
+                    Object.assign(nemicoPokemon, {
+                        nome: "MAX F2",
+                        atk: nuovoP.atk, atkSpec: nuovoP.atkSpec, def: nuovoP.def, defSpec: nuovoP.defSpec, vel: nuovoP.vel,
+                        hpMax: nuovoP.hpMax, elemento: nuovoP.elemento,
+                        immagine: nuovoP.immagine, immagineAtk: nuovoP.immagineAtk, frameAtk: 1, mossaULT: datiFase2.mossaLvl3 || "Attacco 1"
+                    });
+                    nemicoPokemon.hpAttuali = Math.max(1, Math.round((vecchiHpAttuali / vecchiHpMax) * nemicoPokemon.hpMax));
+                }
+                fase2Attivata = true;
+            }
+        } else if (nemicoPokemon.nome.toLowerCase() === "sat" && !nemicoPokemon.satInFase2) {
+            nemicoPokemon.satInFase2 = true;
+            nemicoPokemon.vel = Math.round(nemicoPokemon.vel * 1.25);
+            nemicoPokemon.hpAttuali = Math.min(nemicoPokemon.hpMax, nemicoPokemon.hpAttuali + Math.round(nemicoPokemon.hpMax * 0.30));
+            nemicoPokemon.immagine = "../Sprite/personaggi/SatF2/SatF2.jpeg";
+            nemicoPokemon.immagineAtk = "../Sprite/personaggi/SatF2/SatF2_atk.jpeg";
+            nemicoPokemon.frameAtk = 3;
+            if (effettiAttivi.nemico.defRidotta && effettiAttivi.nemico.defRidotta.isSatCustom) {
+                effettiAttivi.nemico.defRidotta = null;
+            }
+            fase2Attivata = true;
+        } else if (nemicoPokemon.nome.toLowerCase() === "edo" && !nemicoPokemon.edoInFase2) {
+            nemicoPokemon.edoInFase2 = true;
+            nemicoPokemon.atk = Math.round(nemicoPokemon.atk * 1.35);
+            nemicoPokemon.atkSpec = Math.round((nemicoPokemon.atkSpec || nemicoPokemon.atk) * 1.35);
+            nemicoPokemon.def = Math.round(nemicoPokemon.def * 0.50);
+            nemicoPokemon.defSpec = Math.round((nemicoPokemon.defSpec || nemicoPokemon.def) * 0.50);
+            nemicoPokemon.immagine = "../Sprite/personaggi/EdoF2/EdoF2.jpeg";
+            nemicoPokemon.immagineAtk = "../Sprite/personaggi/EdoF2/EdoF2_atk.jpeg";
+            nemicoPokemon.frameAtk = 1;
+            fase2Attivata = true;
+        } else if (nemicoPokemon.nome.toLowerCase() === "gio" && !nemicoPokemon.gioInFase2) {
+            nemicoPokemon.gioInFase2 = true;
+            nemicoPokemon.atk = Math.round(nemicoPokemon.atk * 1.15);
+            nemicoPokemon.atkSpec = Math.round((nemicoPokemon.atkSpec || nemicoPokemon.atk) * 1.15);
+            nemicoPokemon.def = Math.round(nemicoPokemon.def * 0.80);
+            nemicoPokemon.defSpec = Math.round((nemicoPokemon.defSpec || nemicoPokemon.def) * 0.80);
+            nemicoPokemon.immagine = "../Sprite/personaggi/GioF2/GioF2.jpeg";
+            nemicoPokemon.immagineAtk = "../Sprite/personaggi/GioF2/GioF2_Lancia.jpeg";
+            nemicoPokemon.frameAtk = 4;
+            fase2Attivata = true;
+        } else if (!nemicoPokemon.nome.includes("Fase 2")) {
             const nomeFase2  = nemicoPokemon.nome + " Fase 2";
             const datiFase2  = pokemonDatabase.find(p => p.nome.toLowerCase() === nomeFase2.toLowerCase());
             if (datiFase2) {
@@ -578,27 +742,130 @@ function turnoNemico() {
                     raritaTipo: datiFase2.raritaTipo, livelloMossa: 3
                 };
                 messaggioSpeciale += `<br>\u2728 <strong>Fase Shift! Il boss recupera il 50% della vita!</strong> \u2728`;
-                aggiornaGrafica();
+                fase2Attivata = true;
             }
         }
 
-        document.getElementById("console-log").innerHTML =
-            `\u26a0\ufe0f IL BOSS SI INFURIA! ${nemicoPokemon.nome} prepara l'attacco finale!${messaggioSpeciale}`;
-        eseguiAnimazioneUlt(nemicoPokemon, "img-nemico", () => {
-            calcolaEdEseguiDannoNemico(3.0, nemicoPokemon.mossaULT);
-        });
+        const eseguiUlt = () => {
+            document.getElementById("console-log").innerHTML =
+                `\u26a0\ufe0f IL BOSS SI INFURIA! ${nemicoPokemon.nome} prepara l'attacco finale!${messaggioSpeciale}`;
+            eseguiAnimazioneUlt(nemicoPokemon, "img-nemico", () => {
+                const mossaSat = nemicoPokemon.nome.toLowerCase().includes("sat") ? "Maremoto del Bomber" : nemicoPokemon.mossaULT;
+                calcolaEdEseguiDannoNemico(3.0, mossaSat || nemicoPokemon.mossaULT, false);
+            });
+            aggiornaGrafica();
+        };
 
+        if (fase2Attivata) {
+            mostraWarningBoss(eseguiUlt);
+        } else {
+            eseguiUlt();
+        }
+        return;
     } else {
         // Attacco normale
+        let isSplashSat = false;
+        let atkImgBackup = null;
+        let originalFrameAtk = nemicoPokemon.frameAtk || 1;
+        let customMoltMossa = null;
+        let nomeMossa = getNomeMossaAttuale(nemicoPokemon);
+
+        if (nemicoPokemon.nome.toLowerCase().startsWith("max")) {
+            if (!nemicoPokemon.maxFase3 && nemicoPokemon.hpAttuali <= nemicoPokemon.hpMax * (1/3)) {
+                nemicoPokemon.maxFase3 = true;
+                const datiFase3 = pokemonDatabase.find(p => p.nome.toLowerCase() === "max f3");
+                if (datiFase3) {
+                    const nuovoP = creaPokemon(datiFase3, nemicoPokemon.livello, nemicoPokemon.livelloMossa);
+                    const vecchiHpMax = nemicoPokemon.hpMax;
+                    const vecchiHpAttuali = nemicoPokemon.hpAttuali;
+                    Object.assign(nemicoPokemon, {
+                        nome: "MAX F3",
+                        atk: nuovoP.atk, atkSpec: nuovoP.atkSpec, def: nuovoP.def, defSpec: nuovoP.defSpec, vel: nuovoP.vel,
+                        hpMax: nuovoP.hpMax, elemento: nuovoP.elemento,
+                        immagine: nuovoP.immagine, immagineAtk: nuovoP.immagineAtk, frameAtk: 1, mossaULT: datiFase3.mossaLvl3 || "Attacco 1"
+                    });
+                    nemicoPokemon.hpAttuali = Math.max(1, Math.round((vecchiHpAttuali / vecchiHpMax) * nemicoPokemon.hpMax));
+                }
+                fase2Attivata = true;
+            } else if (!nemicoPokemon.maxFase2 && !nemicoPokemon.maxFase3) {
+                nemicoPokemon.maxFase2 = true;
+                const datiFase2 = pokemonDatabase.find(p => p.nome.toLowerCase() === "max f2");
+                if (datiFase2) {
+                    const nuovoP = creaPokemon(datiFase2, nemicoPokemon.livello, nemicoPokemon.livelloMossa);
+                    const vecchiHpMax = nemicoPokemon.hpMax;
+                    const vecchiHpAttuali = nemicoPokemon.hpAttuali;
+                    Object.assign(nemicoPokemon, {
+                        nome: "MAX F2",
+                        atk: nuovoP.atk, atkSpec: nuovoP.atkSpec, def: nuovoP.def, defSpec: nuovoP.defSpec, vel: nuovoP.vel,
+                        hpMax: nuovoP.hpMax, elemento: nuovoP.elemento,
+                        immagine: nuovoP.immagine, immagineAtk: nuovoP.immagineAtk, frameAtk: 1, mossaULT: datiFase2.mossaLvl3 || "Attacco 1"
+                    });
+                    nemicoPokemon.hpAttuali = Math.max(1, Math.round((vecchiHpAttuali / vecchiHpMax) * nemicoPokemon.hpMax));
+                }
+                fase2Attivata = true;
+            }
+        } else if (nemicoPokemon.nome.toLowerCase() === "sat" && !nemicoPokemon.satInFase2) {
+            if (Math.random() < 0.30) {
+                isSplashSat = true;
+                atkImgBackup = nemicoPokemon.immagineAtk;
+                nemicoPokemon.immagineAtk = "../Sprite/personaggi/Sat/Sat_atkAOE.jpeg";
+                nemicoPokemon.frameAtk = 1;
+                effettiAttivi.nemico.defRidotta = { percentuale: 0.15, durata: 1, isSatCustom: true };
+            }
+        } else if (nemicoPokemon.nome.toLowerCase() === "gio") {
+            atkImgBackup = nemicoPokemon.immagineAtk;
+            const rand = Math.random();
+            if (nemicoPokemon.gioInFase2) {
+                if (rand < 0.5) {
+                    nomeMossa = "Lancia";
+                    customMoltMossa = 1.20;
+                    nemicoPokemon.immagineAtk = "../Sprite/personaggi/GioF2/GioF2_Lancia.jpeg";
+                    nemicoPokemon.frameAtk = 4;
+                } else {
+                    nomeMossa = "Raggio";
+                    customMoltMossa = 1.50;
+                    nemicoPokemon.immagineAtk = "../Sprite/personaggi/GioF2/GioF2_Raggio.jpeg";
+                    nemicoPokemon.frameAtk = 3;
+                }
+            } else {
+                if (rand < 0.33) {
+                    nomeMossa = "Pugni";
+                    customMoltMossa = 0.80;
+                    nemicoPokemon.immagineAtk = "../Sprite/personaggi/Gio/Gio_Pugno.jpeg";
+                    nemicoPokemon.frameAtk = 2;
+                } else if (rand < 0.66) {
+                    nomeMossa = "Sfera";
+                    customMoltMossa = 1.25;
+                    nemicoPokemon.immagineAtk = "../Sprite/personaggi/Gio/Gio_Sfera.jpeg";
+                    nemicoPokemon.frameAtk = 3;
+                } else {
+                    nomeMossa = "Raggio";
+                    customMoltMossa = 1.00;
+                    nemicoPokemon.immagineAtk = "../Sprite/personaggi/Gio/Gio_Raggio.jpeg";
+                    nemicoPokemon.frameAtk = 3;
+                }
+            }
+        }
+
+        if (nemicoPokemon.satInFase2) {
+             nomeMossa = "Colpo di Katana";
+        } else if (isSplashSat) {
+             nomeMossa = "Colpo Potente Splash";
+        }
+
         eseguiAnimazioneAttaccoNormale(nemicoPokemon, false, () => {
+            if (atkImgBackup) {
+                nemicoPokemon.immagineAtk = atkImgBackup;
+                nemicoPokemon.frameAtk = originalFrameAtk;
+            }
             if (!mioPokemon) return;
-            const moltMossa = CONFIG_MOSSE[nemicoPokemon.livelloMossa] || 1.0;
-            calcolaEdEseguiDannoNemico(moltMossa, getNomeMossaAttuale(nemicoPokemon));
+            const moltMossa = customMoltMossa !== null ? customMoltMossa : (CONFIG_MOSSE[nemicoPokemon.livelloMossa] || 1.0);
+            calcolaEdEseguiDannoNemico(moltMossa, nomeMossa, isSplashSat);
         });
     }
 }
 
-function calcolaEdEseguiDannoNemico(moltMossa, nomeMossaUsata) {
+function calcolaEdEseguiDannoNemico(moltMossa, nomeMossaUsata, isSplashSat = false) {
     const moltiplicatoreTipo = CONFIG_DEBOLEZZE[nemicoPokemon.elemento]?.[mioPokemon.elemento] || 1.0;
 
     // --- SCHIVATA GIOCATORE ---
@@ -618,6 +885,19 @@ function calcolaEdEseguiDannoNemico(moltMossa, nomeMossaUsata) {
         return;
     }
 
+    // --- LANZA ONE-SHOT GIMMICK ---
+    if (isUlt && nemicoPokemon.boss && nemicoPokemon.nome.toLowerCase().includes("lanza")) {
+        miaSquadra.forEach(p => {
+            if (p) p.hpAttuali = 0;
+        });
+        document.getElementById("console-log").innerHTML += `<br>\u2620\ufe0f <strong>${nemicoPokemon.nome} usa la sua Gimmick Finale e ELIMINA TUTTO IL TEAM!</strong>`;
+        aggiornaGrafica();
+        
+        processaEffettiFineTurno(nemicoPokemon, true);
+        gestisciKOGiocatore();
+        return;
+    }
+
     // Identifica se l'attacco \u00e8 fisico o speciale in base alla statistica maggiore del nemico
     const isSpecial = (nemicoPokemon.atkSpec || 0) > (nemicoPokemon.atk || 0);
     
@@ -632,18 +912,27 @@ function calcolaEdEseguiDannoNemico(moltMossa, nomeMossaUsata) {
         defEffettiva = calcolaStatConEffetti(mioPokemon.def, effettiAttivi.giocatore.defRidotta, null);
     }
 
-    // --- PERK SFONDAMENTO PER GIOCATORE ---
-    // (I nemici non hanno perk sfondamento, a meno che non l'abbiano. Lo ometto per i nemici)
-
     // Calcolo Danno Base
     const dannoBase = (atkEffettivo * atkEffettivo) / (atkEffettivo + defEffettiva);
     
     // Modificatori buff/debuff
     let modDanno = 1.0;
-    if (effettiAttivi.nemico.difesaRidotta) modDanno -= effettiAttivi.nemico.difesaRidotta.percentuale;
+    if (effettiAttivi.nemico.difesaRidotta && !effettiAttivi.nemico.difesaRidotta.isSatCustom) modDanno -= effettiAttivi.nemico.difesaRidotta.percentuale;
     if (effettiAttivi.giocatore.provocato) modDanno += effettiAttivi.giocatore.provocato.percentuale;
     
     let dannoFatto = Math.max(1, Math.round(dannoBase * moltiplicatoreTipo * moltMossa * modDanno));
+
+    let dannoSingoloPanchina = 0;
+    if (isSplashSat) {
+        let dannoAttivo = Math.round(dannoFatto * 0.8);
+        let dannoPanchina = dannoFatto - dannoAttivo;
+        dannoFatto = dannoAttivo;
+
+        let panchinari = miaSquadra.filter(p => p && p !== mioPokemon && p.hpAttuali > 0);
+        if (panchinari.length > 0) {
+            dannoSingoloPanchina = Math.max(1, Math.round(dannoPanchina / panchinari.length));
+        }
+    }
 
     // Decrementa boost ATK temporaneo
     if (effettiAttivi.nemico.atkBoost) {
@@ -665,6 +954,25 @@ function calcolaEdEseguiDannoNemico(moltMossa, nomeMossaUsata) {
         const msgEfficacia = getMessaggioEfficacia(moltiplicatoreTipo);
         document.getElementById("console-log").innerHTML +=
             `<br>${nemicoPokemon.nome} usa <strong>${nomeMossaUsata}</strong> ed infligge ${dannoFatto} danni!${msgEfficacia}`;
+        
+        // --- STUN EDO ---
+        if (dannoFatto > 0 && nemicoPokemon.boss && nemicoPokemon.nome.toLowerCase() === "edo") {
+            if (Math.random() < 0.15) {
+                if (!effettiAttivi.giocatore) effettiAttivi.giocatore = {};
+                effettiAttivi.giocatore.stordito = { durata: 1 };
+                document.getElementById("console-log").innerHTML += `<br>\u{1f351} L'imponenza del GYATT ti stordisce! (Salta il turno)`;
+            }
+        }
+        
+        aggiornaGrafica();
+    }
+
+    if (dannoSingoloPanchina > 0) {
+        let panchinari = miaSquadra.filter(p => p && p !== mioPokemon && p.hpAttuali > 0);
+        panchinari.forEach(p => {
+            p.hpAttuali = Math.max(0, p.hpAttuali - dannoSingoloPanchina);
+        });
+        document.getElementById("console-log").innerHTML += `<br>\u{1f30a} Lo splash colpisce la panchina! (${dannoSingoloPanchina} danni a testa)`;
         aggiornaGrafica();
     }
 
@@ -791,6 +1099,15 @@ function gestisciVittoriaIncontro() {
         }
     });
 
+    // --- CURA TOTALE DOPO BOSS FIGHT ---
+    if (isBossFight) {
+        miaSquadra.forEach(p => {
+            if (p) {
+                p.hpAttuali = p.hpMax;
+            }
+        });
+    }
+
     // --- GUADAGNO MONETE ---
     // I range/valori sono configurati in CONFIG_MONETE_GUADAGNO (stato.js)
     let moneteGuadagnate = 0;
@@ -828,29 +1145,14 @@ function gestisciVittoriaIncontro() {
 
     // --- GESTIONE BOSS (avanzamento mappa) ---
     if (isBossFight) {
-        // Se siamo in mappa 9 e il gauntlet non \u00e8 finito
-        if (mappaAttuale === "mappa9" && indiceGauntlet >= 0 && indiceGauntlet < GAUNTLET_MAPPA9.length - 1) {
-            indiceGauntlet++;
-            document.getElementById("console-log").innerHTML += `<br><strong>${nemicoPokemon.nome} sconfitto! Preparati al prossimo Incredibile... Squadra curata!</strong>`;
-            miaSquadra.forEach(p => { if (p) p.hpAttuali = p.hpMax; });
-            
-            setTimeout(() => {
-                // Non finisce la boss fight, riavvia subito la prossima
-                cambiaSchermata("schermata-gioco", "schermata-gioco"); // forza restare in gioco
-                avviaBossBattle(GAUNTLET_MAPPA9[indiceGauntlet]);
-            }, 3000);
-            return; // Interrompe il normale flusso di vittoria boss
-        }
-
         // Se arrivo qui, o non \u00e8 mappa9, oppure il gauntlet di mappa 9 \u00e8 concluso (Max sconfitto)
-        indiceGauntlet = -1;
         isBossFight = false;
         const chiaviMappe    = Object.keys(ARCHIVIO_MAPPE);
         const indiceProssimo = chiaviMappe.indexOf(mappaAttuale) + 1;
 
         if (indiceProssimo >= chiaviMappe.length) {
             document.getElementById("console-log").innerHTML =
-                "🏆 COMPLIMENTI! Hai completato tutte le mappe! 🏆";
+                "Y? COMPLIMENTI! Hai completato tutte le mappe! Y?";
             const modale = document.getElementById("modal-vittoria-finale");
             if (modale) modale.style.display = "flex";
             return;
@@ -923,9 +1225,6 @@ function eseguiAnimazioneUlt(pokemon, idElementoImg, callbackDanno) {
 // BOSS BATTLE
 // ----------------------------------------------------------
 
-const GAUNTLET_MAPPA9 = ["9", "12", "11", "10", "13"]; // Kul, Edo, Sat, Gio, Max
-let indiceGauntlet = -1;
-
 function avviaBossBattle(idBoss) {
     haUsatoUltGiocatore = false;
     haUsatoUltNemico    = false;
@@ -933,14 +1232,6 @@ function avviaBossBattle(idBoss) {
     resettaItemFight();
 
     if (idBoss === "boss_finale") idBoss = "5";
-
-    // Gestione Gauntlet Mappa 9
-    if (mappaAttuale === "mappa9") {
-        if (indiceGauntlet === -1) indiceGauntlet = 0; // Inizia il gauntlet
-        idBoss = GAUNTLET_MAPPA9[indiceGauntlet];
-    } else {
-        indiceGauntlet = -1; // Resetta per sicurezza
-    }
 
     const datiBoss = ARCHIVIO_BOSS[idBoss];
     if (!datiBoss) return;
@@ -967,7 +1258,7 @@ function avviaBossBattle(idBoss) {
             maxTeamLvl = Math.max(...miaSquadra.filter(p => p).map(p => p.livello));
         }
         
-        let delta_livello = 16;
+        let delta_livello = 11;
         let variazione_seed = (typeof variazioneSeedMappa !== "undefined") ? variazioneSeedMappa : 0;
         let lvBossCalculated = Math.floor(maxTeamLvl + delta_livello + variazione_seed);
         
@@ -1196,8 +1487,16 @@ function processaEffettiInizioTurno(pokemon, isNemico) {
     let saltato = false;
     let msg = "";
 
+    // Stordimento (100% skip turn)
+    if (effettiAttivi[targetId].stordito && effettiAttivi[targetId].stordito.durata > 0) {
+        effettiAttivi[targetId].stordito.durata--;
+        msg += `<br>\u{1f4ab} ${pokemon.nome} \u00e8 stordito e salta il turno!`;
+        saltato = true;
+        if (effettiAttivi[targetId].stordito.durata === 0) effettiAttivi[targetId].stordito = null;
+    }
+
     // Paralisi (25% di skip)
-    if (effettiAttivi[targetId].paralisi && effettiAttivi[targetId].paralisi.durata > 0) {
+    if (!saltato && effettiAttivi[targetId].paralisi && effettiAttivi[targetId].paralisi.durata > 0) {
         effettiAttivi[targetId].paralisi.durata--;
         if (Math.random() < 0.25) {
             msg += `<br>\u26a1 ${pokemon.nome} \u00e8 paralizzato e non pu\u00f2 muoversi!`;
@@ -1277,7 +1576,7 @@ function processaEffettiFineTurno(pokemon, isNemico) {
     }
 
     // Decremento turni passivi (buff/debuff statici)
-    const statici = ["velRidotta", "ventoInCoda", "difesaRidotta", "provocato"];
+    const statici = ["velRidotta", "ventoInCoda", "difesaRidotta", "provocato", "defRidotta"];
     statici.forEach(eff => {
         if (effettiAttivi[targetId][eff] && effettiAttivi[targetId][eff].durata > 0) {
             effettiAttivi[targetId][eff].durata--;

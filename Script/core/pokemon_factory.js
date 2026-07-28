@@ -77,7 +77,7 @@ function calcolaLivelloEMossaMappa(piano, tipoEvento) {
         maxTeamLvl = Math.max(...miaSquadra.filter(p => p).map(p => p.livello));
     }
     
-    let delta_livello = 16;
+    let delta_livello = 11;
     let variazione_seed = (typeof variazioneSeedMappa !== "undefined") ? variazioneSeedMappa : 0;
     let lvBoss = Math.floor(maxTeamLvl + delta_livello + variazione_seed);
     

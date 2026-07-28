@@ -45,14 +45,22 @@ function generaMappaProcedurale() {
     const contatoreEventi = {};
     Object.keys(DB_EVENTI_NODI).forEach(tipo => contatoreEventi[tipo] = 0);
 
-    const ultimoPiano      = schemaAlbero.length - 1; // Piano boss
-    const penultimoPiano   = schemaAlbero.length - 2; // Piano medico/npc
+    // Se mappa 10, forza la mappa a essere solo un boss
+    let schemaAlberoCorrente = schemaAlbero;
+    if (mappaAttuale === "mappa10") {
+        schemaAlberoCorrente = [1, 1]; // Start e Boss
+    } else if (mappaAttuale === "mappa9") {
+        schemaAlberoCorrente = [1, 1, 1, 1, 1]; // Start e 4 Boss
+    }
+
+    const ultimoPiano      = schemaAlberoCorrente.length - 1; // Piano boss
+    const penultimoPiano   = schemaAlberoCorrente.length - 2; // Piano medico/npc
 
     // Centro medico: posizione casuale tra i nodi del penultimo piano
-    const indiceMedicoUnico = Math.floor(Math.random() * schemaAlbero[penultimoPiano]);
+    const indiceMedicoUnico = penultimoPiano >= 0 ? Math.floor(Math.random() * schemaAlberoCorrente[penultimoPiano]) : -1;
 
-    for (let pianoIndex = 0; pianoIndex < schemaAlbero.length; pianoIndex++) {
-        const numNodi = schemaAlbero[pianoIndex];
+    for (let pianoIndex = 0; pianoIndex < schemaAlberoCorrente.length; pianoIndex++) {
+        const numNodi = schemaAlberoCorrente[pianoIndex];
         mappaEventi[pianoIndex] = [];
         const nodiDelPiano = [];
 
@@ -64,6 +72,9 @@ function generaMappaProcedurale() {
                 tipoEvento = "start"; // Dummy
             } else if (pianoIndex === ultimoPiano) {
                 // Ultimo piano: sempre boss
+                tipoEvento = "boss";
+            } else if (mappaAttuale === "mappa9") {
+                // Tutti i nodi su mappa 9 sono boss
                 tipoEvento = "boss";
             } else if (pianoIndex === penultimoPiano) {
                 // Penultimo piano: un unico centro-medico, gli altri npc
@@ -233,7 +244,14 @@ function generaMappaAlbero() {
     const contenitore = document.getElementById("albero-container");
     contenitore.innerHTML = "";
 
-    schemaAlbero.forEach((numNodi, pianoIndex) => {
+    let schemaAlberoCorrente = schemaAlbero;
+    if (mappaAttuale === "mappa10") {
+        schemaAlberoCorrente = [1, 1];
+    } else if (mappaAttuale === "mappa9") {
+        schemaAlberoCorrente = [1, 1, 1, 1, 1];
+    }
+
+    schemaAlberoCorrente.forEach((numNodi, pianoIndex) => {
         const divPiano = document.createElement("div");
         divPiano.className = "piano";
 
@@ -408,10 +426,20 @@ function avviaEvento(pianoSelezionato, indiceNodo, tipoEvento) {
     nodoSceltoAttuale  = indiceNodo;
     tipoEventoAttuale  = tipoEvento; // Salva per il level-up post-vittoria
 
-    // Nodo boss (ultimo piano)
+    // Nodo boss
     if (tipoEvento === "boss") {
         document.getElementById("titolo-incontro").innerText = `SFIDA BOSS\n-- PIANO ${pianoAttuale} --`;
-        const idBossCorrente = ARCHIVIO_MAPPE[mappaAttuale].idBoss;
+        let idBossCorrente = ARCHIVIO_MAPPE[mappaAttuale].idBoss;
+
+        if (mappaAttuale === "mappa9") {
+            if (pianoAttuale === 1) idBossCorrente = "9"; // Kul
+            else if (pianoAttuale === 2) idBossCorrente = "10"; // Gio
+            else if (pianoAttuale === 3) idBossCorrente = "12"; // Edo
+            else if (pianoAttuale === 4) idBossCorrente = "11"; // Sat
+        } else if (mappaAttuale === "mappa10") {
+            idBossCorrente = "13"; // Max
+        }
+
         avviaBossBattle(idBossCorrente);
         return;
     }
