@@ -637,7 +637,7 @@ function turnoNemico() {
                 messaggioSpeciale = "<br>\u2694\ufe0f <strong>Sat sfodera la sua Katana e passa alla Fase 2!</strong>";
             }
         } else if (nomeBoss === "edo") {
-            if (nemicoPokemon.attacchiSubitiEdo >= 5 && !nemicoPokemon.edoInFase2) {
+            if ((nemicoPokemon.hpAttuali <= nemicoPokemon.hpMax / 2 || nemicoPokemon.attacchiSubitiEdo >= 5) && !nemicoPokemon.edoInFase2) {
                 usaUlt = true;
                 messaggioSpeciale = "<br>\u2728 <strong>Il GYATT di Edo sprigiona energia e si trasforma in Oro e Rosa!</strong>";
             }
@@ -757,7 +757,7 @@ function turnoNemico() {
         };
 
         if (fase2Attivata) {
-            mostraWarningBoss(eseguiUlt);
+            mostraWarningBoss(eseguiUlt, nemicoPokemon.nome);
         } else {
             eseguiUlt();
         }
@@ -1200,6 +1200,17 @@ function gestisciVittoriaIncontro() {
 // ----------------------------------------------------------
 
 function eseguiAnimazioneUlt(pokemon, idElementoImg, callbackDanno) {
+    const videoMap = ["sat", "edo", "mattia", "savina", "maccioni", "dinicola", "donato", "gio", "max"];
+    let baseName = pokemon.nome.toLowerCase().replace(/ fase 2/g, "").replace(/ f[23]/g, "").replace(/\s+/g, "");
+    if (baseName.includes("dinicola")) baseName = "dinicola";
+    if (baseName.includes("max")) baseName = "max";
+    
+    if (videoMap.includes(baseName)) {
+        // Questi boss hanno un video MP4, non usare i frame .jpeg
+        if (callbackDanno) callbackDanno();
+        return;
+    }
+
     const totalFrames = pokemon.numFrameUlt || 3;
     let currentFrame  = 1;
     const elementoImg = document.getElementById(idElementoImg);
@@ -1624,5 +1635,86 @@ function eseguiAnimazioneAttaccoNormale(pokemon, isGiocatore, callback) {
                 if (callback) callback();
             }
         }, frameDuration);
+    }
+}
+
+
+// Mostra overlay warning boss
+function mostraWarningBoss(callback, nomeBoss) {
+    const warningDiv = document.getElementById("warning-overlay");
+    
+    let videoPath = null;
+    if (nomeBoss) {
+        let base = nomeBoss.toLowerCase().replace(/ fase 2/g, "").replace(/ f[23]/g, "").replace(/\s+/g, "");
+        const videoMap = {
+            "sat": "../Sprite/personaggi/Sat/SatUlt.mp4",
+            "edo": "../Sprite/personaggi/Edo/EdoULT.mp4",
+            "mattia": "../Sprite/personaggi/Mattia/MattiaULT.mp4",
+            "savina": "../Sprite/personaggi/Savina/SavinaULT.mp4",
+            "maccioni": "../Sprite/personaggi/Maccioni/MaccioniULT.mp4",
+            "dinicola": "../Sprite/personaggi/DiNicolaF2/DiNicolaULT.mp4",
+            "donato": "../Sprite/personaggi/Donato/DonatoULT.mp4",
+            "gio": "../Sprite/personaggi/Gio/GioULT.mp4",
+            "max": "../Sprite/personaggi/Max/MaxULT.mp4"
+        };
+        if (videoMap[base]) {
+            videoPath = videoMap[base];
+        }
+    }
+
+    const riproduciVideo = () => {
+        if (!videoPath) {
+            if (callback) callback();
+            return;
+        }
+        
+        let videoOverlay = document.getElementById("video-ult-overlay");
+        if (!videoOverlay) {
+            videoOverlay = document.createElement("div");
+            videoOverlay.id = "video-ult-overlay";
+            videoOverlay.style.position = "fixed";
+            videoOverlay.style.top = "0";
+            videoOverlay.style.left = "0";
+            videoOverlay.style.width = "100%";
+            videoOverlay.style.height = "100%";
+            videoOverlay.style.backgroundColor = "black";
+            videoOverlay.style.zIndex = "9999";
+            videoOverlay.style.display = "flex";
+            videoOverlay.style.justifyContent = "center";
+            videoOverlay.style.alignItems = "center";
+            
+            const video = document.createElement("video");
+            video.id = "video-ult-player";
+            video.style.width = "100%";
+            video.style.height = "100%";
+            video.style.objectFit = "contain";
+            video.onended = () => {
+                setTimeout(() => {
+                    videoOverlay.style.display = "none";
+                    if (callback) callback();
+                }, 1000); // 1s wait after video finishes
+            };
+            videoOverlay.appendChild(video);
+            document.body.appendChild(videoOverlay);
+        }
+        
+        const videoPlayer = document.getElementById("video-ult-player");
+        videoPlayer.src = videoPath;
+        videoOverlay.style.display = "flex";
+        videoPlayer.play().catch(e => {
+            console.error("Autoplay video bloccato:", e);
+            videoOverlay.style.display = "none";
+            if (callback) callback();
+        });
+    };
+
+    if (warningDiv) {
+        warningDiv.style.display = "flex";
+        setTimeout(() => {
+            warningDiv.style.display = "none";
+            riproduciVideo();
+        }, 3000);
+    } else {
+        riproduciVideo();
     }
 }
