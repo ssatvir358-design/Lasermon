@@ -46,6 +46,7 @@ function regolaVolume(valore) {
     const audio = document.getElementById("musica-gioco");
     if (audio) {
         audio.volume = valore;
+        localStorage.setItem('laserPoke_volume', valore);
         if (valore > 0) {
             document.getElementById("chk-muto").checked = false;
         }
@@ -66,6 +67,7 @@ function toggleMuto(isMuto) {
         audio.volume = volumePrecedente > 0 ? volumePrecedente : 0.25;
         slider.value = audio.volume;
     }
+    localStorage.setItem('laserPoke_volume', audio.volume);
 }
 
 // Callback checkbox autoskip
@@ -94,6 +96,11 @@ document.addEventListener("click", function() {
 document.addEventListener("DOMContentLoaded", function() {
     const audio = document.getElementById("musica-gioco");
     if (audio) {
-        audio.volume = 0.25; // Default iniziale dimezzato
+        const savedVolume = localStorage.getItem('laserPoke_volume');
+        if (savedVolume !== null) {
+            audio.volume = parseFloat(savedVolume);
+        } else {
+            audio.volume = 0.25; // Default iniziale dimezzato
+        }
     }
 });

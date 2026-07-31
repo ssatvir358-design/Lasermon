@@ -19,7 +19,14 @@ function getQuantitaZaino(dbId) {
 }
 
 /** Aggiunge 1 unità di un item allo zaino (raggruppa con eventuali esistenti). */
-function aggiungiAZaino(dbId) {
+function aggiungiAZaino(dbId, qty = 1) {
+    // Se è stato passato il nome dell'oggetto anziché l'ID, lo cerchiamo
+    let veroItem = getOggettoDb(dbId);
+    if (!veroItem) {
+        veroItem = oggettiDatabase.find(o => o.nome.toLowerCase() === dbId.toLowerCase());
+        if (veroItem) dbId = veroItem.id;
+    }
+
     if (typeof isRunVeloce !== "undefined" && isRunVeloce) {
         const itemObj = getOggettoDb(dbId);
         if (itemObj && itemObj.categoria === "consumabile") {
@@ -42,9 +49,9 @@ function aggiungiAZaino(dbId) {
 
     const entry = zaino.find(e => e.dbId === dbId);
     if (entry) {
-        entry.quantita++;
+        entry.quantita += qty;
     } else {
-        zaino.push({ dbId, quantita: 1 });
+        zaino.push({ dbId, quantita: qty });
     }
     
     // Aggiorna l'interfaccia persistente dello zaino se siamo sulla mappa
@@ -388,6 +395,13 @@ function acquistaItem(dbId, quantita = 1) {
         det.appendChild(feedback);
     }
     
+    // Disabilita e nasconde il bottone per evitare doppi click
+    const btnAcquista = document.getElementById("btn-acquista");
+    if (btnAcquista) {
+        btnAcquista.disabled = true;
+        btnAcquista.style.display = "none";
+    }
+    
     // Rimanda alla mappa automaticamente dopo l'acquisto
     setTimeout(() => {
         chiudiNegozio();
@@ -476,7 +490,7 @@ function _renderPannelloItemBattaglia() {
             const cfg = getOggettoDb(entry.dbId);
             if (!cfg) return;
             contenuto += `
-                <div class="pannello-item-row" onclick="usaItemInBattaglia('${entry.dbId}')">
+                <div class="pannello-item-row" onclick="preparaUsoItemInBattaglia('${entry.dbId}')">
                     <img src="${cfg.icona}" class="p-icona"
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';"
                          alt="${cfg.nome}">
@@ -492,20 +506,87 @@ function _renderPannelloItemBattaglia() {
 }
 
 /**
- * Usa un item dallo zaino in battaglia.
- * Applica l'effetto a mioPokemon, poi aggiorna UI senza consumare il turno.
+ * Mostra la schermata di selezione del Pokémon a cui applicare l'oggetto in battaglia.
  * @param {string} dbId - id dell'item da usare
  */
-function usaItemInBattaglia(dbId) {
+function preparaUsoItemInBattaglia(dbId) {
     const cfg = getOggettoDb(dbId);
     if (!cfg) return;
+
+    const pannello = document.getElementById("pannello-item-battaglia");
+    if (!pannello) return;
+
+    let contenuto = `
+        <div class="pannello-item-titolo">
+            \u{1f392} USA SU:
+            <span onclick="apriPannelloItemBattaglia()" style="cursor:pointer; font-size:14px; color:#aaa;">\u2B05 INDIETRO</span>
+        </div>
+    `;
+
+    miaSquadra.forEach((p, i) => {
+        if (!p) return;
+        
+        let pathImmagine = p.immagine;
+        let pName = p.nome;
+        let hpStr = `HP: ${p.hpAttuali}/${p.hpMax}`;
+
+        // Controlla se il target è KO o con HP massimi
+        let canUse = true;
+        let msgError = "";
+        
+        if (cfg.effettoSpeciale === "revive") {
+            if (p.hpAttuali > 0) {
+                canUse = false;
+                msgError = "Non \u00e8 KO";
+            }
+        } else {
+            if (p.hpAttuali <= 0) {
+                canUse = false;
+                msgError = "Il Pok\u00e9mon \u00e8 KO";
+            } else if (p.hpAttuali >= p.hpMax && (!cfg.effettoSpeciale || !cfg.effettoSpeciale.includes("rimuovi"))) {
+                canUse = false;
+                msgError = "HP gi\u00e0 al max";
+            }
+        }
+
+        const opacity = canUse ? "1" : "0.5";
+        const onclickAttr = canUse ? `onclick="confermaUsoItemInBattaglia('${dbId}', ${i})"` : "";
+        const styleText = canUse ? "" : `text-decoration: line-through; color: #888;`;
+
+        contenuto += `
+            <div class="zaino-battaglia-row" style="opacity: ${opacity};" ${onclickAttr}>
+                <div class="zaino-battaglia-icon" style="background-image: url('${pathImmagine}');"></div>
+                <div class="zaino-battaglia-info">
+                    <span style="font-weight: bold; ${styleText}">${pName}</span>
+                    <span>${hpStr}</span>
+                    ${msgError ? `<span style="color:#ff6b6b; font-size:10px;">${msgError}</span>` : ""}
+                </div>
+            </div>
+        `;
+    });
+
+    pannello.innerHTML = contenuto;
+}
+
+/**
+ * Usa un item dallo zaino in battaglia su un Pokémon specifico.
+ * @param {string} dbId - id dell'item da usare
+ * @param {number} indexPokemon - Indice in miaSquadra del Pokémon bersaglio
+ */
+function confermaUsoItemInBattaglia(dbId, indexPokemon) {
+    const cfg = getOggettoDb(dbId);
+    if (!cfg) return;
+    
+    let target = miaSquadra[indexPokemon];
+    if (!target) return;
+
     if (!rimuoviDaZaino(dbId)) return; // Fallback sicurezza
 
     // Traccia utilizzo per fight
     itemUsatiInFight[dbId] = (itemUsatiInFight[dbId] || 0) + 1;
 
     // Applica effetto
-    const msg = applicaEffettoItem(cfg, mioPokemon);
+    const msg = applicaEffettoItem(cfg, target);
 
     // Aggiorna flag turno (1 item per turno)
     itemUsatiQuestoTurno = true;
@@ -514,10 +595,13 @@ function usaItemInBattaglia(dbId) {
     // Messaggio in console-log
     const logEl = document.getElementById("console-log");
     if (logEl) {
-        logEl.innerHTML += `<br>\u{1f392} <strong>${cfg.nome}</strong> usato! ${msg}`;
+        logEl.innerHTML += `<br>\u{1f392} <strong>${cfg.nome}</strong> usato su ${target.nome}! ${msg}`;
     }
 
+    // Se stiamo curando il pokémon attualmente in campo, o un pokemon nella squadra, aggiorniamo la grafica
     aggiornaGrafica();
+    
+    // Chiudi il pannello (che ora è una finestra modale al centro dello schermo)
     chiudiPannelloItemBattaglia();
 }
 

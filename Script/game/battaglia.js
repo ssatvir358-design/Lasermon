@@ -1,3 +1,4 @@
+const trasformazioniKulViste = new Set();
 // ==========================================================
 // battaglia.js — Sistema di combattimento
 // Dipendenze: stato.js, pokemon_factory.js, schermate.js, audio.js, negozio.js
@@ -288,10 +289,26 @@ function preparaIncontroBattaglia(tipoEvento, elementoFiltro = null) {
     const latoGio  = document.querySelector(".lato-giocatore");
     const latoNem  = document.querySelector(".lato-nemico");
 
-    const folderGio = getSpriteName(mioPokemon.nome);
-    const folderNem = getSpriteName(nemicoPokemon.nome);
-    imgVSGio.src = `../Sprite/personaggi/${folderGio}/${folderGio}VS.png`;
-    imgVSNem.src = `../Sprite/personaggi/${folderNem}/${folderNem}VS.png`;
+    function getVsImgPath(p) {
+        if (!p) return "";
+        if (p.immagineVS) return p.immagineVS;
+        if (p.immagine) {
+            const lastSlash = p.immagine.lastIndexOf('/');
+            if (lastSlash !== -1) {
+                const folder = p.immagine.substring(0, lastSlash);
+                const folderName = folder.substring(folder.lastIndexOf('/') + 1);
+                return `${folder}/${folderName}VS.png`;
+            }
+        }
+        const f = getSpriteName(p.nome);
+        return `../Sprite/personaggi/${f}/${f}VS.png`;
+    }
+
+    imgVSGio.onerror = function() { if (this.src.endsWith('.png')) this.src = this.src.replace('.png', '.jpeg'); };
+    imgVSNem.onerror = function() { if (this.src.endsWith('.png')) this.src = this.src.replace('.png', '.jpeg'); };
+
+    imgVSGio.src = getVsImgPath(mioPokemon);
+    imgVSNem.src = getVsImgPath(nemicoPokemon);
 
     latoGio.classList.remove("entra");
     latoNem.classList.remove("entra");
@@ -381,7 +398,7 @@ function turnoGiocatore() {
 // ----------------------------------------------------------
 
 function calcolaEdEseguiDannoGiocatore(moltMossa, nomeMossaUsata) {
-    const moltiplicatoreTipo = CONFIG_DEBOLEZZE[mioPokemon.elemento]?.[nemicoPokemon.elemento] || 1.0;
+    const moltiplicatoreTipo = CONFIG_DEBOLEZZE[mioPokemon.elemento.toLowerCase()]?.[nemicoPokemon.elemento.toLowerCase()] ?? 1.0;
 
     // --- SCHIVATA NEMICO ---
     const isUlt = moltMossa >= 3.0;
@@ -434,7 +451,8 @@ function calcolaEdEseguiDannoGiocatore(moltMossa, nomeMossaUsata) {
     if (effettiAttivi.giocatore.difesaRidotta) modDanno -= effettiAttivi.giocatore.difesaRidotta.percentuale;
     if (effettiAttivi.nemico.provocato) modDanno += effettiAttivi.nemico.provocato.percentuale;
     
-    let dannoFatto = Math.max(1, Math.round(dannoBase * moltiplicatoreTipo * moltMossa * modDanno));
+    let dannoFatto = Math.round(dannoBase * moltiplicatoreTipo * moltMossa * modDanno);
+    if (dannoFatto < 1 && moltiplicatoreTipo > 0) dannoFatto = 1;
 
     // --- MECCANICHE EDO (Gyatt) ---
     if (nemicoPokemon.boss && nemicoPokemon.nome.toLowerCase() === "edo") {
@@ -501,8 +519,8 @@ function calcolaEdEseguiDannoGiocatore(moltMossa, nomeMossaUsata) {
 
     processaEffettiFineTurno(mioPokemon, false);
     
-    // Controlla trigger Fase 2 Mini Boss
-    if (nemicoPokemon.isMiniboss && !nemicoPokemon.inFase2 && nemicoPokemon.hpAttuali > 0 && nemicoPokemon.hpAttuali <= (nemicoPokemon.hpMax / 2)) {
+    // Controlla trigger Fase 2 Nemico (Boss e Miniboss)
+    if ((nemicoPokemon.isMiniboss || nemicoPokemon.boss) && !nemicoPokemon.inFase2 && nemicoPokemon.hpAttuali > 0 && nemicoPokemon.hpAttuali <= (nemicoPokemon.hpMax / 2)) {
         if (attivaFase2MiniBoss()) {
             return; // Interrompe il normale flusso (la fase 2 gestirà il proseguo)
         }
@@ -516,13 +534,20 @@ function calcolaEdEseguiDannoGiocatore(moltMossa, nomeMossaUsata) {
     }
 }
 
-// Funzione per attivare la Fase 2 del Mini Boss
 function attivaFase2MiniBoss() {
     let idF2 = null;
-    if (nemicoPokemon.nome === "Maccioni") idF2 = "Maccione F2";
-    else if (nemicoPokemon.nome === "Savina") idF2 = "Savina F2";
+    let videoTrasformazione = null;
+    if (nemicoPokemon.nome === "Maccioni") idF2 = "Maccioni F2";
+    else if (nemicoPokemon.nome === "Savina") {
+        idF2 = "Savina F2";
+        videoTrasformazione = "../Sprite/personaggi/Savina/SavinaULT.mp4";
+    }
     else if (nemicoPokemon.nome === "Mattia") idF2 = "Mattia F2";
     else if (nemicoPokemon.nome === "Danilo") idF2 = "Danilo F2";
+    else if (nemicoPokemon.nome === "DiNicola") {
+        idF2 = "DiNicola F2";
+        videoTrasformazione = "../Sprite/personaggi/DiNicola/DiNicolaULT.mp4";
+    }
     
     if (!idF2) return false; // Graziani o altri senza F2
     
@@ -544,8 +569,14 @@ function attivaFase2MiniBoss() {
         
     aggiornaGrafica();
     
-    // Prosegue col turno nemico
-    setTimeout(turnoNemico, isSkipAttivo ? 1000 : 2000);
+    // Prosegue col turno nemico, eventuale video di trasformazione
+    if (videoTrasformazione && !isSkipAttivo) {
+        riproduciVideoSchermoIntero(videoTrasformazione, () => {
+            setTimeout(turnoNemico, 500);
+        });
+    } else {
+        setTimeout(turnoNemico, isSkipAttivo ? 1000 : 2000);
+    }
     return true;
 }
 
@@ -612,15 +643,46 @@ function turnoNemico() {
         
         // --- MECCANICHE KUL ---
         if (nomeBoss === "kul") {
+            const vecchiaForma = nemicoPokemon.kulForm || "umano";
             const rnd = Math.random();
-            if (rnd < 0.40) {
-                cambiaFormaKul("gattino");
-            } else if (rnd < 0.80) {
-                cambiaFormaKul("umano");
+            let nuovaForma;
+            if (rnd < 0.40) nuovaForma = "gattino";
+            else if (rnd < 0.80) nuovaForma = "umano";
+            else nuovaForma = "jaguar";
+
+            const cambiaEAttacca = () => {
+                cambiaFormaKul(nuovaForma);
+                eseguiAttaccoNormaleNemico();
+            };
+
+            if (vecchiaForma !== nuovaForma) {
+                // Forma cambiata: mostra WARNING poi video (la prima volta), poi cambia e attacca
+                const transizioneKey = `${vecchiaForma} a ${nuovaForma}`;
+                const videoFile = `../Sprite/personaggi/KulF2/trasformazioni/${transizioneKey}.mp4`;
+                const warningDiv = document.getElementById("warning-overlay");
+
+                if (!trasformazioniKulViste.has(transizioneKey)) {
+                    trasformazioniKulViste.add(transizioneKey);
+                    // Prima volta: mostra warning 3s poi video poi attacca
+                    if (warningDiv) {
+                        warningDiv.style.display = "flex";
+                        setTimeout(() => {
+                            warningDiv.style.display = "none";
+                            riproduciVideoSchermoIntero(videoFile, cambiaEAttacca);
+                        }, 3000);
+                    } else {
+                        riproduciVideoSchermoIntero(videoFile, cambiaEAttacca);
+                    }
+                } else {
+                    // Vista già: cambio forma istantaneo e attacca
+                    cambiaEAttacca();
+                }
             } else {
-                cambiaFormaKul("jaguar");
+                // Stessa forma: nessun video, attacca direttamente
+                cambiaFormaKul(nuovaForma);
+                eseguiAttaccoNormaleNemico();
             }
-            // Kul non ha Phase 2 (niente ult)
+            return; // Il flusso prosegue in cambiaEAttacca / eseguiAttaccoNormaleNemico
         } else if (nomeBoss === "filippo" || nomeBoss === "filippo fase 2") {
             const ceCarraNelTeam = miaSquadra.some(p => p && p.nome.toLowerCase() === "carra");
             if (ceCarraNelTeam) {
@@ -673,7 +735,7 @@ function turnoNemico() {
                     nemicoPokemon.hpAttuali = Math.max(1, Math.round((vecchiHpAttuali / vecchiHpMax) * nemicoPokemon.hpMax));
                 }
                 fase2Attivata = true;
-            } else if (!nemicoPokemon.maxFase2 && !nemicoPokemon.maxFase3) {
+            } else if (!nemicoPokemon.maxFase2 && !nemicoPokemon.maxFase3 && nemicoPokemon.hpAttuali <= nemicoPokemon.hpMax * (2/3)) {
                 nemicoPokemon.maxFase2 = true;
                 const datiFase2 = pokemonDatabase.find(p => p.nome.toLowerCase() === "max f2");
                 if (datiFase2) {
@@ -763,110 +825,115 @@ function turnoNemico() {
         }
         return;
     } else {
-        // Attacco normale
-        let isSplashSat = false;
-        let atkImgBackup = null;
-        let originalFrameAtk = nemicoPokemon.frameAtk || 1;
-        let customMoltMossa = null;
-        let nomeMossa = getNomeMossaAttuale(nemicoPokemon);
-
-        if (nemicoPokemon.nome.toLowerCase().startsWith("max")) {
-            if (!nemicoPokemon.maxFase3 && nemicoPokemon.hpAttuali <= nemicoPokemon.hpMax * (1/3)) {
-                nemicoPokemon.maxFase3 = true;
-                const datiFase3 = pokemonDatabase.find(p => p.nome.toLowerCase() === "max f3");
-                if (datiFase3) {
-                    const nuovoP = creaPokemon(datiFase3, nemicoPokemon.livello, nemicoPokemon.livelloMossa);
-                    const vecchiHpMax = nemicoPokemon.hpMax;
-                    const vecchiHpAttuali = nemicoPokemon.hpAttuali;
-                    Object.assign(nemicoPokemon, {
-                        nome: "MAX F3",
-                        atk: nuovoP.atk, atkSpec: nuovoP.atkSpec, def: nuovoP.def, defSpec: nuovoP.defSpec, vel: nuovoP.vel,
-                        hpMax: nuovoP.hpMax, elemento: nuovoP.elemento,
-                        immagine: nuovoP.immagine, immagineAtk: nuovoP.immagineAtk, frameAtk: 1, mossaULT: datiFase3.mossaLvl3 || "Attacco 1"
-                    });
-                    nemicoPokemon.hpAttuali = Math.max(1, Math.round((vecchiHpAttuali / vecchiHpMax) * nemicoPokemon.hpMax));
-                }
-                fase2Attivata = true;
-            } else if (!nemicoPokemon.maxFase2 && !nemicoPokemon.maxFase3) {
-                nemicoPokemon.maxFase2 = true;
-                const datiFase2 = pokemonDatabase.find(p => p.nome.toLowerCase() === "max f2");
-                if (datiFase2) {
-                    const nuovoP = creaPokemon(datiFase2, nemicoPokemon.livello, nemicoPokemon.livelloMossa);
-                    const vecchiHpMax = nemicoPokemon.hpMax;
-                    const vecchiHpAttuali = nemicoPokemon.hpAttuali;
-                    Object.assign(nemicoPokemon, {
-                        nome: "MAX F2",
-                        atk: nuovoP.atk, atkSpec: nuovoP.atkSpec, def: nuovoP.def, defSpec: nuovoP.defSpec, vel: nuovoP.vel,
-                        hpMax: nuovoP.hpMax, elemento: nuovoP.elemento,
-                        immagine: nuovoP.immagine, immagineAtk: nuovoP.immagineAtk, frameAtk: 1, mossaULT: datiFase2.mossaLvl3 || "Attacco 1"
-                    });
-                    nemicoPokemon.hpAttuali = Math.max(1, Math.round((vecchiHpAttuali / vecchiHpMax) * nemicoPokemon.hpMax));
-                }
-                fase2Attivata = true;
-            }
-        } else if (nemicoPokemon.nome.toLowerCase() === "sat" && !nemicoPokemon.satInFase2) {
-            if (Math.random() < 0.30) {
-                isSplashSat = true;
-                atkImgBackup = nemicoPokemon.immagineAtk;
-                nemicoPokemon.immagineAtk = "../Sprite/personaggi/Sat/Sat_atkAOE.jpeg";
-                nemicoPokemon.frameAtk = 1;
-                effettiAttivi.nemico.defRidotta = { percentuale: 0.15, durata: 1, isSatCustom: true };
-            }
-        } else if (nemicoPokemon.nome.toLowerCase() === "gio") {
-            atkImgBackup = nemicoPokemon.immagineAtk;
-            const rand = Math.random();
-            if (nemicoPokemon.gioInFase2) {
-                if (rand < 0.5) {
-                    nomeMossa = "Lancia";
-                    customMoltMossa = 1.20;
-                    nemicoPokemon.immagineAtk = "../Sprite/personaggi/GioF2/GioF2_Lancia.jpeg";
-                    nemicoPokemon.frameAtk = 4;
-                } else {
-                    nomeMossa = "Raggio";
-                    customMoltMossa = 1.50;
-                    nemicoPokemon.immagineAtk = "../Sprite/personaggi/GioF2/GioF2_Raggio.jpeg";
-                    nemicoPokemon.frameAtk = 3;
-                }
-            } else {
-                if (rand < 0.33) {
-                    nomeMossa = "Pugni";
-                    customMoltMossa = 0.80;
-                    nemicoPokemon.immagineAtk = "../Sprite/personaggi/Gio/Gio_Pugno.jpeg";
-                    nemicoPokemon.frameAtk = 2;
-                } else if (rand < 0.66) {
-                    nomeMossa = "Sfera";
-                    customMoltMossa = 1.25;
-                    nemicoPokemon.immagineAtk = "../Sprite/personaggi/Gio/Gio_Sfera.jpeg";
-                    nemicoPokemon.frameAtk = 3;
-                } else {
-                    nomeMossa = "Raggio";
-                    customMoltMossa = 1.00;
-                    nemicoPokemon.immagineAtk = "../Sprite/personaggi/Gio/Gio_Raggio.jpeg";
-                    nemicoPokemon.frameAtk = 3;
-                }
-            }
-        }
-
-        if (nemicoPokemon.satInFase2) {
-             nomeMossa = "Colpo di Katana";
-        } else if (isSplashSat) {
-             nomeMossa = "Colpo Potente Splash";
-        }
-
-        eseguiAnimazioneAttaccoNormale(nemicoPokemon, false, () => {
-            if (atkImgBackup) {
-                nemicoPokemon.immagineAtk = atkImgBackup;
-                nemicoPokemon.frameAtk = originalFrameAtk;
-            }
-            if (!mioPokemon) return;
-            const moltMossa = customMoltMossa !== null ? customMoltMossa : (CONFIG_MOSSE[nemicoPokemon.livelloMossa] || 1.0);
-            calcolaEdEseguiDannoNemico(moltMossa, nomeMossa, isSplashSat);
-        });
+        eseguiAttaccoNormaleNemico();
     }
 }
 
+function eseguiAttaccoNormaleNemico() {
+    if (!nemicoPokemon || nemicoPokemon.hpAttuali <= 0 || !mioPokemon) return;
+
+    let isSplashSat = false;
+    let atkImgBackup = null;
+    let originalFrameAtk = nemicoPokemon.frameAtk || 1;
+    let customMoltMossa = null;
+    let nomeMossa = getNomeMossaAttuale(nemicoPokemon);
+
+    if (nemicoPokemon.nome.toLowerCase().startsWith("max")) {
+        if (!nemicoPokemon.maxFase3 && nemicoPokemon.hpAttuali <= nemicoPokemon.hpMax * (1/3)) {
+            nemicoPokemon.maxFase3 = true;
+            const datiFase3 = pokemonDatabase.find(p => p.nome.toLowerCase() === "max f3");
+            if (datiFase3) {
+                const nuovoP = creaPokemon(datiFase3, nemicoPokemon.livello, nemicoPokemon.livelloMossa);
+                const vecchiHpMax = nemicoPokemon.hpMax;
+                const vecchiHpAttuali = nemicoPokemon.hpAttuali;
+                Object.assign(nemicoPokemon, {
+                    nome: "MAX F3",
+                    atk: nuovoP.atk, atkSpec: nuovoP.atkSpec, def: nuovoP.def, defSpec: nuovoP.defSpec, vel: nuovoP.vel,
+                    hpMax: nuovoP.hpMax, elemento: nuovoP.elemento,
+                    immagine: nuovoP.immagine, immagineAtk: nuovoP.immagineAtk, frameAtk: 1, mossaULT: datiFase3.mossaLvl3 || "Attacco 1"
+                });
+                nemicoPokemon.hpAttuali = Math.max(1, Math.round((vecchiHpAttuali / vecchiHpMax) * nemicoPokemon.hpMax));
+            }
+            fase2Attivata = true;
+        } else if (!nemicoPokemon.maxFase2 && !nemicoPokemon.maxFase3 && nemicoPokemon.hpAttuali <= nemicoPokemon.hpMax * (2/3)) {
+            nemicoPokemon.maxFase2 = true;
+            const datiFase2 = pokemonDatabase.find(p => p.nome.toLowerCase() === "max f2");
+            if (datiFase2) {
+                const nuovoP = creaPokemon(datiFase2, nemicoPokemon.livello, nemicoPokemon.livelloMossa);
+                const vecchiHpMax = nemicoPokemon.hpMax;
+                const vecchiHpAttuali = nemicoPokemon.hpAttuali;
+                Object.assign(nemicoPokemon, {
+                    nome: "MAX F2",
+                    atk: nuovoP.atk, atkSpec: nuovoP.atkSpec, def: nuovoP.def, defSpec: nuovoP.defSpec, vel: nuovoP.vel,
+                    hpMax: nuovoP.hpMax, elemento: nuovoP.elemento,
+                    immagine: nuovoP.immagine, immagineAtk: nuovoP.immagineAtk, frameAtk: 1, mossaULT: datiFase2.mossaLvl3 || "Attacco 1"
+                });
+                nemicoPokemon.hpAttuali = Math.max(1, Math.round((vecchiHpAttuali / vecchiHpMax) * nemicoPokemon.hpMax));
+            }
+            fase2Attivata = true;
+        }
+    } else if (nemicoPokemon.nome.toLowerCase() === "sat" && !nemicoPokemon.satInFase2) {
+        if (Math.random() < 0.30) {
+            isSplashSat = true;
+            atkImgBackup = nemicoPokemon.immagineAtk;
+            nemicoPokemon.immagineAtk = "../Sprite/personaggi/Sat/Sat_atkAOE.jpeg";
+            nemicoPokemon.frameAtk = 1;
+            effettiAttivi.nemico.defRidotta = { percentuale: 0.15, durata: 1, isSatCustom: true };
+        }
+    } else if (nemicoPokemon.nome.toLowerCase() === "gio") {
+        atkImgBackup = nemicoPokemon.immagineAtk;
+        const rand = Math.random();
+        if (nemicoPokemon.gioInFase2) {
+            if (rand < 0.5) {
+                nomeMossa = "Lancia";
+                customMoltMossa = 1.20;
+                nemicoPokemon.immagineAtk = "../Sprite/personaggi/GioF2/GioF2_Lancia.jpeg";
+                nemicoPokemon.frameAtk = 4;
+            } else {
+                nomeMossa = "Raggio";
+                customMoltMossa = 1.50;
+                nemicoPokemon.immagineAtk = "../Sprite/personaggi/GioF2/GioF2_Raggio.jpeg";
+                nemicoPokemon.frameAtk = 3;
+            }
+        } else {
+            if (rand < 0.33) {
+                nomeMossa = "Pugni";
+                customMoltMossa = 0.80;
+                nemicoPokemon.immagineAtk = "../Sprite/personaggi/Gio/Gio_Pugno.jpeg";
+                nemicoPokemon.frameAtk = 2;
+            } else if (rand < 0.66) {
+                nomeMossa = "Sfera";
+                customMoltMossa = 1.25;
+                nemicoPokemon.immagineAtk = "../Sprite/personaggi/Gio/Gio_Sfera.jpeg";
+                nemicoPokemon.frameAtk = 3;
+            } else {
+                nomeMossa = "Raggio";
+                customMoltMossa = 1.00;
+                nemicoPokemon.immagineAtk = "../Sprite/personaggi/Gio/Gio_Raggio.jpeg";
+                nemicoPokemon.frameAtk = 3;
+            }
+        }
+    }
+
+    if (nemicoPokemon.satInFase2) {
+         nomeMossa = "Colpo di Katana";
+    } else if (isSplashSat) {
+         nomeMossa = "Colpo Potente Splash";
+    }
+
+    eseguiAnimazioneAttaccoNormale(nemicoPokemon, false, () => {
+        if (atkImgBackup) {
+            nemicoPokemon.immagineAtk = atkImgBackup;
+            nemicoPokemon.frameAtk = originalFrameAtk;
+        }
+        if (!mioPokemon) return;
+        const moltMossa = customMoltMossa !== null ? customMoltMossa : (CONFIG_MOSSE[nemicoPokemon.livelloMossa] || 1.0);
+        calcolaEdEseguiDannoNemico(moltMossa, nomeMossa, isSplashSat);
+    });
+}
+
 function calcolaEdEseguiDannoNemico(moltMossa, nomeMossaUsata, isSplashSat = false) {
-    const moltiplicatoreTipo = CONFIG_DEBOLEZZE[nemicoPokemon.elemento]?.[mioPokemon.elemento] || 1.0;
+    const moltiplicatoreTipo = CONFIG_DEBOLEZZE[nemicoPokemon.elemento.toLowerCase()]?.[mioPokemon.elemento.toLowerCase()] ?? 1.0;
 
     // --- SCHIVATA GIOCATORE ---
     const isUlt = moltMossa >= 3.0;
@@ -920,7 +987,8 @@ function calcolaEdEseguiDannoNemico(moltMossa, nomeMossaUsata, isSplashSat = fal
     if (effettiAttivi.nemico.difesaRidotta && !effettiAttivi.nemico.difesaRidotta.isSatCustom) modDanno -= effettiAttivi.nemico.difesaRidotta.percentuale;
     if (effettiAttivi.giocatore.provocato) modDanno += effettiAttivi.giocatore.provocato.percentuale;
     
-    let dannoFatto = Math.max(1, Math.round(dannoBase * moltiplicatoreTipo * moltMossa * modDanno));
+    let dannoFatto = Math.round(dannoBase * moltiplicatoreTipo * moltMossa * modDanno);
+    if (dannoFatto < 1 && moltiplicatoreTipo > 0) dannoFatto = 1;
 
     let dannoSingoloPanchina = 0;
     if (isSplashSat) {
@@ -1074,6 +1142,8 @@ function gestisciVittoriaIncontro() {
         livUpGuadagnati = CONFIG_LEVEL_UP.boss;
     } else if (tipoEventoAttuale === "miniboss") {
         livUpGuadagnati = 3; // I mini boss danno +3 livelli a tutta la squadra
+        // Cura tutta la squadra al 100% dopo un miniboss
+        miaSquadra.forEach(p => { if (p) p.hpAttuali = p.hpMax; });
     } else if (tipoEventoAttuale === "cespuglio") {
         livUpGuadagnati = CONFIG_LEVEL_UP.cespuglio;
     } else if (tipoEventoAttuale === "npc") {
@@ -1145,8 +1215,24 @@ function gestisciVittoriaIncontro() {
 
     // --- GESTIONE BOSS (avanzamento mappa) ---
     if (isBossFight) {
-        // Se arrivo qui, o non \u00e8 mappa9, oppure il gauntlet di mappa 9 \u00e8 concluso (Max sconfitto)
         isBossFight = false;
+
+        // Se c'è un callback post-vittoria boss (es. sequenza Bombers), invocalo
+        if (typeof _dopoVittoriaBoss === "function") {
+            const cb = _dopoVittoriaBoss;
+            _dopoVittoriaBoss = null;
+            setTimeout(() => {
+                // Ripristina pulsanti per il prossimo scontro
+                document.getElementById("btn-attacco").style.display = "";
+                document.getElementById("btn-item").style.display = "";
+                document.getElementById("btn-pokemon").style.display = "";
+                document.getElementById("btn-fuga").style.display = "";
+                cb();
+            }, isSkipAttivo ? 1500 : 3000);
+            return;
+        }
+
+        // Altrimenti: avanzamento mappa normale
         const chiaviMappe    = Object.keys(ARCHIVIO_MAPPE);
         const indiceProssimo = chiaviMappe.indexOf(mappaAttuale) + 1;
 
@@ -1640,22 +1726,74 @@ function eseguiAnimazioneAttaccoNormale(pokemon, isGiocatore, callback) {
 
 
 // Mostra overlay warning boss
+function riproduciVideoSchermoIntero(src, callback) {
+    if (!src) {
+        if (callback) callback();
+        return;
+    }
+    
+    let videoOverlay = document.getElementById("video-ult-overlay");
+    if (!videoOverlay) {
+        videoOverlay = document.createElement("div");
+        videoOverlay.id = "video-ult-overlay";
+        videoOverlay.style.position = "fixed";
+        videoOverlay.style.top = "0";
+        videoOverlay.style.left = "0";
+        videoOverlay.style.width = "100%";
+        videoOverlay.style.height = "100%";
+        videoOverlay.style.backgroundColor = "black";
+        videoOverlay.style.zIndex = "9999";
+        videoOverlay.style.display = "flex";
+        videoOverlay.style.justifyContent = "center";
+        videoOverlay.style.alignItems = "center";
+        
+        const video = document.createElement("video");
+        video.id = "video-ult-player";
+        video.style.width = "100%";
+        video.style.height = "100%";
+        video.style.objectFit = "contain";
+        videoOverlay.appendChild(video);
+        document.body.appendChild(videoOverlay);
+    }
+
+    const videoPlayer = document.getElementById("video-ult-player");
+    videoPlayer.src = src;
+    videoPlayer.onended = () => {
+        setTimeout(() => {
+            videoOverlay.style.display = "none";
+            if (callback) callback();
+        }, 1000);
+    };
+    videoOverlay.style.display = "flex";
+    videoPlayer.play().catch(e => {
+        console.error("Autoplay video bloccato:", e);
+        videoOverlay.style.display = "none";
+        if (callback) callback();
+    });
+}
+
 function mostraWarningBoss(callback, nomeBoss) {
     const warningDiv = document.getElementById("warning-overlay");
     
     let videoPath = null;
     if (nomeBoss) {
-        let base = nomeBoss.toLowerCase().replace(/ fase 2/g, "").replace(/ f[23]/g, "").replace(/\s+/g, "");
+        let base = nomeBoss.toLowerCase().replace(/ fase 2/g, "").replace(/\s+/g, "");
+        if (!base.startsWith("max")) {
+            base = base.replace(/f[23]/g, "");
+        }
+        
         const videoMap = {
-            "sat": "../Sprite/personaggi/Sat/SatUlt.mp4",
+            "sat": "../Sprite/personaggi/Sat/SatULT.mp4",
             "edo": "../Sprite/personaggi/Edo/EdoULT.mp4",
             "mattia": "../Sprite/personaggi/Mattia/MattiaULT.mp4",
             "savina": "../Sprite/personaggi/Savina/SavinaULT.mp4",
             "maccioni": "../Sprite/personaggi/Maccioni/MaccioniULT.mp4",
-            "dinicola": "../Sprite/personaggi/DiNicolaF2/DiNicolaULT.mp4",
+            "dinicola": "../Sprite/personaggi/DiNicola/DiNicolaULT.mp4",
             "donato": "../Sprite/personaggi/Donato/DonatoULT.mp4",
             "gio": "../Sprite/personaggi/Gio/GioULT.mp4",
-            "max": "../Sprite/personaggi/Max/MaxULT.mp4"
+            "max": "../Sprite/personaggi/Max/MaxULT.mp4",
+            "maxf2": "../Sprite/personaggi/Max/MaxULT.mp4",
+            "maxf3": "../Sprite/personaggi/MaxF2/MaxF2ULT.mp4"
         };
         if (videoMap[base]) {
             videoPath = videoMap[base];
@@ -1663,49 +1801,7 @@ function mostraWarningBoss(callback, nomeBoss) {
     }
 
     const riproduciVideo = () => {
-        if (!videoPath) {
-            if (callback) callback();
-            return;
-        }
-        
-        let videoOverlay = document.getElementById("video-ult-overlay");
-        if (!videoOverlay) {
-            videoOverlay = document.createElement("div");
-            videoOverlay.id = "video-ult-overlay";
-            videoOverlay.style.position = "fixed";
-            videoOverlay.style.top = "0";
-            videoOverlay.style.left = "0";
-            videoOverlay.style.width = "100%";
-            videoOverlay.style.height = "100%";
-            videoOverlay.style.backgroundColor = "black";
-            videoOverlay.style.zIndex = "9999";
-            videoOverlay.style.display = "flex";
-            videoOverlay.style.justifyContent = "center";
-            videoOverlay.style.alignItems = "center";
-            
-            const video = document.createElement("video");
-            video.id = "video-ult-player";
-            video.style.width = "100%";
-            video.style.height = "100%";
-            video.style.objectFit = "contain";
-            video.onended = () => {
-                setTimeout(() => {
-                    videoOverlay.style.display = "none";
-                    if (callback) callback();
-                }, 1000); // 1s wait after video finishes
-            };
-            videoOverlay.appendChild(video);
-            document.body.appendChild(videoOverlay);
-        }
-        
-        const videoPlayer = document.getElementById("video-ult-player");
-        videoPlayer.src = videoPath;
-        videoOverlay.style.display = "flex";
-        videoPlayer.play().catch(e => {
-            console.error("Autoplay video bloccato:", e);
-            videoOverlay.style.display = "none";
-            if (callback) callback();
-        });
+        riproduciVideoSchermoIntero(videoPath, callback);
     };
 
     if (warningDiv) {

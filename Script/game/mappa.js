@@ -48,10 +48,9 @@ function generaMappaProcedurale() {
     // Se mappa 10, forza la mappa a essere solo un boss
     let schemaAlberoCorrente = schemaAlbero;
     if (mappaAttuale === "mappa10") {
-        schemaAlberoCorrente = [1, 1]; // Start e Boss
-    } else if (mappaAttuale === "mappa9") {
-        schemaAlberoCorrente = [1, 1, 1, 1, 1]; // Start e 4 Boss
+        schemaAlberoCorrente = [1, 1]; // Start e Boss (nodo finale con BossFinale.png)
     }
+    // mappa9: usa lo schema normale con un unico nodo boss finale che avvia 4 fight sequenziali
 
     const ultimoPiano      = schemaAlberoCorrente.length - 1; // Piano boss
     const penultimoPiano   = schemaAlberoCorrente.length - 2; // Piano medico/npc
@@ -72,9 +71,6 @@ function generaMappaProcedurale() {
                 tipoEvento = "start"; // Dummy
             } else if (pianoIndex === ultimoPiano) {
                 // Ultimo piano: sempre boss
-                tipoEvento = "boss";
-            } else if (mappaAttuale === "mappa9") {
-                // Tutti i nodi su mappa 9 sono boss
                 tipoEvento = "boss";
             } else if (pianoIndex === penultimoPiano) {
                 // Penultimo piano: un unico centro-medico, gli altri npc
@@ -247,9 +243,8 @@ function generaMappaAlbero() {
     let schemaAlberoCorrente = schemaAlbero;
     if (mappaAttuale === "mappa10") {
         schemaAlberoCorrente = [1, 1];
-    } else if (mappaAttuale === "mappa9") {
-        schemaAlberoCorrente = [1, 1, 1, 1, 1];
     }
+    // mappa9: usa lo schema normale; il nodo boss finale avvierà 4 fight sequenziali
 
     schemaAlberoCorrente.forEach((numNodi, pianoIndex) => {
         const divPiano = document.createElement("div");
@@ -330,6 +325,8 @@ function generaMappaAlbero() {
                     let imgChibi = ARCHIVIO_BOSS[idBossCorrente].iconaChibi;
                     if (mappaAttuale === "mappa9") {
                         imgChibi = "../Sprite/nodi/4Chibi.png";
+                    } else if (mappaAttuale === "mappa10") {
+                        imgChibi = "../Sprite/nodi/BossFinale.png";
                     }
                     bottone.style.backgroundImage = `url('${imgChibi}')`;
                     bottone.style.backgroundSize  = "cover";
@@ -432,10 +429,9 @@ function avviaEvento(pianoSelezionato, indiceNodo, tipoEvento) {
         let idBossCorrente = ARCHIVIO_MAPPE[mappaAttuale].idBoss;
 
         if (mappaAttuale === "mappa9") {
-            if (pianoAttuale === 1) idBossCorrente = "9"; // Kul
-            else if (pianoAttuale === 2) idBossCorrente = "10"; // Gio
-            else if (pianoAttuale === 3) idBossCorrente = "12"; // Edo
-            else if (pianoAttuale === 4) idBossCorrente = "11"; // Sat
+            // Boss nodo unico in mappa9: avvia la sequenza dei 4 Bombers
+            avviaSequenzaBombers();
+            return;
         } else if (mappaAttuale === "mappa10") {
             idBossCorrente = "13"; // Max
         }
@@ -487,4 +483,57 @@ function avviaEvento(pianoSelezionato, indiceNodo, tipoEvento) {
     }
     
     preparaIncontroBattaglia(tipoEvento, elementoFiltro);
+}
+
+// ----------------------------------------------------------
+// SEQUENZA BOMBERS (Mappa 9 - boss nodo unico)
+// Affronta Kul, Gio, Edo, Sat in sequenza; cura la squadra tra uno e l'altro.
+// ----------------------------------------------------------
+let _bomberQueue = [];
+
+function avviaSequenzaBombers() {
+    // Ordine dei 4 bomber IDs
+    _bomberQueue = ["9", "10", "12", "11"]; // Kul, Gio, Edo, Sat
+    document.getElementById("titolo-incontro").innerText = "I BOMBERS\n-- SFIDA FINALE --";
+    _avviaProssimoBomber();
+}
+
+function _avviaProssimoBomber() {
+    if (_bomberQueue.length === 0) {
+        // Tutti sconfitti!
+        gestisciVittoriaBombers();
+        return;
+    }
+    const idBoss = _bomberQueue.shift();
+    // Cura tutta la squadra al 100% prima di ogni scontro
+    if (typeof miaSquadra !== "undefined") {
+        miaSquadra.forEach(p => { if (p) p.hpAttuali = p.hpMax; });
+    }
+    // Imposta il callback da chiamare dopo la vittoria di questo boss
+    window._dopoVittoriaBoss = _avviaProssimoBomber;
+    // Avvia il boss normalmente
+    avviaBossBattle(idBoss);
+}
+
+function gestisciVittoriaBombers() {
+    // Avanza alla prossima mappa (mappa10) come una normale vittoria boss
+    const chiaviMappe = Object.keys(ARCHIVIO_MAPPE);
+    const indiceProssimo = chiaviMappe.indexOf(mappaAttuale) + 1;
+    if (indiceProssimo < chiaviMappe.length) {
+        mappaAttuale = chiaviMappe[indiceProssimo];
+    }
+    miaSquadra.forEach(p => { if (p) p.hpAttuali = p.hpMax; });
+    pianoAttuale = 0;
+    nodoSceltoAttuale = 0;
+    generaMappaProcedurale();
+    cambiaSchermata("schermata-gioco", "schermata-mappa");
+    aggiornaSquadraMappa();
+    generaMappaAlbero();
+    document.getElementById("btn-attacco").style.display = "";
+    document.getElementById("btn-item").style.display = "";
+    document.getElementById("btn-pokemon").style.display = "";
+    document.getElementById("btn-fuga").style.display = "";
+    if (typeof mostraAvviso === "function") {
+        mostraAvviso("\ud83c\udf89 Hai sconfitto tutti i Bombers! Ora sei nella Mappa 10!");
+    }
 }

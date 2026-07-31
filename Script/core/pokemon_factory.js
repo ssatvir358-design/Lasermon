@@ -205,7 +205,16 @@ function creaPokemon(infoBase, livello, livelloMossa = 1) {
         raritaTipo:   infoBase.raritaTipo,
         elemento:     elementoPkm,
         immagine:     infoBase.immagine,
-        immagineVS:   "../Sprite/personaggi/" + (infoBase.nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3').replace(/\s+/g, '')) + "/" + (infoBase.nome.replace(' Fase 2', 'F2').replace(' Fase 3', 'F3').replace(/\s+/g, '')) + "VS.png",
+        immagineVS:   (function() {
+            // Se il character definisce esplicitamente immagineVS (es. "Re e Merlino"), usala
+            if (infoBase.immagineVS) return infoBase.immagineVS;
+            if (!infoBase.immagine) return "";
+            const lastSlash = infoBase.immagine.lastIndexOf('/');
+            if (lastSlash === -1) return "";
+            const folder = infoBase.immagine.substring(0, lastSlash);
+            const folderName = folder.substring(folder.lastIndexOf('/') + 1);
+            return `${folder}/${folderName}VS.png`;
+        })(),
         immagineAtk:  infoBase.immagineAtk,
         frameAtk:     infoBase.frameAtk || 1,
         mossaLvl1:    infoBase.mossaLvl1,

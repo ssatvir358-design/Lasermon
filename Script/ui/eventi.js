@@ -375,8 +375,20 @@ function avviaEventoItem() {
 }
 
 function selezionaItemEvento(item) {
-    // Aggiungiamo l'oggetto allo zaino globale
-    zaino.push(item);
+    // Controlla che ci sia almeno un pokemon nella squadra con uno slot libero
+    const pokemonConSlotLibero = miaSquadra.filter(p => p && (!p.oggetti || p.oggetti.length < (CONFIG_SLOT_ITEM_PER_POKEMON || 1)));
+    
+    if (pokemonConSlotLibero.length === 0) {
+        mostraAvviso("Tutti i tuoi Pok\u00e9mon hanno gi\u00e0 un oggetto equipaggiato! Rimuovi un oggetto per prendere questo.");
+        return;
+    }
+    
+    // Aggiungiamo l'oggetto allo zaino globale usando il suo ID
+    if (item.id) {
+        aggiungiAZaino(item.id, 1);
+    } else {
+        zaino.push({ dbId: item.id || item.nome, quantita: 1 });
+    }
     document.getElementById("console-log").innerHTML = `\u{1f381} Hai trovato: ${item.nome}! Aggiunto allo zaino.`;
     
     // Torna alla mappa e riavanza

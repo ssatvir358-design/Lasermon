@@ -340,18 +340,19 @@
    ============================================================ */
 #pannello-item-battaglia {
     display: none;  /* mostrato da JS quando click su btn-item */
-    position: absolute;
-    bottom: 70px;
-    left: 8px;
-    width: 270px;
-    max-height: 310px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 380px;
+    max-height: 80vh;
     background: rgba(18, 24, 45, 0.98);
     border: 3px solid #f9ca24;
     border-radius: 10px;
     overflow-y: auto;
-    z-index: 50;
+    z-index: 500;
     font-family: monospace;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    box-shadow: 0 4px 30px rgba(0,0,0,0.8);
 }
 
 .pannello-item-titolo {
@@ -411,11 +412,46 @@
 }
 
 .pannello-item-vuoto {
-    padding: 20px 16px;
-    color: #777;
-    font-size: 12px;
+    padding: 15px;
+    color: #ccc;
     text-align: center;
-    line-height: 1.6;
+}
+
+/* ----------------------------------------------------------
+   STILI PER SELEZIONE TARGET (USO OGGETTI IN BATTAGLIA)
+   ---------------------------------------------------------- */
+.zaino-battaglia-row {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.zaino-battaglia-row:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.zaino-battaglia-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    border: 2px solid #fff;
+    background-size: cover;
+    background-position: top center;
+    margin-right: 12px;
+}
+
+.zaino-battaglia-info {
+    display: flex;
+    flex-direction: column;
+    color: white;
+    font-size: 12px;
+}
+
+.zaino-battaglia-info span {
+    margin-bottom: 3px;
 }
 
 /* ---- BOTTONE ITEM IN BATTAGLIA ---- */

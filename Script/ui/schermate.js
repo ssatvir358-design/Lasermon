@@ -181,18 +181,9 @@ function generaOpzioniPokemon(quanti, isStarter) {
         
         let bloccoAzioneHTML = "";
         if (miaSquadra.length >= 6) {
-            // Squadra piena: mostra select per scegliere chi sostituire
-            let opzioniSostituzione = "";
-            miaSquadra.forEach((membro, idx) => {
-                let elemento = membro.elemento ? membro.elemento.toUpperCase() : "FUOCO";
-                opzioniSostituzione += `<option value="${idx}">Sostituisci ${membro.nome} (${elemento}) | Lvl.${membro.livello} | HP:${membro.hpAttuali}/${membro.hpMax} | ATK:${membro.atk} DEF:${membro.def} VEL:${membro.vel} SP.ATK:${membro.atkSpec} SP.DEF:${membro.defSpec}</option>`;
-            });
-            
+            // Squadra piena: mostra pulsante per aprire la modal di sostituzione
             bloccoAzioneHTML = `
-                <select id="select-sostituisci-${i}" style="margin-top: 10px; width: 100%; font-size: 14px; padding: 5px;">
-                    ${opzioniSostituzione}
-                </select>
-                <button class="btn-scegli" style="margin-top: 5px; width: 100%;" onclick="confermaSceltaConSostituzioneDaIndice(${i})">CONFERMA</button>
+                <button class="btn-scegli" style="margin-top: 5px; width: 100%;" onclick="apriModalSostituzione(${i})">Scegli (Sostituisci)</button>
             `;
         } else {
             // C'è spazio, semplice tasto Scegli
@@ -239,29 +230,68 @@ function aggiungiASquadraDaIndice(idx) {
     }
 }
 
-// Conferma scelta con sostituzione da indice dell'array temporaneo
-function confermaSceltaConSostituzioneDaIndice(indiceOpzione) {
-    const select = document.getElementById(`select-sostituisci-${indiceOpzione}`);
-    if (!select) return;
-    const valoreScelto = select.value;
-    const nuovoPokemon = opzioniSceltaPokemon[indiceOpzione];
+// UI per Sostituzione tramite Modal
+function apriModalSostituzione(indiceNuovo) {
+    const modal = document.getElementById("schermata-sostituzione");
+    const lista = document.getElementById("lista-sostituzione-squadra");
+    if (!modal || !lista) return;
+
+    lista.innerHTML = "";
+
+    miaSquadra.forEach((p, index) => {
+        let lvlMossa = p.livelloMossa || 1;
+        let nomeMossa = getNomeMossaAttuale(p);
+
+        let scheda = document.createElement("div");
+        scheda.className = "scheda-disco-pokemon";
+        scheda.style.backgroundColor = p.colore || "#ffffff";
+        scheda.style.flexShrink = "0";
+        scheda.style.minWidth = "180px";
+        scheda.style.maxWidth = "220px";
+        scheda.style.cursor = "pointer";
+
+        scheda.onclick = function() {
+            eseguiSostituzione(indiceNuovo, index);
+        };
+
+        scheda.innerHTML = `
+            <img src="${p.immagine}" alt="${p.nome}" style="width:100%; max-height: 120px; object-fit: contain; border-radius:5px; margin-bottom:10px;">
+            <div style="font-size:13px; text-align:left; color:#333; line-height: 1.4; padding: 5px; width: 100%; box-sizing: border-box;">
+                <strong>${p.nome}</strong> <span style="font-size:11px;">(${p.raritaTipo ? p.raritaTipo.toUpperCase() : "COMUNE"})</span><br>
+                Elemento: ${getHtmlElemento(p.elemento)}<br>
+                Lvl: ${p.livello} | HP: ${p.hpAttuali}/${p.hpMax}<br>
+                ATK: ${p.atk} DEF: ${p.def}<br>
+                VEL: ${p.vel}<br>
+                SP.ATK: ${p.atkSpec} SP.DEF: ${p.defSpec}<br>
+                <div style="margin-top:8px; padding:4px; background:rgba(0,0,0,0.1); border-radius:3px; text-align:center; word-wrap: break-word;">
+                    ${nomeMossa} (Lvl ${lvlMossa})
+                </div>
+            </div>
+        `;
+        lista.appendChild(scheda);
+    });
+
+    modal.style.display = "flex";
+}
+
+function chiudiModalSostituzione() {
+    const modal = document.getElementById("schermata-sostituzione");
+    if (modal) modal.style.display = "none";
+}
+
+function eseguiSostituzione(indiceNuovo, indiceSquadra) {
+    const nuovoPokemon = opzioniSceltaPokemon[indiceNuovo];
     if (!nuovoPokemon) return;
 
-    if (valoreScelto !== "keep") {
-        let idxDaRimuovere = parseInt(valoreScelto);
-        miaSquadra[idxDaRimuovere] = nuovoPokemon;
-        
-        // Verifica se il nuovo Pokemon ha diritto a un perk e mostra la schermata
-        verificaPerkDopoEvento(nuovoPokemon, () => {
-            cambiaSchermata("schermata-selezione", "schermata-mappa");
-            generaMappaAlbero();
-            aggiornaSquadraMappa();
-        });
-    } else {
+    miaSquadra[indiceSquadra] = nuovoPokemon;
+    chiudiModalSostituzione();
+
+    // Verifica se il nuovo Pokemon ha diritto a un perk e mostra la schermata
+    verificaPerkDopoEvento(nuovoPokemon, () => {
         cambiaSchermata("schermata-selezione", "schermata-mappa");
         generaMappaAlbero();
         aggiornaSquadraMappa();
-    }
+    });
 }
 
 // ----------------------------------------------------------
@@ -917,7 +947,8 @@ function tornaAllaMappa() {
     
     document.getElementById("btn-attacco").style.display = "flex";
     document.getElementById("btn-attacco").disabled = false;
-    document.getElementById("btn-torna-mappa").style.display = "none";
+    const btnTornaMappa = document.getElementById("btn-torna-mappa");
+    if (btnTornaMappa) btnTornaMappa.style.display = "none";
     // Ripristina btn-item visibile e disabilitato (sar\u00e0 ri-abilitato a inizio prossimo incontro)
     const btnItem = document.getElementById("btn-item");
     if (btnItem) { btnItem.style.display = "flex"; btnItem.disabled = true; }
@@ -960,6 +991,9 @@ function apriSchermataDiscoMossa() {
         let scheda = document.createElement("div");
         scheda.className = "scheda-disco-pokemon";
         scheda.style.backgroundColor = p.colore || "#ffffff";
+        scheda.style.flexShrink = "0";
+        scheda.style.minWidth = "160px";
+        scheda.style.maxWidth = "200px";
 
         let btnText = lvlMossa >= 3 ? "MAX" : "POTENZIA";
         let btnColor = lvlMossa >= 3 ? "#718093" : "#2f3640";

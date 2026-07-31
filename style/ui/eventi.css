@@ -50,17 +50,23 @@
 .griglia-opzioni-disco {
     display: flex !important;
     flex-direction: row !important;
-    justify-content: center !important;
-    align-items: center !important;
-    gap: 30px !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    gap: 16px !important;
     width: 100% !important;
-    flex-wrap: wrap !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    padding-bottom: 10px !important;
+    scrollbar-width: thin !important;
 }
+.griglia-opzioni-disco::-webkit-scrollbar { height: 6px; }
+.griglia-opzioni-disco::-webkit-scrollbar-thumb { background: #ffca28; border-radius: 3px; }
 
 /* LA SCHEDA GRANDE DEL POTENZIAMENTO */
 .scheda-disco-pokemon {
     width: 260px !important;
-    height: 400px !important;
+    min-height: 400px !important;
+    height: auto !important;
     background-color: #ffffff !important;
     border: 4px solid #2f3640 !important;
     border-radius: 14px !important;
