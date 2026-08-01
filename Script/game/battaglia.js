@@ -1072,8 +1072,15 @@ function gestisciKOGiocatore() {
     // Mostra immagine KO del Pok\u00e9mon corrente
     const imgGiocatore = document.getElementById("img-giocatore");
     if (imgGiocatore && mioPokemon) {
-        const folderGio = getSpriteName(mioPokemon.nome);
-        imgGiocatore.src = `../Sprite/personaggi/${folderGio}/${folderGio}KO.jpeg`;
+        const fName = getSpriteName(mioPokemon.nome);
+        let folderPath = `../Sprite/personaggi/${fName}`;
+        if (mioPokemon.immagine) {
+            const lastSlash = mioPokemon.immagine.lastIndexOf('/');
+            if (lastSlash !== -1) {
+                folderPath = mioPokemon.immagine.substring(0, lastSlash);
+            }
+        }
+        imgGiocatore.src = `${folderPath}/${fName}KO.jpeg`;
     }
 
     // --- PERK SALVAVITA ---
@@ -1488,9 +1495,15 @@ function fugaBattaglia() {
 
 
 function gestisciKONemico() {
-    const folderNem = getSpriteName(nemicoPokemon.nome);
-    document.getElementById("img-nemico").src =
-        `../Sprite/personaggi/${folderNem}/${folderNem}KO.jpeg`;
+    const fNem = getSpriteName(nemicoPokemon.nome);
+    let folderPathNem = `../Sprite/personaggi/${fNem}`;
+    if (nemicoPokemon.immagine) {
+        const lastSlash = nemicoPokemon.immagine.lastIndexOf('/');
+        if (lastSlash !== -1) {
+            folderPathNem = nemicoPokemon.immagine.substring(0, lastSlash);
+        }
+    }
+    document.getElementById("img-nemico").src = `${folderPathNem}/${fNem}KO.jpeg`;
 
     setTimeout(() => {
         if (nemiciIncontro.length > 0) {
