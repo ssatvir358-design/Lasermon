@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini Poke-Clone Roguelike v4</title>
-    <link rel="stylesheet" href="../style/style.css?v=1785578297">
+    <link rel="stylesheet" href="../style/style.css?v=1785605841">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
@@ -186,7 +186,10 @@
 
                 <!-- Central Action Area -->
                 <div class="lobby-action-area">
-                    <button id="btn-start" onclick="apriSelezioneModalita()">PLAY NOW</button>
+                    <button id="btn-start" onclick="apriSelezioneModalita()">⚔ NUOVA RUN</button>
+                    <button id="btn-continua-run" onclick="apriSchermataSlot('carica')" style="display:none; margin-top:14px; background: linear-gradient(135deg, #1a1a3e, #2c2c6e); border: 2px solid #7c5cbf; color: #c9a7ff; font-family: monospace; font-size: 18px; font-weight: bold; padding: 14px 36px; border-radius: 12px; cursor: pointer; letter-spacing: 2px; transition: all 0.3s; box-shadow: 0 0 16px rgba(124,92,191,0.3);"
+                        onmouseover="this.style.background='linear-gradient(135deg,#2a1a5e,#4a2aae)';this.style.boxShadow='0 0 28px rgba(124,92,191,0.7)';"
+                        onmouseout="this.style.background='linear-gradient(135deg,#1a1a3e,#2c2c6e)';this.style.boxShadow='0 0 16px rgba(124,92,191,0.3)';">📂 CONTINUA RUN</button>
                     <div class="lobby-subtitle">AUTOBATTLER ROGUELIKE</div>
                 </div>
 
@@ -294,6 +297,12 @@
                     </div>
 
                 </div>
+
+                <!-- Tasto Salva Run -->
+                <button onclick="apriSchermataSlot('salva')" class="ui-btn-moderno" style="width: 80px; height: 80px; padding: 5px; font-size: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; background: linear-gradient(135deg, #1a1a3e, #2c2c6e); border-color: #7c5cbf;">
+                    <span style="font-size: 24px; margin-bottom: 5px;">💾</span>
+                    SALVA
+                </button>
 
                 <!-- Tasto Reset Run (Quadrato) -->
                 <button onclick="resettaRunConStarter()" class="ui-btn-moderno ui-btn-danger" style="width: 80px; height: 80px; padding: 5px; font-size: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2;">
@@ -958,154 +967,155 @@
          ============================================= -->
 
     <!-- 1. Dati statici -->
-    <script src="../Script/data/config.js?v=1785578297"></script>
-    <script src="../Script/data/characters/alex.js?v=1785578297"></script>
-    <script src="../Script/data/characters/altimani.js?v=1785578297"></script>
-    <script src="../Script/data/characters/mori.js?v=1785578297"></script>
-    <script src="../Script/data/characters/arman.js?v=1785578297"></script>
-    <script src="../Script/data/characters/babbonatale.js?v=1785578297"></script>
-    <script src="../Script/data/characters/bacchi.js?v=1785578297"></script>
-    <script src="../Script/data/characters/bellini.js?v=1785578297"></script>
-    <script src="../Script/data/characters/bonacina.js?v=1785578297"></script>
-    <script src="../Script/data/characters/bottardi.js?v=1785578297"></script>
-    <script src="../Script/data/characters/bottura.js?v=1785578297"></script>
-    <script src="../Script/data/characters/bussolotti.js?v=1785578297"></script>
-    <script src="../Script/data/characters/matteo.js?v=1785578297"></script>
-    <script src="../Script/data/characters/capiluppi.js?v=1785578297"></script>
-    <script src="../Script/data/characters/carnevali.js?v=1785578297"></script>
-    <script src="../Script/data/characters/carra.js?v=1785578297"></script>
-    <script src="../Script/data/characters/contini.js?v=1785578297"></script>
-    <script src="../Script/data/characters/danilo.js?v=1785578297"></script>
-    <script src="../Script/data/characters/danilof2.js?v=1785578297"></script>
-    <script src="../Script/data/characters/dinicolaF2.js?v=1785578297"></script>
-    <script src="../Script/data/characters/dinicola.js?v=1785578297"></script>
-    <script src="../Script/data/characters/donatoF2.js?v=1785578297"></script>
-    <script src="../Script/data/characters/donato.js?v=1785578297"></script>
-    <script src="../Script/data/characters/edo.js?v=1785578297"></script>
-    <script src="../Script/data/characters/fabio.js?v=1785578297"></script>
-    <script src="../Script/data/characters/falco.js?v=1785578297"></script>
-    <script src="../Script/data/characters/filippo.js?v=1785578297"></script>
-    <script src="../Script/data/characters/ghandu.js?v=1785578297"></script>
-    <script src="../Script/data/characters/gian.js?v=1785578297"></script>
-    <script src="../Script/data/characters/gio.js?v=1785578297"></script>
-    <script src="../Script/data/characters/giulia.js?v=1785578297"></script>
-    <script src="../Script/data/characters/giulio.js?v=1785578297"></script>
-    <script src="../Script/data/characters/graziani.js?v=1785578297"></script>
-    <script src="../Script/data/characters/kul.js?v=1785578297"></script>
-    <script src="../Script/data/characters/lanza.js?v=1785578297"></script>
-    <script src="../Script/data/characters/loconsole.js?v=1785578297"></script>
-    <script src="../Script/data/characters/maccioni.js?v=1785578297"></script>
-    <script src="../Script/data/characters/maccionif2.js?v=1785578297"></script>
-    <script src="../Script/data/characters/manuela.js?v=1785578297"></script>
-    <script src="../Script/data/characters/mattia.js?v=1785578297"></script>
-    <script src="../Script/data/characters/mattiaf2.js?v=1785578297"></script>
-    <script src="../Script/data/characters/mariel.js?v=1785578297"></script>
-    <script src="../Script/data/characters/max.js?v=1785578297"></script>
-    <script src="../Script/data/characters/maxf2.js?v=1785578297"></script>
-    <script src="../Script/data/characters/maxf3.js?v=1785578297"></script>
-    <script src="../Script/data/characters/monica.js?v=1785578297"></script>
-    <script src="../Script/data/characters/nicolas.js?v=1785578297"></script>
-    <script src="../Script/data/characters/nicolo.js?v=1785578297"></script>
-    <script src="../Script/data/characters/nico.js?v=1785578297"></script>
-    <script src="../Script/data/characters/nonamedonna.js?v=1785578297"></script>
-    <script src="../Script/data/characters/nonameuomo.js?v=1785578297"></script>
-    <script src="../Script/data/characters/paola.js?v=1785578297"></script>
-    <script src="../Script/data/characters/paolo.js?v=1785578297"></script>
-    <script src="../Script/data/characters/paroni.js?v=1785578297"></script>
-    <script src="../Script/data/characters/rauf.js?v=1785578297"></script>
-    <script src="../Script/data/characters/re_merlino.js?v=1785578297"></script>
-    <script src="../Script/data/characters/ruggiero.js?v=1785578297"></script>
-    <script src="../Script/data/characters/saad.js?v=1785578297"></script>
-    <script src="../Script/data/characters/salvatore.js?v=1785578297"></script>
-    <script src="../Script/data/characters/sat.js?v=1785578297"></script>
-    <script src="../Script/data/characters/savina.js?v=1785578297"></script>
-    <script src="../Script/data/characters/savinaf2.js?v=1785578297"></script>
-    <script src="../Script/data/characters/serghej.js?v=1785578297"></script>
-    <script src="../Script/data/characters/menza.js?v=1785578297"></script>
-    <script src="../Script/data/characters/solieri.js?v=1785578297"></script>
-    <script src="../Script/data/characters/tania.js?v=1785578297"></script>
-    <script src="../Script/data/characters/telemaco.js?v=1785578297"></script>
-    <script src="../Script/data/characters/tudor.js?v=1785578297"></script>
-    <script src="../Script/data/characters/valentina.js?v=1785578297"></script>
-    <script src="../Script/data/characters/venturini.js?v=1785578297"></script>
-        <script src="../Script/data/characters/valen.js?v=1785578297"></script>
-    <script src="../Script/data/characters/nyssa.js?v=1785578297"></script>
-    <script src="../Script/data/characters/cassian.js?v=1785578297"></script>
-    <script src="../Script/data/characters/kiora.js?v=1785578297"></script>
-    <script src="../Script/data/characters/zareen.js?v=1785578297"></script>
-    <script src="../Script/data/characters/elys.js?v=1785578297"></script>
-    <script src="../Script/data/characters/lucien.js?v=1785578297"></script>
-    <script src="../Script/data/characters/vesper.js?v=1785578297"></script>
-    <script src="../Script/data/characters/vesperlatabularasadelcapitale.js?v=1785578297"></script>
-    <script src="../Script/data/characters/ryden.js?v=1785578297"></script>
-    <script src="../Script/data/characters/van.js?v=1785578297"></script>
-    <script src="../Script/data/characters/mireya.js?v=1785578297"></script>
-    <script src="../Script/data/characters/darius.js?v=1785578297"></script>
-    <script src="../Script/data/characters/rivena.js?v=1785578297"></script>
-    <script src="../Script/data/characters/icer.js?v=1785578297"></script>
-    <script src="../Script/data/characters/evren.js?v=1785578297"></script>
-    <script src="../Script/data/characters/maelis.js?v=1785578297"></script>
-    <script src="../Script/data/characters/elyra.js?v=1785578297"></script>
-    <script src="../Script/data/characters/aster.js?v=1785578297"></script>
-    <script src="../Script/data/characters/bob.js?v=1785578297"></script>
-    <script src="../Script/data/characters/soraya.js?v=1785578297"></script>
-    <script src="../Script/data/characters/nerys.js?v=1785578297"></script>
-    <script src="../Script/data/characters/kit.js?v=1785578297"></script>
-    <script src="../Script/data/characters/nelly.js?v=1785578297"></script>
-    <script src="../Script/data/characters/virea.js?v=1785578297"></script>
-    <script src="../Script/data/characters/mauro.js?v=1785578297"></script>
-    <script src="../Script/data/characters/caelum.js?v=1785578297"></script>
-    <script src="../Script/data/characters/falcogenryusai.js?v=1785578297"></script>
-    <script src="../Script/data/characters/falcoroshi.js?v=1785578297"></script>
-    <script src="../Script/data/characters/falcomonkey.js?v=1785578297"></script>
-    <script src="../Script/data/characters/falcoaalk.js?v=1785578297"></script>
-    <script src="../Script/data/characters/falcomajin.js?v=1785578297"></script>
-    <script src="../Script/data/characters/falcoshoto.js?v=1785578297"></script>
-    <script src="../Script/data/characters/falcohero.js?v=1785578297"></script>
-    <script src="../Script/data/characters/falcochan.js?v=1785578297"></script>
-    <script src="../Script/data/characters/falcodragon.js?v=1785578297"></script>
-    <script src="../Script/data/characters/falconitsu.js?v=1785578297"></script>
-    <script src="../Script/data/characters/falcomalfalk.js?v=1785578297"></script>
-    <script src="../Script/data/characters/falcosing.js?v=1785578297"></script>
-    <script src="../Script/data/characters/marini.js?v=1785578297"></script>
-    <script src="../Script/data/characters/ilie.js?v=1785578297"></script>
-    <script src="../Script/data/characters/mattiasped.js?v=1785578297"></script>
-    <script src="../Script/data/characters/index.js?v=1785578297"></script>
-    <script src="../Script/data/database_veloce.js?v=1785578297"></script>
+    <script src="../Script/data/config.js?v=1785605841"></script>
+    <script src="../Script/data/characters/alex.js?v=1785605841"></script>
+    <script src="../Script/data/characters/altimani.js?v=1785605841"></script>
+    <script src="../Script/data/characters/mori.js?v=1785605841"></script>
+    <script src="../Script/data/characters/arman.js?v=1785605841"></script>
+    <script src="../Script/data/characters/babbonatale.js?v=1785605841"></script>
+    <script src="../Script/data/characters/bacchi.js?v=1785605841"></script>
+    <script src="../Script/data/characters/bellini.js?v=1785605841"></script>
+    <script src="../Script/data/characters/bonacina.js?v=1785605841"></script>
+    <script src="../Script/data/characters/bottardi.js?v=1785605841"></script>
+    <script src="../Script/data/characters/bottura.js?v=1785605841"></script>
+    <script src="../Script/data/characters/bussolotti.js?v=1785605841"></script>
+    <script src="../Script/data/characters/matteo.js?v=1785605841"></script>
+    <script src="../Script/data/characters/capiluppi.js?v=1785605841"></script>
+    <script src="../Script/data/characters/carnevali.js?v=1785605841"></script>
+    <script src="../Script/data/characters/carra.js?v=1785605841"></script>
+    <script src="../Script/data/characters/contini.js?v=1785605841"></script>
+    <script src="../Script/data/characters/danilo.js?v=1785605841"></script>
+    <script src="../Script/data/characters/danilof2.js?v=1785605841"></script>
+    <script src="../Script/data/characters/dinicolaF2.js?v=1785605841"></script>
+    <script src="../Script/data/characters/dinicola.js?v=1785605841"></script>
+    <script src="../Script/data/characters/donatoF2.js?v=1785605841"></script>
+    <script src="../Script/data/characters/donato.js?v=1785605841"></script>
+    <script src="../Script/data/characters/edo.js?v=1785605841"></script>
+    <script src="../Script/data/characters/fabio.js?v=1785605841"></script>
+    <script src="../Script/data/characters/falco.js?v=1785605841"></script>
+    <script src="../Script/data/characters/filippo.js?v=1785605841"></script>
+    <script src="../Script/data/characters/ghandu.js?v=1785605841"></script>
+    <script src="../Script/data/characters/gian.js?v=1785605841"></script>
+    <script src="../Script/data/characters/gio.js?v=1785605841"></script>
+    <script src="../Script/data/characters/giulia.js?v=1785605841"></script>
+    <script src="../Script/data/characters/giulio.js?v=1785605841"></script>
+    <script src="../Script/data/characters/graziani.js?v=1785605841"></script>
+    <script src="../Script/data/characters/kul.js?v=1785605841"></script>
+    <script src="../Script/data/characters/lanza.js?v=1785605841"></script>
+    <script src="../Script/data/characters/loconsole.js?v=1785605841"></script>
+    <script src="../Script/data/characters/maccioni.js?v=1785605841"></script>
+    <script src="../Script/data/characters/maccionif2.js?v=1785605841"></script>
+    <script src="../Script/data/characters/manuela.js?v=1785605841"></script>
+    <script src="../Script/data/characters/mattia.js?v=1785605841"></script>
+    <script src="../Script/data/characters/mattiaf2.js?v=1785605841"></script>
+    <script src="../Script/data/characters/mariel.js?v=1785605841"></script>
+    <script src="../Script/data/characters/max.js?v=1785605841"></script>
+    <script src="../Script/data/characters/maxf2.js?v=1785605841"></script>
+    <script src="../Script/data/characters/maxf3.js?v=1785605841"></script>
+    <script src="../Script/data/characters/monica.js?v=1785605841"></script>
+    <script src="../Script/data/characters/nicolas.js?v=1785605841"></script>
+    <script src="../Script/data/characters/nicolo.js?v=1785605841"></script>
+    <script src="../Script/data/characters/nico.js?v=1785605841"></script>
+    <script src="../Script/data/characters/nonamedonna.js?v=1785605841"></script>
+    <script src="../Script/data/characters/nonameuomo.js?v=1785605841"></script>
+    <script src="../Script/data/characters/paola.js?v=1785605841"></script>
+    <script src="../Script/data/characters/paolo.js?v=1785605841"></script>
+    <script src="../Script/data/characters/paroni.js?v=1785605841"></script>
+    <script src="../Script/data/characters/rauf.js?v=1785605841"></script>
+    <script src="../Script/data/characters/re_merlino.js?v=1785605841"></script>
+    <script src="../Script/data/characters/ruggiero.js?v=1785605841"></script>
+    <script src="../Script/data/characters/saad.js?v=1785605841"></script>
+    <script src="../Script/data/characters/salvatore.js?v=1785605841"></script>
+    <script src="../Script/data/characters/sat.js?v=1785605841"></script>
+    <script src="../Script/data/characters/savina.js?v=1785605841"></script>
+    <script src="../Script/data/characters/savinaf2.js?v=1785605841"></script>
+    <script src="../Script/data/characters/serghej.js?v=1785605841"></script>
+    <script src="../Script/data/characters/menza.js?v=1785605841"></script>
+    <script src="../Script/data/characters/solieri.js?v=1785605841"></script>
+    <script src="../Script/data/characters/tania.js?v=1785605841"></script>
+    <script src="../Script/data/characters/telemaco.js?v=1785605841"></script>
+    <script src="../Script/data/characters/tudor.js?v=1785605841"></script>
+    <script src="../Script/data/characters/valentina.js?v=1785605841"></script>
+    <script src="../Script/data/characters/venturini.js?v=1785605841"></script>
+        <script src="../Script/data/characters/valen.js?v=1785605841"></script>
+    <script src="../Script/data/characters/nyssa.js?v=1785605841"></script>
+    <script src="../Script/data/characters/cassian.js?v=1785605841"></script>
+    <script src="../Script/data/characters/kiora.js?v=1785605841"></script>
+    <script src="../Script/data/characters/zareen.js?v=1785605841"></script>
+    <script src="../Script/data/characters/elys.js?v=1785605841"></script>
+    <script src="../Script/data/characters/lucien.js?v=1785605841"></script>
+    <script src="../Script/data/characters/vesper.js?v=1785605841"></script>
+    <script src="../Script/data/characters/vesperlatabularasadelcapitale.js?v=1785605841"></script>
+    <script src="../Script/data/characters/ryden.js?v=1785605841"></script>
+    <script src="../Script/data/characters/van.js?v=1785605841"></script>
+    <script src="../Script/data/characters/mireya.js?v=1785605841"></script>
+    <script src="../Script/data/characters/darius.js?v=1785605841"></script>
+    <script src="../Script/data/characters/rivena.js?v=1785605841"></script>
+    <script src="../Script/data/characters/icer.js?v=1785605841"></script>
+    <script src="../Script/data/characters/evren.js?v=1785605841"></script>
+    <script src="../Script/data/characters/maelis.js?v=1785605841"></script>
+    <script src="../Script/data/characters/elyra.js?v=1785605841"></script>
+    <script src="../Script/data/characters/aster.js?v=1785605841"></script>
+    <script src="../Script/data/characters/bob.js?v=1785605841"></script>
+    <script src="../Script/data/characters/soraya.js?v=1785605841"></script>
+    <script src="../Script/data/characters/nerys.js?v=1785605841"></script>
+    <script src="../Script/data/characters/kit.js?v=1785605841"></script>
+    <script src="../Script/data/characters/nelly.js?v=1785605841"></script>
+    <script src="../Script/data/characters/virea.js?v=1785605841"></script>
+    <script src="../Script/data/characters/mauro.js?v=1785605841"></script>
+    <script src="../Script/data/characters/caelum.js?v=1785605841"></script>
+    <script src="../Script/data/characters/falcogenryusai.js?v=1785605841"></script>
+    <script src="../Script/data/characters/falcoroshi.js?v=1785605841"></script>
+    <script src="../Script/data/characters/falcomonkey.js?v=1785605841"></script>
+    <script src="../Script/data/characters/falcoaalk.js?v=1785605841"></script>
+    <script src="../Script/data/characters/falcomajin.js?v=1785605841"></script>
+    <script src="../Script/data/characters/falcoshoto.js?v=1785605841"></script>
+    <script src="../Script/data/characters/falcohero.js?v=1785605841"></script>
+    <script src="../Script/data/characters/falcochan.js?v=1785605841"></script>
+    <script src="../Script/data/characters/falcodragon.js?v=1785605841"></script>
+    <script src="../Script/data/characters/falconitsu.js?v=1785605841"></script>
+    <script src="../Script/data/characters/falcomalfalk.js?v=1785605841"></script>
+    <script src="../Script/data/characters/falcosing.js?v=1785605841"></script>
+    <script src="../Script/data/characters/marini.js?v=1785605841"></script>
+    <script src="../Script/data/characters/ilie.js?v=1785605841"></script>
+    <script src="../Script/data/characters/mattiasped.js?v=1785605841"></script>
+    <script src="../Script/data/characters/index.js?v=1785605841"></script>
+    <script src="../Script/data/database_veloce.js?v=1785605841"></script>
     <!-- Personaggi: un file per ciascuno (aggiungi qui nuovi personaggi) -->
     <!-- Index che assembla pokemonDatabase dai file sopra -->
-    <script src="../Script/data/mappe.js?v=1785578297"></script>
-    <script src="../Script/data/boss.js?v=1785578297"></script>
-    <script src="../Script/data/eventi_nodi.js?v=1785578297"></script>
-    <script src="../Script/data/eventi_misteriosi.js?v=1785578297"></script>
-    <script src="../Script/data/oggetti.js?v=1785578297"></script>
-    <script src="../Script/data/perks.js?v=1785578297"></script>
+    <script src="../Script/data/mappe.js?v=1785605841"></script>
+    <script src="../Script/data/boss.js?v=1785605841"></script>
+    <script src="../Script/data/eventi_nodi.js?v=1785605841"></script>
+    <script src="../Script/data/eventi_misteriosi.js?v=1785605841"></script>
+    <script src="../Script/data/oggetti.js?v=1785605841"></script>
+    <script src="../Script/data/perks.js?v=1785605841"></script>
 
     <!-- 2. Core -->
-    <script src="../Script/core/stato.js?v=1785578297"></script>
-    <script src="../Script/core/pokemon_factory.js?v=1785578297"></script>
+    <script src="../Script/core/stato.js?v=1785605841"></script>
+    <script src="../Script/core/pokemon_factory.js?v=1785605841"></script>
+    <script src="../Script/core/salvataggio.js?v=1785605841"></script>
 
     <!-- 3. UI Audio -->
-    <script src="../Script/ui/audio.js?v=1785578297"></script>
+    <script src="../Script/ui/audio.js?v=1785605841"></script>
 
     <!-- 4. UI Schermate -->
-    <script src="../Script/ui/schermate.js?v=1785578297"></script>
+    <script src="../Script/ui/schermate.js?v=1785605841"></script>
 
     <!-- 5. UI Negozio / Zaino -->
-    <script src="../Script/ui/negozio.js?v=1785578297"></script>
+    <script src="../Script/ui/negozio.js?v=1785605841"></script>
 
     <!-- 5b. UI Perk -->
-    <script src="../Script/ui/perk_ui.js?v=1785578297"></script>
+    <script src="../Script/ui/perk_ui.js?v=1785605841"></script>
 
     <!-- 5c. Sandbox / Debugger (carica DOPO stato.js, pokemon_factory.js e perk_ui.js) -->
-    <script src="../Script/sandbox/sandbox.js?v=1785578297"></script>
+    <script src="../Script/sandbox/sandbox.js?v=1785605841"></script>
 
     <!-- 6. Game -->
-    <script src="../Script/game/mappa.js?v=1785578297"></script>
-    <script src="../Script/game/battaglia.js?v=1785578297"></script>
+    <script src="../Script/game/mappa.js?v=1785605841"></script>
+    <script src="../Script/game/battaglia.js?v=1785605841"></script>
 
     <!-- 7. UI Eventi -->
-    <script src="../Script/ui/eventi.js?v=1785578297"></script>
+    <script src="../Script/ui/eventi.js?v=1785605841"></script>
 
     <!-- ============= MODALE SELEZIONE MODALITA' ============= -->
     <div id="modal-selezione-modalita" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); z-index: 30000; justify-content: center; align-items: center; flex-direction: column; font-family: monospace;">
@@ -1153,6 +1163,16 @@
             onmouseout="this.style.borderColor='#7f8c8d'; this.style.color='#7f8c8d';">
             ← Torna alla Lobby
         </button>
+    </div>
+
+    <!-- ============= SCHERMATA SALVATAGGI ============= -->
+    <div id="schermata-salvataggi" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(5,5,20,0.96); z-index:500000; justify-content:center; align-items:center; flex-direction:column; font-family:monospace;">
+        <h1 id="salvataggi-titolo" style="color:#c9a7ff; font-size:28px; letter-spacing:3px; margin-bottom:8px; text-shadow:0 0 20px rgba(180,120,255,0.6);">💾 SALVA PARTITA</h1>
+        <p style="color:#7f8c8d; font-size:13px; margin-bottom:36px;">Scegli uno slot</p>
+        <div id="salvataggi-slots-container" style="display:flex; gap:24px; flex-wrap:wrap; justify-content:center; max-width:960px; padding:0 20px;"></div>
+        <button onclick="chiudiSchermataSlot()" style="margin-top:40px; background:none; border:2px solid #555; color:#888; padding:10px 36px; border-radius:10px; font-family:monospace; font-size:14px; cursor:pointer; transition:all 0.3;"
+            onmouseover="this.style.borderColor='#aaa';this.style.color='#eee';"
+            onmouseout="this.style.borderColor='#555';this.style.color='#888';">✕ CHIUDI</button>
     </div>
 
     <!-- Modal Sostituzione Membro -->

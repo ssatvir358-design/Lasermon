@@ -193,3 +193,143 @@
     box-shadow: 1px 1px 0px #2f3640 !important;
     transform: translate(3px, 3px) !important;
 }
+
+/* ==========================================================
+   SAVE SLOT CARDS
+   ========================================================== */
+.save-slot-card {
+    width: 260px;
+    min-height: 260px;
+    background: linear-gradient(145deg, rgba(20, 20, 50, 0.95), rgba(10, 10, 30, 0.98));
+    border: 2px solid rgba(124, 92, 191, 0.5);
+    border-radius: 18px;
+    padding: 22px 20px 18px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    backdrop-filter: blur(12px);
+    position: relative;
+    overflow: hidden;
+}
+
+.save-slot-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #7c5cbf, #a78bdb, #7c5cbf);
+    border-radius: 18px 18px 0 0;
+}
+
+.save-slot-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(167, 139, 219, 0.8);
+    box-shadow: 0 16px 40px rgba(124, 92, 191, 0.35);
+}
+
+.save-slot-empty {
+    border-color: rgba(80, 80, 120, 0.35);
+    opacity: 0.75;
+}
+
+.save-slot-empty::before {
+    background: linear-gradient(90deg, #3a3a6a, #5a5a9a, #3a3a6a);
+}
+
+.save-slot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.save-slot-num {
+    font-size: 13px;
+    font-weight: bold;
+    color: #c9a7ff;
+    letter-spacing: 2px;
+}
+
+.save-slot-badge {
+    font-size: 11px;
+    background: rgba(124, 92, 191, 0.25);
+    color: #a78bdb;
+    padding: 3px 8px;
+    border-radius: 20px;
+    border: 1px solid rgba(124,92,191,0.4);
+}
+
+.save-slot-mappa {
+    font-size: 15px;
+    color: #ecf0f1;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.save-slot-squadra {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    min-height: 44px;
+}
+
+.save-slot-time {
+    font-size: 11px;
+    color: #7f8c8d;
+    margin-top: auto;
+}
+
+.save-slot-vuoto-icon {
+    font-size: 40px;
+    text-align: center;
+    color: rgba(124, 92, 191, 0.3);
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.save-slot-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.save-btn {
+    border: none;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+}
+
+.save-btn-primary {
+    background: linear-gradient(135deg, #5a3aaa, #7c5cbf);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(124, 92, 191, 0.3);
+}
+
+.save-btn-primary:hover {
+    background: linear-gradient(135deg, #7c5cbf, #a078d8);
+    box-shadow: 0 6px 18px rgba(124, 92, 191, 0.55);
+    transform: translateY(-2px);
+}
+
+.save-btn-danger {
+    background: rgba(231, 76, 60, 0.15);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.4);
+    flex: 0 0 auto;
+    padding: 8px 14px;
+}
+
+.save-btn-danger:hover {
+    background: rgba(231, 76, 60, 0.35);
+    border-color: #e74c3c;
+}
+

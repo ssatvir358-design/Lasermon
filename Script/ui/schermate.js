@@ -33,7 +33,10 @@ function cambiaSchermata(idNascondi, idMostra) {
 const _cambiaSchermataBase = cambiaSchermata;
 cambiaSchermata = function(idNascondi, idMostra) {
     _cambiaSchermataBase(idNascondi, idMostra);
-    if (idMostra === "schermata-start") riproduciMusica("lobby.mp3");
+    if (idMostra === "schermata-start") {
+        riproduciMusica("lobby.mp3");
+        if (typeof aggiornaBottoneContinua === "function") aggiornaBottoneContinua();
+    }
     if (idMostra === "schermata-mappa") {
         riproduciMusica("mappa.mp3");
         // Imposta sfondo mappa dinamicamente
@@ -1201,6 +1204,11 @@ document.addEventListener("DOMContentLoaded", adattaRisoluzioneGioco);
 
 // Esegui subito all'avvio dello script
 adattaRisoluzioneGioco();
+
+// Aggiorna subito il bottone Continua in base ai salvataggi presenti
+window.addEventListener("load", function() {
+    if (typeof aggiornaBottoneContinua === "function") aggiornaBottoneContinua();
+});
 
 // Ritorno in Lobby
 function tornaALobbyDaMappa() {
