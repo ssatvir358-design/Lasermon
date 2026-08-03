@@ -96,7 +96,7 @@ const STATS_RUN_VELOCE = {
     "Falco Malfalk": { hpBase: 4, atkBase: 5, defBase: 5, velBase: 2 },
     "Falcosing":    { hpBase: 4, atkBase: 2, defBase: 5, velBase: 5 },
     "Maccioni":     { hpBase: 3, atkBase: 6, defBase: 1, velBase: 6 },
-    "Maccione F2":  { hpBase: 5, atkBase: 2, defBase: 6, velBase: 5 },
+    "Maccioni F2":  { hpBase: 5, atkBase: 2, defBase: 6, velBase: 5 },
     "Savina":       { hpBase: 4, atkBase: 5, defBase: 5, velBase: 2 },
     "Savina F2":    { hpBase: 3, atkBase: 6, defBase: 3, velBase: 6 },
     "Mattia":       { hpBase: 3, atkBase: 6, defBase: 3, velBase: 4 },

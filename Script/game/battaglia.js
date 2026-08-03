@@ -537,7 +537,7 @@ function calcolaEdEseguiDannoGiocatore(moltMossa, nomeMossaUsata) {
 function attivaFase2MiniBoss() {
     let idF2 = null;
     let videoTrasformazione = null;
-    if (nemicoPokemon.nome === "Maccioni") idF2 = "Maccione F2";
+    if (nemicoPokemon.nome === "Maccioni") idF2 = "Maccioni F2";
     else if (nemicoPokemon.nome === "Savina") {
         idF2 = "Savina F2";
         videoTrasformazione = "../Sprite/personaggi/Savina/SavinaULT.mp4";
@@ -1602,49 +1602,53 @@ function processaEffettiInizioTurno(pokemon, isNemico) {
     let targetId = isNemico ? "nemico" : "giocatore";
     let saltato = false;
     let msg = "";
+    
+    if (!effettiAttivi || !effettiAttivi[targetId]) return false;
 
     // Stordimento (100% skip turn)
     if (effettiAttivi[targetId].stordito && effettiAttivi[targetId].stordito.durata > 0) {
         effettiAttivi[targetId].stordito.durata--;
-        msg += `<br>\u{1f4ab} ${pokemon.nome} \u00e8 stordito e salta il turno!`;
-        saltato = true;
+        if (!saltato) {
+            msg += `<br>\u{1f4ab} ${pokemon.nome} è stordito e salta il turno!`;
+            saltato = true;
+        }
         if (effettiAttivi[targetId].stordito.durata === 0) effettiAttivi[targetId].stordito = null;
     }
 
     // Paralisi (25% di skip)
-    if (!saltato && effettiAttivi[targetId].paralisi && effettiAttivi[targetId].paralisi.durata > 0) {
+    if (effettiAttivi[targetId].paralisi && effettiAttivi[targetId].paralisi.durata > 0) {
         effettiAttivi[targetId].paralisi.durata--;
-        if (Math.random() < 0.25) {
-            msg += `<br>\u26a1 ${pokemon.nome} \u00e8 paralizzato e non pu\u00f2 muoversi!`;
+        if (!saltato && Math.random() < 0.25) {
+            msg += `<br>\u26a1 ${pokemon.nome} è paralizzato e non può muoversi!`;
             saltato = true;
         }
         if (effettiAttivi[targetId].paralisi.durata === 0) effettiAttivi[targetId].paralisi = null;
     }
     
     // Congelamento (10% di skip)
-    if (!saltato && effettiAttivi[targetId].congelamento && effettiAttivi[targetId].congelamento.durata > 0) {
+    if (effettiAttivi[targetId].congelamento && effettiAttivi[targetId].congelamento.durata > 0) {
         effettiAttivi[targetId].congelamento.durata--;
-        if (Math.random() < 0.10) {
-            msg += `<br>\u2744\ufe0f ${pokemon.nome} \u00e8 congelato solido!`;
+        if (!saltato && Math.random() < 0.10) {
+            msg += `<br>\u2744\ufe0f ${pokemon.nome} è congelato solido!`;
             saltato = true;
         }
         if (effettiAttivi[targetId].congelamento.durata === 0) effettiAttivi[targetId].congelamento = null;
     }
 
     // Paura (15% di skip)
-    if (!saltato && effettiAttivi[targetId].paura && effettiAttivi[targetId].paura.durata > 0) {
+    if (effettiAttivi[targetId].paura && effettiAttivi[targetId].paura.durata > 0) {
         effettiAttivi[targetId].paura.durata--;
-        if (Math.random() < 0.15) {
+        if (!saltato && Math.random() < 0.15) {
             msg += `<br>\u{1f311} ${pokemon.nome} trema per la paura e non attacca!`;
             saltato = true;
         }
         if (effettiAttivi[targetId].paura.durata === 0) effettiAttivi[targetId].paura = null;
     }
 
-    // Cecit\u00e0 (20% miss) -> non salta il turno, ma facciamo finta missi l'attacco
-    if (!saltato && effettiAttivi[targetId].cecita && effettiAttivi[targetId].cecita.durata > 0) {
+    // Cecità (20% miss) -> non salta il turno, ma facciamo finta missi l'attacco
+    if (effettiAttivi[targetId].cecita && effettiAttivi[targetId].cecita.durata > 0) {
         effettiAttivi[targetId].cecita.durata--;
-        if (Math.random() < 0.20) {
+        if (!saltato && Math.random() < 0.20) {
             msg += `<br>\u{1faa8} A causa della sabbia negli occhi, l'attacco di ${pokemon.nome} fallisce!`;
             saltato = true;
         }
@@ -1653,8 +1657,11 @@ function processaEffettiInizioTurno(pokemon, isNemico) {
 
     if (msg !== "") {
         document.getElementById("console-log").innerHTML += msg;
-        aggiornaGrafica();
     }
+    
+    // Aggiorniamo sempre la grafica a inizio turno per rimuovere eventuali icone di stati scaduti (durata === 0)
+    aggiornaGrafica();
+    
     return saltato;
 }
 
@@ -1702,8 +1709,10 @@ function processaEffettiFineTurno(pokemon, isNemico) {
 
     if (msg !== "") {
         document.getElementById("console-log").innerHTML += msg;
-        aggiornaGrafica();
     }
+    
+    // Aggiorniamo sempre la grafica a fine turno per rimuovere eventuali icone di stati scaduti
+    aggiornaGrafica();
 }
 
 // Funzione per animazione multi-frame o singola
