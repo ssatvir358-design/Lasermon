@@ -62,13 +62,8 @@ const DB_EVENTI_MISTERIOSI = [
                 azione: function() {
                     apriModaleBersaglio("A chi vuoi dare le Ciabatte Birk?", function(indicePG) {
                         let p = miaSquadra[indicePG];
-                        if (!p.perkId) {
-                            p.perkId = "ciabatte_birk"; // We need to handle this perk or stat boost
-                            p.vel += Math.round(p.vel * 0.10);
-                            mostraEsitoMistero(`${p.nome} ha equipaggiato le Ciabatte Birk! (+10% SPD)`);
-                        } else {
-                            mostraEsitoMistero(`${p.nome} ha già un perk equipaggiato! Non può prendere le ciabatte.`);
-                        }
+                        aggiungiBuffTemporaneoNextFight(p.idUnico, 'vel', 0.10);
+                        mostraEsitoMistero(`${p.nome} ha equipaggiato le Ciabatte Birk! (+10% SPD per il prossimo scontro)`);
                     });
                 }
             },
@@ -99,7 +94,7 @@ const DB_EVENTI_MISTERIOSI = [
                 azione: function() {
                     apriModaleBersaglio("Di quale Pokémon vuoi aumentare il livello della mossa?", function(indicePG) {
                         let p = miaSquadra[indicePG];
-                        p.livelloMossa++;
+                        if (p.livelloMossa < 3) p.livelloMossa++;
                         mostraEsitoMistero(`La tua determinazione porta ad aumentare di 1 il livello della mossa di ${p.nome}!`);
                     });
                 }
@@ -352,8 +347,8 @@ const DB_EVENTI_MISTERIOSI = [
                     if (monete >= 2) {
                         monete -= 2;
                         monete += 1; // Resto di cortesia
-                        aggiungiAZaino("BRIOCHE CALDA", 1);
-                        mostraEsitoMistero("Spendi 2 monete. L'azienda ti regala 1 moneta di resto e 1x BRIOCHE CALDA!");
+                        aggiungiAZaino("SNACK AL VOLO", 1);
+                        mostraEsitoMistero("Spendi 2 monete. L'azienda ti regala 1 moneta di resto e 1x SNACK AL VOLO!");
                     } else {
                         mostraEsitoMistero("Non hai monete per chiamare.");
                     }
@@ -379,7 +374,7 @@ const DB_EVENTI_MISTERIOSI = [
                 azione: function() {
                     apriModaleBersaglio("Di chi vuoi aumentare il livello della mossa?", function(indicePG) {
                         let p = miaSquadra[indicePG];
-                        p.livelloMossa++;
+                        if (p.livelloMossa < 3) p.livelloMossa++;
                         mostraEsitoMistero(`${p.nome} ha guadagnato +1 Livello Mossa per l'efficienza burocratica!`);
                     });
                 }
@@ -425,7 +420,7 @@ const DB_EVENTI_MISTERIOSI = [
                         let pgVecchio = miaSquadra[indicePG];
                         miaSquadra.splice(indicePG, 1);
                         
-                        let targetLivello = Math.max(1, (miaSquadra[0] ? miaSquadra[0].livello - 1 : 1));
+                        let targetLivello = pgVecchio.livello + 2;
                         let idNuovoPg = pescaPokemonCasuale([]);
                         let p = creaPokemon(idNuovoPg, targetLivello, 1);
                         
@@ -460,8 +455,9 @@ const DB_EVENTI_MISTERIOSI = [
                 testo: "AVVIA COMANDO 'FORMAT C:'",
                 azione: function() {
                     if (Math.random() < 0.40) {
-                        aggiungiAZaino("DISCO MOSSA", 1);
-                        mostraEsitoMistero("Miracolo informatico! Il backend si ripulisce e sblocchi 1x DISCO MOSSA gratis.");
+                        mostraEsitoMistero("Miracolo informatico! Il backend si ripulisce e sblocchi un potenziamento mossa gratis.", false, () => {
+                            apriSchermataDiscoMossa();
+                        });
                     } else {
                         miaSquadra.forEach(p => {
                             if (p && p.hpAttuali > 0) {
@@ -544,7 +540,7 @@ const DB_EVENTI_MISTERIOSI = [
                 azione: function() {
                     apriModaleBersaglio("Di quale Pokémon vuoi aumentare il livello della mossa?", function(indicePG) {
                         let p = miaSquadra[indicePG];
-                        p.livelloMossa++;
+                        if (p.livelloMossa < 3) p.livelloMossa++;
                         mostraEsitoMistero(`${p.nome} ha aumentato la mossa di +1 grazie all'attenzione ai pericoli!`);
                     });
                 }
@@ -594,7 +590,7 @@ const DB_EVENTI_MISTERIOSI = [
                         p.hpMax += 2;
                         p.hpAttuali += 2;
                         p.def += 2;
-                        aggiungiBuffTemporaneoNextFight(p.idUnico, 'spd', -0.15); // Wait, "Velocità" in stats is "vel" or "spd" (speed)? vel is speed in italian, spd is sp.def. I used spd above for speed. Let's fix this in eventi.js to map properly. Let's use 'vel' for speed.
+                        aggiungiBuffTemporaneoNextFight(p.idUnico, 'vel', -0.15);
                         mostraEsitoMistero(`Blindatura totale! ${p.nome} ottiene permanentemente +2 PV e +2 DEF, ma per i riflessi lenti subirà -15% Velocità nel prossimo scontro.`);
                     }
                 }
@@ -638,9 +634,14 @@ const DB_EVENTI_MISTERIOSI = [
                 testo: "FIX IN PRODUZIONE",
                 azione: function() {
                     apriModaleBersaglio("Di quale Pokémon vuoi aumentare la mossa? (1/2)", function(i1) {
-                        miaSquadra[i1].livelloMossa++;
+                        if (miaSquadra[i1].livelloMossa < 3) miaSquadra[i1].livelloMossa++;
                         apriModaleBersaglio("Di quale ALTRO Pokémon vuoi aumentare la mossa? (2/2)", function(i2) {
-                            miaSquadra[i2].livelloMossa++;
+                            if (i1 !== i2 && miaSquadra[i2].livelloMossa < 3) {
+                                miaSquadra[i2].livelloMossa++;
+                            } else if (i1 === i2) {
+                                // Scelto stesso pokemon, se puo' sale ancora
+                                if (miaSquadra[i2].livelloMossa < 3) miaSquadra[i2].livelloMossa++;
+                            }
                             miaSquadra.forEach(p => {
                                 if (p && p.hpAttuali > 0) {
                                     let dmg = Math.max(1, Math.round(p.hpAttuali * 0.30));

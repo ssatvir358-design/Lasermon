@@ -37,24 +37,24 @@ const CONFIG_STAT_ELEMENTO = {
 
 // Moltiplicatori di danno (Attaccante >> Difensore)
 const CONFIG_DEBOLEZZE = {
-    "normale": {},
-    "fuoco": { "acqua": 0.5, "erba": 1.5, "ghiaccio": 1.5 },
-    "acqua": { "fuoco": 1.5, "erba": 0.5, "terra": 1.5 },
-    "erba": { "fuoco": 0.5, "acqua": 1.5, "veleno": 0.5, "terra": 1.5, "vento": 0.5 },
-    "elettro": { "acqua": 1.5, "erba": 0.5, "elettro": 0.5, "terra": 0, "vento": 1.5 },
-    "ghiaccio": { "fuoco": 0.5, "acqua": 0.5, "ghiaccio": 0.5, "terra": 1.5, "vento": 1.5 },
-    "lotta": { "normale": 1.5, "ghiaccio": 1.5, "vento": 0.5 },
-    "veleno": { "erba": 1.5, "veleno": 0.5, "terra": 0.5, "vento": 1.5 },
-    "terra": { "fuoco": 1.5, "erba": 0.5, "elettro": 1.5, "veleno": 1.5, "vento": 0 },
-    "vento": { "erba": 1.5, "elettro": 0.5, "lotta": 1.5 },
-    "psico": { "lotta": 1.5, "veleno": 1.5 },
-    "drago": { "ghiaccio": 0.5 },
-    "folletto": { "normale": 0, "lotta": 1.5, "veleno": 0.5 },
-    "luce": {},
+    "normale": { "folletto": 1.5, "luce": 0.75 },
+    "fuoco": { "acqua": 0.5, "erba": 1.5, "ghiaccio": 1.5, "drago": 0.5, "luce": 0.75 },
+    "acqua": { "fuoco": 1.5, "erba": 0.5, "terra": 1.5, "drago": 0.5, "luce": 0.75 },
+    "erba": { "fuoco": 0.5, "acqua": 1.5, "veleno": 0.5, "terra": 1.5, "vento": 0.5, "drago": 0.5, "luce": 0.75 },
+    "elettro": { "acqua": 1.5, "erba": 0.5, "elettro": 0.5, "terra": 0, "vento": 1.5, "drago": 0.5, "luce": 0.75 },
+    "ghiaccio": { "fuoco": 0.5, "acqua": 0.5, "ghiaccio": 0.5, "terra": 1.5, "vento": 1.5, "drago": 1.5, "luce": 0.75 },
+    "lotta": { "normale": 1.5, "ghiaccio": 1.5, "vento": 0.5, "psico": 0.5, "luce": 0.75 },
+    "veleno": { "erba": 1.5, "veleno": 0.5, "terra": 0.5, "vento": 1.5, "luce": 0.75 },
+    "terra": { "fuoco": 1.5, "erba": 0.5, "elettro": 1.5, "veleno": 1.5, "vento": 0, "luce": 0.75 },
+    "vento": { "erba": 1.5, "elettro": 0.5, "lotta": 1.5, "luce": 0.75 },
+    "psico": { "lotta": 1.5, "veleno": 1.5, "psico": 1.5, "folletto": 1.5, "luce": 0.75 },
+    "drago": { "ghiaccio": 0.5, "drago": 1.5, "folletto": 0, "luce": 0.75 },
+    "folletto": { "normale": 0, "lotta": 1.5, "veleno": 0.5, "psico": 1.5, "drago": 1.5, "luce": 0.75 },
+    "luce": { "buio": 2 },
     "buio": { 
         "normale": 1.25, "fuoco": 1.25, "acqua": 1.25, "erba": 1.25, "elettro": 1.25, "ghiaccio": 1.25,
         "lotta": 1.25, "veleno": 1.25, "terra": 1.25, "vento": 1.25, "psico": 1.25, "drago": 1.25, "folletto": 1.25,
-        "luce": 1.25, "buio": 1.25
+        "luce": 2
     }
 };
 

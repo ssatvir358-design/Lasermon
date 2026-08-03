@@ -543,7 +543,7 @@ function preparaUsoItemInBattaglia(dbId) {
             if (p.hpAttuali <= 0) {
                 canUse = false;
                 msgError = "Il Pok\u00e9mon \u00e8 KO";
-            } else if (p.hpAttuali >= p.hpMax && (!cfg.effettoSpeciale || !cfg.effettoSpeciale.includes("rimuovi"))) {
+            } else if (cfg.stat === "hp" && p.hpAttuali >= p.hpMax && (!cfg.effettoSpeciale || !cfg.effettoSpeciale.includes("rimuovi"))) {
                 canUse = false;
                 msgError = "HP gi\u00e0 al max";
             }

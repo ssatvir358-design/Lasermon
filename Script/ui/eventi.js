@@ -51,7 +51,7 @@ function generaOpzioniPokeball() {
 
 // Avvia la schermata dello scambio Pok\u00e9mon (mostra la squadra selezionabile)
 function avviaEventoScambio() {
-    document.getElementById("scambio-fase-selezione").style.display = "block";
+    document.getElementById("scambio-fase-selezione").style.display = "flex";
     document.getElementById("scambio-fase-risultato").style.display = "none";
 
     let contenitoreSquadra = document.getElementById("scambio-squadra-list");
@@ -59,26 +59,37 @@ function avviaEventoScambio() {
 
     miaSquadra.forEach((p, index) => {
         let scheda = document.createElement("div");
-        scheda.className = "scheda-disco-pokemon"; 
+        let lvlMossa = p.livelloMossa || 1;
+        let nomeMossa = getNomeMossaAttuale(p);
+
+        scheda.className = "scheda-disco-pokemon";
         scheda.style.backgroundColor = p.colore || "#ffffff";
-        scheda.style.transform = "scale(0.8)";
-        scheda.style.height = "auto";
+        scheda.style.flexShrink = "0";
+        scheda.style.minWidth = "180px";
+        scheda.style.maxWidth = "220px";
         scheda.style.cursor = "pointer";
+
         scheda.onclick = () => eseguiScambioDiretto(index);
         
         scheda.innerHTML = `
-            <div class="foto-disco-pkm"><img src="${p.immagine}"></div>
-            <div class="info-disco-pkm" style="width: 100%;">
-                <div class="nome-disco-pkm" style="font-size: 16px; margin-bottom: 5px;">${p.nome} <span style="font-size:12px">(${p.elemento.toUpperCase()})</span></div>
-                <div style="font-family: monospace; font-size: 12px; margin-bottom: 2px;">Lvl: ${p.livello} | HP: ${p.hpAttuali}/${p.hpMax}</div>
-                <div style="font-family: monospace; font-size: 12px;">ATK: ${p.atk} | DEF: ${p.def} | VEL: ${p.vel}</div>
-                <div style="font-family: monospace; font-size: 12px;">SP.ATK: ${p.atkSpec} | SP.DEF: ${p.defSpec}</div>
+            <img src="${p.immagine}" alt="${p.nome}" style="width:100%; max-height: 130px; object-fit: contain; border-radius:5px; margin-bottom:10px;">
+            <div style="font-size:13px; text-align:left; color:#333; line-height: 1.4; padding: 5px; width: 100%; box-sizing: border-box;">
+                <div style="font-weight:bold; font-size:15px; margin-bottom:5px; text-align:center;">${p.nome} <span style="font-size:11px; color:#555;">(Lv.${p.livello})</span></div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:3px; font-size:12px;">
+                    <div><strong>HP:</strong> ${p.hpMax}</div>
+                    <div><strong>ATK:</strong> ${p.atk}</div>
+                    <div><strong>DEF:</strong> ${p.def}</div>
+                    <div><strong>VEL:</strong> ${p.vel}</div>
+                </div>
+                <div style="margin-top:8px; font-size:11px; text-align:center; background:rgba(255,255,255,0.4); padding:3px; border-radius:3px;">
+                    <strong>${nomeMossa}</strong> (Lvl ${lvlMossa})
+                </div>
             </div>
         `;
         contenitoreSquadra.appendChild(scheda);
     });
 
-    cambiaSchermata("schermata-mappa", "schermata-scambio");
+    document.getElementById("schermata-scambio").style.display = "flex";
 }
 
 // Variabile globale nel file per tracciare il pok\u00e9mon ottenuto dallo scambio
@@ -110,19 +121,27 @@ function eseguiScambioDiretto(indexDaScambiare) {
     _ultimoScambiato = nuovoPkm; // Salva per check perk in chiusura
 
     document.getElementById("scambio-fase-selezione").style.display = "none";
-    document.getElementById("scambio-fase-risultato").style.display = "block";
+    document.getElementById("scambio-fase-risultato").style.display = "flex";
     document.getElementById("testo-risultato-scambio").innerHTML = `Hai scambiato ${vecchioPkm.nome} (Lvl ${vecchioPkm.livello}) per un <strong>${nuovoPkm.nome} (Lvl ${nuovoPkm.livello})</strong>!`;
 
     let contenitoreCard = document.getElementById("card-nuovo-pokemon");
+    let lvlMossa = nuovoPkm.livelloMossa || 1;
+    let nomeMossa = getNomeMossaAttuale(nuovoPkm);
+
     contenitoreCard.innerHTML = `
-        <div class="scheda-disco-pokemon" style="background-color: ${nuovoPkm.colore}; cursor: default; transform: scale(0.9); height: auto; flex-direction: column;">
-            <div class="foto-disco-pkm"><img src="${nuovoPkm.immagine}"></div>
-            <div class="info-disco-pkm" style="text-align: center; width: 100%;">
-                <div class="nome-disco-pkm">${nuovoPkm.nome}</div>
-                <div style="font-family: monospace; font-size: 14px; margin-top: 5px;">Lvl: ${nuovoPkm.livello} | HP: ${nuovoPkm.hpAttuali}/${nuovoPkm.hpMax}</div>
-                <div style="font-family: monospace; font-size: 14px;">ATK: ${nuovoPkm.atk} | DEF: ${nuovoPkm.def} | VEL: ${nuovoPkm.vel}</div>
-                <div style="font-family: monospace; font-size: 14px;">SP.ATK: ${nuovoPkm.atkSpec} | SP.DEF: ${nuovoPkm.defSpec}</div>
-                <div style="font-size: 13px; color: #27ae60; font-weight: bold; margin-top: 5px;">TIPO: ${nuovoPkm.elemento.toUpperCase()}</div>
+        <div class="scheda-disco-pokemon" style="background-color: ${nuovoPkm.colore || '#ffffff'}; flex-shrink: 0; min-width: 180px; max-width: 220px; cursor: default;">
+            <img src="${nuovoPkm.immagine}" alt="${nuovoPkm.nome}" style="width:100%; max-height: 120px; object-fit: contain; border-radius:5px; margin-bottom:10px;">
+            <div style="font-size:13px; text-align:left; color:#333; line-height: 1.4; padding: 5px; width: 100%; box-sizing: border-box;">
+                <div style="font-weight:bold; font-size:15px; margin-bottom:5px; text-align:center;">${nuovoPkm.nome} <span style="font-size:11px; color:#555;">(Lv.${nuovoPkm.livello})</span></div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:2px;">
+                    <div><strong>HP:</strong> ${nuovoPkm.hpMax}</div>
+                    <div><strong>ATK:</strong> ${nuovoPkm.atk}</div>
+                    <div><strong>DEF:</strong> ${nuovoPkm.def}</div>
+                    <div><strong>VEL:</strong> ${nuovoPkm.vel}</div>
+                </div>
+                <div style="margin-top:8px; font-size:11px; text-align:center; background:rgba(255,255,255,0.4); padding:3px; border-radius:3px;">
+                    <strong>${nomeMossa}</strong> (Lvl ${lvlMossa})
+                </div>
             </div>
         </div>
     `;
@@ -130,7 +149,7 @@ function eseguiScambioDiretto(indexDaScambiare) {
 
 // Annulla lo scambio e torna alla mappa sbloccando i nodi successivi
 function annullaScambio() {
-    cambiaSchermata("schermata-scambio", "schermata-mappa");
+    document.getElementById("schermata-scambio").style.display = "none";
     generaMappaAlbero();
 }
 
@@ -144,7 +163,7 @@ function chiudiEventoScambio() {
 
     // Callback finale: chiude lo scambio e aggiorna la mappa
     const tornaAMappa = () => {
-        cambiaSchermata("schermata-scambio", "schermata-mappa");
+        document.getElementById("schermata-scambio").style.display = "none";
         aggiornaSquadraMappa();
         generaMappaAlbero();
     };

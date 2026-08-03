@@ -833,5 +833,31 @@ const DB_OGGETTI = [
         usabileInBattaglia: false,
         limiteUtilizziPerFight: null,
         durataInTurni: null
+    },
+    {
+        id: "equip_25",
+        nome: "SMART WORKING FORZATO",
+        icona: "../Sprite/item/non comprabili/smartphone.png",
+        iconaFallback: "📱",
+        mappeAbilitate: [7, 8, 9],
+        descrizione: "AUMENTA +20% VELOCITÀ MA -20% DIFESA (MALEDETTO)",
+        categoria: "equipaggiabile",
+        acquistabile: false,
+        stat: "vel",
+        valore: 0.20,
+        valoreType: "percent",
+        costo: 0,
+        consumabile: false,
+        effettoSpeciale: null,
+        usabileInBattaglia: false,
+        limiteUtilizziPerFight: null,
+        durataInTurni: null,
+        malusStatistica: "def",
+        malusValore: -0.20,
+        malusValoreType: "percent",
+        spawnPerc: null,
+        itemSpeciale: true,
+        raritaItem: "comune",
+        maledetto: true
     }
 ];

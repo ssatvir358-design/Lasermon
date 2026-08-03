@@ -341,10 +341,10 @@ function aggiornaPannelloZainoMappa() {
             const itemDesc = fullItem && fullItem.descrizione ? fullItem.descrizione : "";
             
             cella.className = "zaino-cella piena";
-            let isConsumabileCura = itemCat === "consumabile" && fullItem.stat === "hp" && (!fullItem.effettoSpeciale || !fullItem.effettoSpeciale.includes("rimuovi"));
+            let isConsumabile = itemCat === "consumabile";
             if (itemCat === "equipaggiabile") {
                 cella.onclick = () => apriAssegnazioneOggetto(i, false);
-            } else if (isConsumabileCura) {
+            } else if (isConsumabile) {
                 cella.onclick = () => apriAssegnazioneOggetto(i, true);
             }
             
@@ -436,7 +436,7 @@ function confermaAssegnazioneOggetto(indexZaino, indexPokemon, isCura = false) {
                 mostraAvviso("Questo Pokémon è KO! Usa un oggetto per rianimarlo.");
                 return;
             }
-            if (p.hpAttuali >= p.hpMax && (!fullItem.effettoSpeciale || !fullItem.effettoSpeciale.includes("rimuovi"))) {
+            if (fullItem.stat === "hp" && p.hpAttuali >= p.hpMax && (!fullItem.effettoSpeciale || !fullItem.effettoSpeciale.includes("rimuovi"))) {
                 mostraAvviso("Questo Pokémon ha già i PS al massimo!");
                 return;
             }

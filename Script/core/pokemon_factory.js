@@ -86,11 +86,11 @@ function calcolaLivelloEMossaMappa(piano, tipoEvento) {
     if (tipoEvento === "boss") {
         livelloGenerato = lvBoss;
     } else if (tipoEvento === "npc" || tipoEvento === "allenatore") {
-        // MIN(LV_BOSS-5; ROUND(LV_INGRESSO + (((LV_BOSS - LV_INGRESSO)/6)*P*0,45))+RANDOM(0;+1))
-        let randomOffset = Math.floor(Math.random() * 2); // 0 or +1
+        // MIN(LV_BOSS-6; ROUND(LV_INGRESSO + (((LV_BOSS - LV_INGRESSO)/6)*P*0,45))+RANDOM(-1;0))
+        let randomOffset = Math.floor(Math.random() * 2) - 1; // -1 or 0
         let baseCalc = lvIngresso + (((lvBoss - lvIngresso) / 6) * piano * 0.45);
         let calc = Math.round(baseCalc) + randomOffset;
-        livelloGenerato = Math.min(lvBoss - 5, calc);
+        livelloGenerato = Math.min(lvBoss - 6, calc);
     } else if (tipoEvento === "miniboss") {
         let maxTeamLvl = (typeof maxLvlTeamInizioMappa !== "undefined") ? maxLvlTeamInizioMappa : 1;
         if (typeof miaSquadra !== "undefined" && miaSquadra.length > 0) {

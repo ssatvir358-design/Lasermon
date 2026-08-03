@@ -537,7 +537,7 @@ function calcolaEdEseguiDannoGiocatore(moltMossa, nomeMossaUsata) {
 function attivaFase2MiniBoss() {
     let idF2 = null;
     let videoTrasformazione = null;
-    if (nemicoPokemon.nome === "Maccioni") idF2 = "Maccioni F2";
+    if (nemicoPokemon.nome === "Maccioni") idF2 = "Maccione F2";
     else if (nemicoPokemon.nome === "Savina") {
         idF2 = "Savina F2";
         videoTrasformazione = "../Sprite/personaggi/Savina/SavinaULT.mp4";
@@ -954,10 +954,16 @@ function calcolaEdEseguiDannoNemico(moltMossa, nomeMossaUsata, isSplashSat = fal
 
     // --- LANZA ONE-SHOT GIMMICK ---
     if (isUlt && nemicoPokemon.boss && nemicoPokemon.nome.toLowerCase().includes("lanza")) {
-        miaSquadra.forEach(p => {
-            if (p) p.hpAttuali = 0;
+        miaSquadra.forEach((p, index) => {
+            if (p) {
+                if (index === indicePokemonAttivo) {
+                    p.hpAttuali = 0;
+                } else {
+                    p.hpAttuali -= Math.floor(p.hpAttuali * 0.5);
+                }
+            }
         });
-        document.getElementById("console-log").innerHTML += `<br>\u2620\ufe0f <strong>${nemicoPokemon.nome} usa la sua Gimmick Finale e ELIMINA TUTTO IL TEAM!</strong>`;
+        document.getElementById("console-log").innerHTML += `<br>\u2620\ufe0f <strong>${nemicoPokemon.nome} usa la sua Gimmick Finale!</strong>`;
         aggiornaGrafica();
         
         processaEffettiFineTurno(nemicoPokemon, true);
