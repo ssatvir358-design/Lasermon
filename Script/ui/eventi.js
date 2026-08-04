@@ -72,17 +72,16 @@ function avviaEventoScambio() {
         scheda.onclick = () => eseguiScambioDiretto(index);
         
         scheda.innerHTML = `
-            <img src="${p.immagine}" alt="${p.nome}" style="width:100%; max-height: 130px; object-fit: contain; border-radius:5px; margin-bottom:10px;">
+            <img src="${p.immagine}" alt="${p.nome}" style="width:100%; max-height: 120px; object-fit: contain; border-radius:5px; margin-bottom:10px;">
             <div style="font-size:13px; text-align:left; color:#333; line-height: 1.4; padding: 5px; width: 100%; box-sizing: border-box;">
-                <div style="font-weight:bold; font-size:15px; margin-bottom:5px; text-align:center;">${p.nome} <span style="font-size:11px; color:#555;">(Lv.${p.livello})</span></div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:3px; font-size:12px;">
-                    <div><strong>HP:</strong> ${p.hpMax}</div>
-                    <div><strong>ATK:</strong> ${p.atk}</div>
-                    <div><strong>DEF:</strong> ${p.def}</div>
-                    <div><strong>VEL:</strong> ${p.vel}</div>
-                </div>
-                <div style="margin-top:8px; font-size:11px; text-align:center; background:rgba(255,255,255,0.4); padding:3px; border-radius:3px;">
-                    <strong>${nomeMossa}</strong> (Lvl ${lvlMossa})
+                <strong>${p.nome}</strong> <span style="font-size:11px;">(${p.raritaTipo ? p.raritaTipo.toUpperCase() : "COMUNE"})</span><br>
+                Elemento: ${getHtmlElemento(p.elemento)}<br>
+                Lvl: ${p.livello} | HP: ${p.hpAttuali}/${p.hpMax}<br>
+                ATK: ${p.atk} DEF: ${p.def}<br>
+                VEL: ${p.vel}<br>
+                SP.ATK: ${p.atkSpec} SP.DEF: ${p.defSpec}<br>
+                <div style="margin-top:8px; padding:4px; background:rgba(0,0,0,0.1); border-radius:3px; text-align:center; word-wrap: break-word;">
+                    ${nomeMossa} (Lvl ${lvlMossa})
                 </div>
             </div>
         `;
@@ -104,6 +103,8 @@ function eseguiScambioDiretto(indexDaScambiare) {
         vecchioPkm.oggetti.forEach(ogg => {
             if (typeof aggiungiAZaino === "function" && ogg.id) {
                 aggiungiAZaino(ogg.id);
+            } else if (typeof aggiungiAZaino === "function" && ogg.dbId) {
+                aggiungiAZaino(ogg.dbId);
             } else {
                 zaino.push(ogg);
             }
@@ -132,15 +133,14 @@ function eseguiScambioDiretto(indexDaScambiare) {
         <div class="scheda-disco-pokemon" style="background-color: ${nuovoPkm.colore || '#ffffff'}; flex-shrink: 0; min-width: 180px; max-width: 220px; cursor: default;">
             <img src="${nuovoPkm.immagine}" alt="${nuovoPkm.nome}" style="width:100%; max-height: 120px; object-fit: contain; border-radius:5px; margin-bottom:10px;">
             <div style="font-size:13px; text-align:left; color:#333; line-height: 1.4; padding: 5px; width: 100%; box-sizing: border-box;">
-                <div style="font-weight:bold; font-size:15px; margin-bottom:5px; text-align:center;">${nuovoPkm.nome} <span style="font-size:11px; color:#555;">(Lv.${nuovoPkm.livello})</span></div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:2px;">
-                    <div><strong>HP:</strong> ${nuovoPkm.hpMax}</div>
-                    <div><strong>ATK:</strong> ${nuovoPkm.atk}</div>
-                    <div><strong>DEF:</strong> ${nuovoPkm.def}</div>
-                    <div><strong>VEL:</strong> ${nuovoPkm.vel}</div>
-                </div>
-                <div style="margin-top:8px; font-size:11px; text-align:center; background:rgba(255,255,255,0.4); padding:3px; border-radius:3px;">
-                    <strong>${nomeMossa}</strong> (Lvl ${lvlMossa})
+                <strong>${nuovoPkm.nome}</strong> <span style="font-size:11px;">(${nuovoPkm.raritaTipo ? nuovoPkm.raritaTipo.toUpperCase() : "COMUNE"})</span><br>
+                Elemento: ${getHtmlElemento(nuovoPkm.elemento)}<br>
+                Lvl: ${nuovoPkm.livello} | HP: ${nuovoPkm.hpAttuali}/${nuovoPkm.hpMax}<br>
+                ATK: ${nuovoPkm.atk} DEF: ${nuovoPkm.def}<br>
+                VEL: ${nuovoPkm.vel}<br>
+                SP.ATK: ${nuovoPkm.atkSpec} SP.DEF: ${nuovoPkm.defSpec}<br>
+                <div style="margin-top:8px; padding:4px; background:rgba(0,0,0,0.1); border-radius:3px; text-align:center; word-wrap: break-word;">
+                    ${nomeMossa} (Lvl ${lvlMossa})
                 </div>
             </div>
         </div>
@@ -180,58 +180,93 @@ function chiudiEventoScambio() {
 
 // Avvia un evento misterioso: pesca uno tra quelli abilitati per la mappa corrente
 function avviaEventoMisterioso() {
-    let numeroMappaCorrente = parseInt(mappaAttuale.replace("mappa", "")) || 1;
-    let eventiFiltrati = DB_EVENTI_MISTERIOSI.filter(ev => ev.mappeAbilitate.includes(numeroMappaCorrente));
-    
-    if (eventiFiltrati.length === 0) eventiFiltrati = DB_EVENTI_MISTERIOSI;
-    
-    // Selezione pesata in base alle percentuali
-    let sommaPercentuali = eventiFiltrati.reduce((sum, ev) => sum + ev.percentuale, 0);
-    let rand = Math.random() * sommaPercentuali;
-    let eventoEstratto = eventiFiltrati[0];
-    let contatore = 0;
-    
-    for (let ev of eventiFiltrati) {
-        contatore += ev.percentuale;
-        if (rand <= contatore) {
-            eventoEstratto = ev; break;
+    try {
+        let numeroMappaCorrente = parseInt(mappaAttuale.replace("mappa", "")) || 1;
+        let eventiFiltrati = DB_EVENTI_MISTERIOSI.filter(ev => ev.mappeAbilitate.includes(numeroMappaCorrente));
+        
+        if (eventiFiltrati.length === 0) eventiFiltrati = DB_EVENTI_MISTERIOSI;
+        
+        // Selezione pesata in base alle percentuali
+        let sommaPercentuali = eventiFiltrati.reduce((sum, ev) => sum + ev.percentuale, 0);
+        let rand = Math.random() * sommaPercentuali;
+        let eventoEstratto = eventiFiltrati[0];
+        let contatore = 0;
+        
+        for (let ev of eventiFiltrati) {
+            contatore += ev.percentuale;
+            if (rand <= contatore) {
+                eventoEstratto = ev; break;
+            }
         }
+        
+        document.getElementById("mistero-titolo-evento").innerText = eventoEstratto.nome;
+        document.getElementById("mistero-descrizione").innerText = eventoEstratto.descrizione;
+        
+        // Reset UI
+        const scelteContainer = document.getElementById("mistero-scelte-container");
+        const esitoTesto = document.getElementById("mistero-esitotesto");
+        const btnContinua = document.getElementById("btn-mistero-continua");
+        
+        scelteContainer.innerHTML = "";
+        esitoTesto.style.display = "none";
+        btnContinua.style.display = "none";
+        scelteContainer.style.display = "flex";
+        
+        if (eventoEstratto.scelte && eventoEstratto.scelte.length > 0) {
+            eventoEstratto.scelte.forEach((scelta, index) => {
+                const btn = document.createElement("button");
+                btn.className = "btn-battle";
+                btn.style.backgroundColor = "#2c3e50";
+                btn.style.color = "white";
+                btn.innerText = scelta.testo;
+                btn.onclick = () => {
+                    // Esegui azione e nascondi pulsanti
+                    scelteContainer.style.display = "none";
+                    if (scelta.azione) {
+                        try {
+                            scelta.azione();
+                        } catch (err) {
+                            console.error("Errore nell'azione scelta evento misterioso:", err);
+                            monete += 10;
+                            if (typeof aggiornaStatisticheHeader === 'function') aggiornaStatisticheHeader();
+                            mostraEsitoMistero("C'è stato un errore imprevisto durante l'evento! Vieni ricompensato con 10 monete per il disagio.");
+                        }
+                    }
+                };
+                scelteContainer.appendChild(btn);
+            });
+        } else {
+            // Fallback per vecchi eventi senza scelte
+            if (eventoEstratto.azione) {
+                try {
+                    eventoEstratto.azione();
+                    mostraEsitoMistero("Evento completato.");
+                } catch (err) {
+                    console.error("Errore nell'azione evento misterioso:", err);
+                    monete += 10;
+                    if (typeof aggiornaStatisticheHeader === 'function') aggiornaStatisticheHeader();
+                    mostraEsitoMistero("C'è stato un errore imprevisto durante l'evento! Vieni ricompensato con 10 monete per il disagio.");
+                }
+            } else {
+                mostraEsitoMistero("Evento completato.");
+            }
+        }
+        
+        cambiaSchermata("schermata-mappa", "schermata-mistero");
+    } catch (err) {
+        console.error("Errore critico in avviaEventoMisterioso:", err);
+        const scelteContainer = document.getElementById("mistero-scelte-container");
+        if (scelteContainer) scelteContainer.style.display = "none";
+        
+        document.getElementById("mistero-titolo-evento").innerText = "ERRORE DI SISTEMA";
+        document.getElementById("mistero-descrizione").innerText = "Un glitch imprevisto ha interrotto l'evento misterioso.";
+        
+        monete += 10;
+        if (typeof aggiornaStatisticheHeader === 'function') aggiornaStatisticheHeader();
+        
+        mostraEsitoMistero("C'è stato un errore imprevisto! Vieni ricompensato con 10 monete per il disagio.");
+        cambiaSchermata("schermata-mappa", "schermata-mistero");
     }
-    
-    document.getElementById("mistero-titolo-evento").innerText = eventoEstratto.nome;
-    document.getElementById("mistero-descrizione").innerText = eventoEstratto.descrizione;
-    
-    // Reset UI
-    const scelteContainer = document.getElementById("mistero-scelte-container");
-    const esitoTesto = document.getElementById("mistero-esitotesto");
-    const btnContinua = document.getElementById("btn-mistero-continua");
-    
-    scelteContainer.innerHTML = "";
-    esitoTesto.style.display = "none";
-    btnContinua.style.display = "none";
-    scelteContainer.style.display = "flex";
-    
-    if (eventoEstratto.scelte && eventoEstratto.scelte.length > 0) {
-        eventoEstratto.scelte.forEach((scelta, index) => {
-            const btn = document.createElement("button");
-            btn.className = "btn-battle";
-            btn.style.backgroundColor = "#2c3e50";
-            btn.style.color = "white";
-            btn.innerText = scelta.testo;
-            btn.onclick = () => {
-                // Esegui azione e nascondi pulsanti
-                scelteContainer.style.display = "none";
-                if (scelta.azione) scelta.azione();
-            };
-            scelteContainer.appendChild(btn);
-        });
-    } else {
-        // Fallback per vecchi eventi senza scelte
-        if (eventoEstratto.azione) eventoEstratto.azione();
-        mostraEsitoMistero("Evento completato.");
-    }
-    
-    cambiaSchermata("schermata-mappa", "schermata-mistero");
 }
 
 function mostraEsitoMistero(testo, isFight = false, fightCallback = null) {

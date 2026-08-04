@@ -418,6 +418,20 @@ const DB_EVENTI_MISTERIOSI = [
                 azione: function() {
                     apriModaleBersaglio("Chi vuoi licenziare in cambio della nuova risorsa?", function(indicePG) {
                         let pgVecchio = miaSquadra[indicePG];
+                        
+                        // Restituisci oggetti allo zaino
+                        if (pgVecchio.oggetti && pgVecchio.oggetti.length > 0) {
+                            pgVecchio.oggetti.forEach(ogg => {
+                                if (typeof aggiungiAZaino === "function" && ogg.id) {
+                                    aggiungiAZaino(ogg.id);
+                                } else if (typeof aggiungiAZaino === "function" && ogg.dbId) {
+                                    aggiungiAZaino(ogg.dbId);
+                                } else {
+                                    zaino.push(ogg);
+                                }
+                            });
+                        }
+                        
                         miaSquadra.splice(indicePG, 1);
                         
                         let targetLivello = pgVecchio.livello + 2;

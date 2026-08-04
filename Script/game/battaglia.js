@@ -213,7 +213,7 @@ function preparaIncontroBattaglia(tipoEvento, elementoFiltro = null) {
     }
 
     if (tipoEvento === "cespuglio") {
-        nemiciIncontro.push(creaPokemon(pescaPokemonCasuale(), livNemico, livMossaNemico));
+        nemiciIncontro.push(creaPokemon(pescaPokemonCasuale(), livNemico, livMossaNemico, true));
     } else if (tipoEvento === "npc") {
         const npcChibiMap = {
             "acqua": "Evren",
@@ -240,14 +240,14 @@ function preparaIncontroBattaglia(tipoEvento, elementoFiltro = null) {
         }
         
         if (pChibi) {
-            nemiciIncontro.push(creaPokemon(pChibi, livNemico, livMossaNemico));
+            nemiciIncontro.push(creaPokemon(pChibi, livNemico, livMossaNemico, true));
         } else {
-            nemiciIncontro.push(creaPokemon(pescaPokemonCasuale([], elementoFiltro), livNemico, livMossaNemico));
+            nemiciIncontro.push(creaPokemon(pescaPokemonCasuale([], elementoFiltro), livNemico, livMossaNemico, true));
         }
         
         // Secondo personaggio è casuale, ma escludiamo il chibi appena inserito
         const esclusioni = pChibi ? [pChibi.nome] : [];
-        nemiciIncontro.push(creaPokemon(pescaPokemonCasuale(esclusioni, elementoFiltro), livNemico, livMossaNemico));
+        nemiciIncontro.push(creaPokemon(pescaPokemonCasuale(esclusioni, elementoFiltro), livNemico, livMossaNemico, true));
     } else if (tipoEvento === "miniboss") {
         let numMappa = 1;
         if (typeof mappaAttuale !== "undefined" && mappaAttuale.startsWith("mappa")) {
@@ -260,13 +260,13 @@ function preparaIncontroBattaglia(tipoEvento, elementoFiltro = null) {
         else if (numMappa === 6) idMiniboss = "Savina";
         else if (numMappa === 8) idMiniboss = "Maccioni";
         
-        let mb = creaPokemon(idMiniboss, livNemico, livMossaNemico);
-        if (!mb) mb = creaPokemon(pescaPokemonCasuale(), livNemico, livMossaNemico);
+        let mb = creaPokemon(idMiniboss, livNemico, livMossaNemico, true);
+        if (!mb) mb = creaPokemon(pescaPokemonCasuale(), livNemico, livMossaNemico, true);
         mb.isMiniboss = true;
         mb.inFase2 = false;
         nemiciIncontro.push(mb);
     } else {
-        nemiciIncontro.push(creaPokemon(pescaPokemonCasuale(), livNemico, livMossaNemico));
+        nemiciIncontro.push(creaPokemon(pescaPokemonCasuale(), livNemico, livMossaNemico, true));
     }
 
     nemicoPokemon = nemiciIncontro.shift();
@@ -552,7 +552,7 @@ function attivaFase2MiniBoss() {
     if (!idF2) return false; // Graziani o altri senza F2
     
     // Crea il nuovo pokemon F2
-    let f2 = creaPokemon(idF2, nemicoPokemon.livello, nemicoPokemon.livelloMossa);
+    let f2 = creaPokemon(idF2, nemicoPokemon.livello, nemicoPokemon.livelloMossa, true);
     f2.isMiniboss = true;
     f2.inFase2 = true;
     
@@ -657,7 +657,7 @@ function turnoNemico() {
 
             if (vecchiaForma !== nuovaForma) {
                 // Forma cambiata: mostra WARNING poi video (la prima volta), poi cambia e attacca
-                const transizioneKey = `${vecchiaForma} a ${nuovaForma}`;
+                const transizioneKey = `${vecchiaForma}_a_${nuovaForma}`;
                 const videoFile = `../Sprite/personaggi/KulF2/trasformazioni/${transizioneKey}.mp4`;
                 const warningDiv = document.getElementById("warning-overlay");
 
@@ -723,7 +723,7 @@ function turnoNemico() {
                 nemicoPokemon.maxFase3 = true;
                 const datiFase3 = pokemonDatabase.find(p => p.nome.toLowerCase() === "max f3");
                 if (datiFase3) {
-                    const nuovoP = creaPokemon(datiFase3, nemicoPokemon.livello, nemicoPokemon.livelloMossa);
+                    const nuovoP = creaPokemon(datiFase3, nemicoPokemon.livello, nemicoPokemon.livelloMossa, true);
                     const vecchiHpMax = nemicoPokemon.hpMax;
                     const vecchiHpAttuali = nemicoPokemon.hpAttuali;
                     Object.assign(nemicoPokemon, {
@@ -739,7 +739,7 @@ function turnoNemico() {
                 nemicoPokemon.maxFase2 = true;
                 const datiFase2 = pokemonDatabase.find(p => p.nome.toLowerCase() === "max f2");
                 if (datiFase2) {
-                    const nuovoP = creaPokemon(datiFase2, nemicoPokemon.livello, nemicoPokemon.livelloMossa);
+                    const nuovoP = creaPokemon(datiFase2, nemicoPokemon.livello, nemicoPokemon.livelloMossa, true);
                     const vecchiHpMax = nemicoPokemon.hpMax;
                     const vecchiHpAttuali = nemicoPokemon.hpAttuali;
                     Object.assign(nemicoPokemon, {
@@ -843,7 +843,7 @@ function eseguiAttaccoNormaleNemico() {
             nemicoPokemon.maxFase3 = true;
             const datiFase3 = pokemonDatabase.find(p => p.nome.toLowerCase() === "max f3");
             if (datiFase3) {
-                const nuovoP = creaPokemon(datiFase3, nemicoPokemon.livello, nemicoPokemon.livelloMossa);
+                const nuovoP = creaPokemon(datiFase3, nemicoPokemon.livello, nemicoPokemon.livelloMossa, true);
                 const vecchiHpMax = nemicoPokemon.hpMax;
                 const vecchiHpAttuali = nemicoPokemon.hpAttuali;
                 Object.assign(nemicoPokemon, {
@@ -859,7 +859,7 @@ function eseguiAttaccoNormaleNemico() {
             nemicoPokemon.maxFase2 = true;
             const datiFase2 = pokemonDatabase.find(p => p.nome.toLowerCase() === "max f2");
             if (datiFase2) {
-                const nuovoP = creaPokemon(datiFase2, nemicoPokemon.livello, nemicoPokemon.livelloMossa);
+                const nuovoP = creaPokemon(datiFase2, nemicoPokemon.livello, nemicoPokemon.livelloMossa, true);
                 const vecchiHpMax = nemicoPokemon.hpMax;
                 const vecchiHpAttuali = nemicoPokemon.hpAttuali;
                 Object.assign(nemicoPokemon, {
@@ -877,7 +877,7 @@ function eseguiAttaccoNormaleNemico() {
             isSplashSat = true;
             atkImgBackup = nemicoPokemon.immagineAtk;
             nemicoPokemon.immagineAtk = "../Sprite/personaggi/Sat/Sat_atkAOE.jpeg";
-            nemicoPokemon.frameAtk = 1;
+            nemicoPokemon.frameAtk = 4;
             effettiAttivi.nemico.defRidotta = { percentuale: 0.15, durata: 1, isSatCustom: true };
         }
     } else if (nemicoPokemon.nome.toLowerCase() === "gio") {
@@ -1381,7 +1381,7 @@ function avviaBossBattle(idBoss) {
             }
         }
         
-        let p = creaPokemon(base, finalLvl, 3);
+        let p = creaPokemon(base, finalLvl, 3, true);
         p.boss = true;
         nemiciIncontro.push(p);
     });

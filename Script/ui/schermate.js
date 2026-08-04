@@ -286,6 +286,19 @@ function eseguiSostituzione(indiceNuovo, indiceSquadra) {
     const nuovoPokemon = opzioniSceltaPokemon[indiceNuovo];
     if (!nuovoPokemon) return;
 
+    let vecchioPkm = miaSquadra[indiceSquadra];
+    if (vecchioPkm && vecchioPkm.oggetti && vecchioPkm.oggetti.length > 0) {
+        vecchioPkm.oggetti.forEach(ogg => {
+            if (typeof aggiungiAZaino === "function" && ogg.id) {
+                aggiungiAZaino(ogg.id);
+            } else if (typeof aggiungiAZaino === "function" && ogg.dbId) {
+                aggiungiAZaino(ogg.dbId);
+            } else {
+                zaino.push(ogg);
+            }
+        });
+    }
+
     miaSquadra[indiceSquadra] = nuovoPokemon;
     chiudiModalSostituzione();
 

@@ -23,7 +23,7 @@ function aggiungiAZaino(dbId, qty = 1) {
     // Se è stato passato il nome dell'oggetto anziché l'ID, lo cerchiamo
     let veroItem = getOggettoDb(dbId);
     if (!veroItem) {
-        veroItem = oggettiDatabase.find(o => o.nome.toLowerCase() === dbId.toLowerCase());
+        veroItem = DB_OGGETTI.find(o => o.nome.toLowerCase() === dbId.toLowerCase());
         if (veroItem) dbId = veroItem.id;
     }
 

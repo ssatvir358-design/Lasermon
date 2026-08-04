@@ -152,7 +152,7 @@ function getHtmlElemento(elementoNome, isGrande = false) {
  * @param {number} livelloMossa - Livello della mossa (1, 2 o 3)
  * @returns {object}            - Istanza Pok\u00e9mon pronta all'uso
  */
-function creaPokemon(infoBase, livello, livelloMossa = 1) {
+function creaPokemon(infoBase, livello, livelloMossa = 1, isNemico = false) {
     // Supporto per chiamate con stringa nome: converte in oggetto dal DB
     if (typeof infoBase === "string") {
         const nomeCercato = infoBase;
@@ -175,7 +175,35 @@ function creaPokemon(infoBase, livello, livelloMossa = 1) {
     const molEvo = infoBase.moltiplicatoreEvoluzione || 1.0;
     
     // Calcolo statistiche con le formule definite sopra
-    const hpMax = calcolaHP(infoBase.hpBase,  livello, statsElem.hp,  molRar, molEvo);
+    let hpMax = calcolaHP(infoBase.hpBase,  livello, statsElem.hp,  molRar, molEvo);
+    
+    // --- Moltiplicatori speciali per Boss e Mini Boss (solo HP finali) ---
+    if (isNemico && (infoBase.boss || infoBase.isMiniboss)) {
+        const nomeLower = infoBase.nome.toLowerCase();
+        const raritaLower = (infoBase.raritaTipo || "").toLowerCase();
+        let moltHP = 1;
+
+        if (nomeLower.startsWith("donato")) moltHP = 1.5;
+        else if (nomeLower.startsWith("giulio")) moltHP = 1.8;
+        else if (nomeLower.startsWith("paolo")) moltHP = 2;
+        else if (nomeLower.startsWith("dinicola")) moltHP = 2.2;
+        else if (nomeLower.startsWith("lanza")) moltHP = 2.5;
+        else if (nomeLower.startsWith("filippo")) moltHP = 2.7;
+        else if (nomeLower.startsWith("massimo") || nomeLower.startsWith("max")) moltHP = 3;
+        
+        else if (nomeLower.startsWith("graziani")) moltHP = 1.8;
+        else if (nomeLower.startsWith("danilo")) moltHP = 1.8;
+        else if (nomeLower.startsWith("maccioni")) moltHP = 2.2;
+        else if (nomeLower.startsWith("savina")) moltHP = 2.2;
+        else if (nomeLower.startsWith("mattia")) moltHP = 2;
+        
+        if (raritaLower === "bombers" || raritaLower === "bomber") moltHP = 3;
+
+        if (moltHP !== 1) {
+            hpMax = Math.round(hpMax * moltHP);
+        }
+    }
+
     const atk   = calcolaStat(infoBase.atkBase, livello, statsElem.atk, molRar, molEvo);
     const def   = calcolaStat(infoBase.defBase, livello, statsElem.def, molRar, molEvo);
     const atkSpec = calcolaStat(infoBase.atkSpec || infoBase.atkBase, livello, statsElem.atkSpec || statsElem.atk, molRar, molEvo);
