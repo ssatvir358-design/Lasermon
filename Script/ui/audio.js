@@ -76,6 +76,7 @@ function toggleAutoskip(valore) {
     isSkipAttivo = valore;
     const btn = document.getElementById("btn-skip-fixed");
     if (btn) btn.classList.toggle("attivo", valore);
+    localStorage.setItem('laserPoke_autoskip', valore);
 }
 
 // Abilita la modalit\u00e0 skip rapido per il combattimento corrente
@@ -102,5 +103,17 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
             audio.volume = 0.25; // Default iniziale dimezzato
         }
+    }
+    
+    // Ripristina preferenza autoskip
+    const savedAutoskip = localStorage.getItem('laserPoke_autoskip');
+    if (savedAutoskip !== null) {
+        const isAutoskip = savedAutoskip === 'true';
+        isAutoskipAbilitato = isAutoskip;
+        isSkipAttivo = isAutoskip;
+        const chkAutoskip = document.getElementById("chk-autoskip");
+        if (chkAutoskip) chkAutoskip.checked = isAutoskip;
+        const btn = document.getElementById("btn-skip-fixed");
+        if (btn) btn.classList.toggle("attivo", isAutoskip);
     }
 });

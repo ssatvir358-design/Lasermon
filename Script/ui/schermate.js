@@ -132,7 +132,7 @@ function mostraSelezione() {
                 <img src="${p.immagine}" alt="${p.nome}" class="sprite-pokemon">
             </div>
             <div class="blocco-stats">
-                <strong>${p.nome}</strong> (${p.raritaTipo.toUpperCase()})<br>
+                <strong>${p.nome}</strong> <br>
                 \u2022 Elemento: ${getHtmlElemento(p.elemento)}<br>
                 \u2022 Livello: ${p.livello}<br>
                 \u2022 HP: ${p.hpMax}<br>
@@ -198,7 +198,7 @@ function generaOpzioniPokemon(quanti, isStarter) {
                 <img src="${p.immagine}" alt="${p.nome}" class="sprite-pokemon">
             </div>
             <div class="blocco-stats">
-                <strong>${p.nome}</strong> (${p.raritaTipo.toUpperCase()})<br>
+                <strong>${p.nome}</strong> <br>
                 Elemento: ${getHtmlElemento(p.elemento)}<br>
                 Livello: ${p.livello}<br>
                 HP: ${p.hpMax}<br>
@@ -260,7 +260,7 @@ function apriModalSostituzione(indiceNuovo) {
         scheda.innerHTML = `
             <img src="${p.immagine}" alt="${p.nome}" style="width:100%; max-height: 120px; object-fit: contain; border-radius:5px; margin-bottom:10px;">
             <div style="font-size:13px; text-align:left; color:#333; line-height: 1.4; padding: 5px; width: 100%; box-sizing: border-box;">
-                <strong>${p.nome}</strong> <span style="font-size:11px;">(${p.raritaTipo ? p.raritaTipo.toUpperCase() : "COMUNE"})</span><br>
+                <strong>${p.nome}</strong> <br>
                 Elemento: ${getHtmlElemento(p.elemento)}<br>
                 Lvl: ${p.livello} | HP: ${p.hpAttuali}/${p.hpMax}<br>
                 ATK: ${p.atk} DEF: ${p.def}<br>
@@ -721,7 +721,7 @@ function mostraDettaglioPokemon(index) {
 
     document.getElementById("dettaglio-img").src = p.immagineVS; 
     document.getElementById("dettaglio-nome").innerText = p.nome;
-    document.getElementById("dettaglio-rarita").innerText = p.raritaTipo.toUpperCase();
+    document.getElementById('dettaglio-rarita').innerText = '';
     
     // Inietta il badge elemento nelle statistiche
     let bloccoStats = document.querySelector("#schermata-dettaglio .valori-stats");
@@ -1171,7 +1171,7 @@ function applicaFiltriPokedex() {
             <div class="blocco-stats-pokedex">
                 <div class="info-titolo">
                     <span class="nome-pkm">${pBase.nome}</span><br>
-                    <span class="rarita-pkm">[${pBase.raritaTipo.toUpperCase()}]</span><br>
+                    <br>
                     <div style="margin-top:2px;">${getHtmlElemento(pBase.elemento)}</div>
                 </div>
                 <hr class="separatore-pkm">
@@ -1238,5 +1238,108 @@ function tornaALobbyDaMappa() {
 
 function tornaAllaLobbyDaVittoria() {
     location.reload();
+}
+
+// ==========================================
+// MODALE MANUALE DI GIOCO
+// ==========================================
+
+function apriManualeDiGioco() {
+    generaContenutoManuale();
+    document.getElementById('schermata-manuale').style.display = 'flex';
+}
+
+function chiudiManualeDiGioco() {
+    document.getElementById('schermata-manuale').style.display = 'none';
+}
+
+function cambiaTabManuale(tabId) {
+    const tabs = document.querySelectorAll('.manuale-tab-content');
+    tabs.forEach(t => t.style.display = 'none');
+    
+    const btns = document.querySelectorAll('.manuale-tab-btn');
+    btns.forEach(b => b.classList.remove('attivo'));
+    
+    document.getElementById(tabId).style.display = 'block';
+    const activeBtn = Array.from(btns).find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes(tabId));
+    if (activeBtn) activeBtn.classList.add('attivo');
+}
+
+function generaContenutoManuale() {
+    // 1. Schivata
+    const containerSchivata = document.getElementById('manuale-schivata-dyn');
+    if (containerSchivata && typeof CONFIG_SCHIVATA_ELEMENTO !== 'undefined') {
+        let htmlSchivata = '';
+        for (const [elem, molt] of Object.entries(CONFIG_SCHIVATA_ELEMENTO)) {
+            htmlSchivata += `<div style="background: #1a1a2e; padding: 5px 10px; border-radius: 4px; border: 1px solid #444;">
+                <span style="color: #9b59b6; text-transform: capitalize; font-weight: bold;">${elem}</span>: ${molt}
+            </div>`;
+        }
+        containerSchivata.innerHTML = htmlSchivata;
+    }
+
+    // 2. Elementi & Debolezze
+    const containerElementi = document.getElementById('manuale-elementi-dyn');
+    if (containerElementi && typeof CONFIG_DEBOLEZZE !== 'undefined') {
+        let htmlElementi = '';
+        for (const [attaccante, difensori] of Object.entries(CONFIG_DEBOLEZZE)) {
+            let fortiContro = [];
+            let deboliContro = [];
+            for (const [difensore, molt] of Object.entries(difensori)) {
+                if (molt > 1) fortiContro.push(difensore);
+                else if (molt < 1) deboliContro.push(difensore);
+            }
+            
+            htmlElementi += `<div style="background: #0f0f1a; border-left: 3px solid #e74c3c; padding: 10px;">
+                <strong style="color: #e74c3c; text-transform: capitalize; font-size: 16px;">${attaccante}</strong><br>
+                ${fortiContro.length > 0 ? `<span style="color: #2ecc71;">Forte contro:</span> ${fortiContro.join(', ')}<br>` : ''}
+                ${deboliContro.length > 0 ? `<span style="color: #e67e22;">Debole contro:</span> ${deboliContro.join(', ')}` : ''}
+            </div>`;
+        }
+        containerElementi.innerHTML = htmlElementi;
+    }
+
+    // 3. Mosse
+    const containerMosse = document.getElementById('manuale-mosse-dyn');
+    if (containerMosse && typeof CONFIG_MOSSE !== 'undefined') {
+        let htmlMosse = '';
+        for (const [lvl, molt] of Object.entries(CONFIG_MOSSE)) {
+            if (lvl == 3) {
+                htmlMosse += `<li style="margin-bottom: 8px;"><strong>Mossa Lv${lvl}:</strong> <span style="color: #f1c40f;">Attiva l'abilità speciale legata al proprio elemento! (Moltiplicatore Danno base: x${molt})</span></li>`;
+            } else {
+                htmlMosse += `<li style="margin-bottom: 8px;"><strong>Mossa Lv${lvl}:</strong> Moltiplicatore Danno x${molt}</li>`;
+            }
+        }
+        containerMosse.innerHTML = htmlMosse;
+    }
+    
+    // 4. Status (Generato per comodità ma coi numeri descrittivi)
+    const containerStatus = document.getElementById('manuale-status-dyn');
+    if (containerStatus) {
+        const stati = [
+            { elem: "Fuoco", icon: "🔥", desc: "Scottatura: 10% max HP per 3 turni." },
+            { elem: "Erba", icon: "🌿", desc: "Seme Sanguisuga: Ruba il 10% max HP per 3 turni curando l'attaccante." },
+            { elem: "Acqua", icon: "💧", desc: "Inzuppato: Riduce la Velocità avversaria del 20% per 3 turni." },
+            { elem: "Elettro", icon: "⚡", desc: "Paralisi: 25% di probabilità di far saltare il turno al nemico per 3 turni." },
+            { elem: "Ghiaccio", icon: "❄️", desc: "Congelamento: 10% di probabilità di far saltare il turno al nemico per 3 turni." },
+            { elem: "Terra", icon: "🪨", desc: "Cecità: 20% di probabilità che l'attacco nemico fallisca per 3 turni." },
+            { elem: "Volante / Vento", icon: "🌪️", desc: "Vento in Coda: Aumenta la Velocità dell'attaccante del 20% per 3 turni." },
+            { elem: "Lotta", icon: "🥊", desc: "Spezzaguardia: Riduce la Difesa avversaria del 20% per 3 turni." },
+            { elem: "Psico", icon: "🔮", desc: "Stordimento: Salta 1 turno (100% probabilità)." },
+            { elem: "Veleno", icon: "☠️", desc: "Avvelenamento: Danno fisso che scala col livello per 3 turni." },
+            { elem: "Drago", icon: "🐉", desc: "Furia Draconica: Riduce sia ATK che DEF avversari del 15% per 3 turni." },
+            { elem: "Folletto", icon: "✨", desc: "Provocazione: Abbassa l'attacco fisico e speciale del nemico del 20% per 3 turni." },
+            { elem: "Luce", icon: "✨", desc: "Abbagliato: Riduce l'Attacco nemico del 20% per 3 turni." },
+            { elem: "Buio", icon: "🌑", desc: "Paura: 15% di probabilità di far saltare il turno al nemico per 3 turni." }
+        ];
+        
+        let htmlStatus = '';
+        for (let s of stati) {
+            htmlStatus += `<li style="background: #111; padding: 10px; border-radius: 5px; border-left: 3px solid #9b59b6;">
+                <strong>${s.icon} ${s.elem}</strong><br><span style="color: #bdc3c7;">${s.desc}</span>
+            </li>`;
+        }
+        containerStatus.innerHTML = htmlStatus;
+    }
 }
 

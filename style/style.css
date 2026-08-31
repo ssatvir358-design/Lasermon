@@ -13,6 +13,7 @@
 @import url("ui/eventi.css");
 @import url("ui/negozio.css");
 @import url("ui/perk.css");
+@import url("ui/challenge.css");
 
 /* 3. Game State / Battle */
 @import url("game/battaglia.css");

@@ -23,8 +23,15 @@ const CONFIG_LEVEL_UP = {
 // ----------------------------------------------------------
 
 function getMessaggioEfficacia(moltiplicatore) {
-    if (moltiplicatore > 1) return "<br><span style='color:#e1b12c; font-weight:bold;'>\u00c8 superefficace!</span>";
-    if (moltiplicatore < 1) return "<br><span style='color:#7f8fa6; font-style:italic;'>Non \u00e8 molto efficace...</span>";
+    if (moltiplicatore === 0) {
+        return "<br><span style='color: #ff4757; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 8px rgba(255, 71, 87, 0.8); padding: 2px 5px; background: rgba(0,0,0,0.5); border-radius: 4px; display: inline-block; margin-top: 5px;'>❌ Non ha alcun effetto! (Immunità) ❌</span>";
+    }
+    if (moltiplicatore > 1) {
+        return `<br><span style='color: #2ecc71; font-weight: bold; text-shadow: 0 0 5px rgba(46, 204, 113, 0.6); padding: 2px 5px; background: rgba(0,0,0,0.5); border-radius: 4px; display: inline-block; margin-top: 5px;'>💥 È superefficace! (x${moltiplicatore}) 💥</span>`;
+    }
+    if (moltiplicatore < 1) {
+        return `<br><span style='color: #f39c12; font-style: italic; opacity: 0.9; padding: 2px 5px; background: rgba(0,0,0,0.5); border-radius: 4px; display: inline-block; margin-top: 5px;'>🔻 Non è molto efficace... (x${moltiplicatore}) 🔻</span>`;
+    }
     return "";
 }
 
@@ -134,37 +141,72 @@ function mandaInCampoMioPokemon() {
         document.getElementById("btn-attacco").style.display = "none";
         if (document.getElementById("btn-item")) document.getElementById("btn-item").style.display = "none";
         if (document.getElementById("btn-pokemon")) document.getElementById("btn-pokemon").style.display = "none";
-        if (document.getElementById("btn-fuga")) document.getElementById("btn-fuga").style.display = "";
+        if (document.getElementById("btn-fuga")) document.getElementById("btn-fuga").style.display = (typeof isChallengeBattle !== 'undefined' && isChallengeBattle) ? "none" : "";
     } else {
         document.getElementById("btn-attacco").style.display = "";
         if (document.getElementById("btn-item")) document.getElementById("btn-item").style.display = "";
         if (document.getElementById("btn-pokemon")) document.getElementById("btn-pokemon").style.display = "";
-        if (document.getElementById("btn-fuga")) document.getElementById("btn-fuga").style.display = "";
+        if (document.getElementById("btn-fuga")) document.getElementById("btn-fuga").style.display = (typeof isChallengeBattle !== 'undefined' && isChallengeBattle) ? "none" : "";
     }
     document.getElementById("btn-attacco").disabled             = false;
     document.getElementById("img-giocatore").src                = mioPokemon.immagine;
     return true;
 }
 
+let isAutoBattlePaused = false;
+
+function togglePausaAutoBattle() {
+    isAutoBattlePaused = !isAutoBattlePaused;
+    const btn = document.getElementById("btn-pausa-auto-fixed");
+    if (isAutoBattlePaused) {
+        btn.classList.add("attivo");
+        btn.innerHTML = "&#9654; RIPRENDI";
+    } else {
+        btn.classList.remove("attivo");
+        btn.innerHTML = "&#10074;&#10074; PAUSA AUTO";
+    }
+    
+    // Se stavamo aspettando il turno giocatore, sblocchiamo subito i controlli
+    if (document.getElementById("btn-pausa-auto-fixed").style.display !== "none") {
+        abilitaControlliGiocatore();
+    }
+}
+
 // ----------------------------------------------------------
+// CONTROLLI GIOCATORE
 // Abilita i controlli del turno giocatore (attacco + item)
 // Da chiamare ogni volta che ritorna il turno al giocatore.
 // ----------------------------------------------------------
 function abilitaControlliGiocatore() {
     if (typeof isRunVeloce !== "undefined" && isRunVeloce) {
-        // Nascondi pulsanti per sicurezza in Auto-Battle
-        document.getElementById("btn-attacco").style.display = "none";
-        if (document.getElementById("btn-item")) document.getElementById("btn-item").style.display = "none";
-        if (document.getElementById("btn-pokemon")) document.getElementById("btn-pokemon").style.display = "none";
-        if (document.getElementById("btn-fuga")) document.getElementById("btn-fuga").style.display = "";
-        
-        // Sblocca i pulsanti per far funzionare l'auto-attacco e la fuga
-        document.getElementById("btn-attacco").disabled = false;
-        if (document.getElementById("btn-fuga")) document.getElementById("btn-fuga").disabled = false;
+        // Mostra il bottone della pausa
+        const btnPausa = document.getElementById("btn-pausa-auto-fixed");
+        if (btnPausa) btnPausa.style.display = "block";
 
-        // Esegui automaticamente il turno con piccolo ritardo
-        setTimeout(turnoGiocatore, isSkipAttivo ? 500 : 1000);
-        return;
+        if (!isAutoBattlePaused) {
+            // Nascondi pulsanti per sicurezza in Auto-Battle
+            document.getElementById("btn-attacco").style.display = "none";
+            if (document.getElementById("btn-item")) document.getElementById("btn-item").style.display = "none";
+            if (document.getElementById("btn-pokemon")) document.getElementById("btn-pokemon").style.display = "none";
+            if (document.getElementById("btn-fuga")) document.getElementById("btn-fuga").style.display = (typeof isChallengeBattle !== 'undefined' && isChallengeBattle) ? "none" : "";
+            
+            // Sblocca i pulsanti per far funzionare l'auto-attacco e la fuga
+            document.getElementById("btn-attacco").disabled = false;
+            if (document.getElementById("btn-fuga")) document.getElementById("btn-fuga").disabled = false;
+
+            // Esegui automaticamente il turno con piccolo ritardo
+            setTimeout(turnoGiocatore, isSkipAttivo ? 500 : 1000);
+            return;
+        } else {
+            // Se in pausa, mostra i controlli normali
+            document.getElementById("btn-attacco").style.display = "";
+            if (document.getElementById("btn-item")) document.getElementById("btn-item").style.display = "";
+            if (document.getElementById("btn-pokemon")) document.getElementById("btn-pokemon").style.display = "";
+            if (document.getElementById("btn-fuga")) document.getElementById("btn-fuga").style.display = (typeof isChallengeBattle !== 'undefined' && isChallengeBattle) ? "none" : "";
+        }
+    } else {
+        const btnPausa = document.getElementById("btn-pausa-auto-fixed");
+        if (btnPausa) btnPausa.style.display = "none";
     }
 
     document.getElementById("btn-attacco").disabled = false;
@@ -173,6 +215,8 @@ function abilitaControlliGiocatore() {
     resettaItemTurno();      // Resetta il flag "item già usato"
     aggiornaStatoBtnItem();  // Aggiorna stato bottone item
 }
+
+
 
 
 // ----------------------------------------------------------
@@ -184,6 +228,10 @@ function preparaIncontroBattaglia(tipoEvento, elementoFiltro = null) {
     haUsatoUltNemico    = false;
     nemiciIncontro      = [];
     isSkipAttivo        = isAutoskipAbilitato;
+    
+    // Azzera esplicitamente il log ad ogni nuovo scontro
+    const logEl = document.getElementById("console-log");
+    if (logEl) logEl.innerHTML = "Scontro iniziato! Preparati alla battaglia.";
     
     // Reset UI per lo skip
     const btnSkipFixed = document.getElementById("btn-skip-fixed");
@@ -332,8 +380,7 @@ function preparaIncontroBattaglia(tipoEvento, elementoFiltro = null) {
 
         if (nemicoPokemon.vel > mioPokemon.vel) {
             chiAttaccaPerPrimo = "nemico";
-            document.getElementById("console-log").innerHTML =
-                `Il nemico \u00e8 pi\u00f9 veloce! ${nemicoPokemon.nome} attacca per primo!`;
+            document.getElementById("console-log").innerHTML += "<hr style='border-color: #444; margin: 15px 0;'>" + `Il nemico \u00e8 pi\u00f9 veloce! ${nemicoPokemon.nome} attacca per primo!`;
             document.getElementById("btn-attacco").disabled = true;
             document.getElementById("btn-pokemon").disabled = true;
             document.getElementById("btn-fuga").disabled = true;
@@ -341,7 +388,7 @@ function preparaIncontroBattaglia(tipoEvento, elementoFiltro = null) {
             setTimeout(turnoNemico, 1500);
         } else {
             chiAttaccaPerPrimo = "giocatore";
-            document.getElementById("console-log").innerHTML = tipoEvento === "cespuglio"
+            document.getElementById("console-log").innerHTML += "<hr style='border-color: #444; margin: 15px 0;'>" + tipoEvento === "cespuglio"
                 ? `Un ${nemicoPokemon.nome} selvatico appare!`
                 : `L'allenatore manda in campo ${nemicoPokemon.nome}!`;
             abilitaControlliGiocatore();
@@ -377,8 +424,7 @@ function turnoGiocatore() {
     // Controlla ULT bombers (5% prob)
     if (mioPokemon.raritaTipo === "bombers" && !haUsatoUltGiocatore && Math.random() <= 0.05) {
         haUsatoUltGiocatore = true;
-        document.getElementById("console-log").innerHTML =
-            `\u26a0\ufe0f ${mioPokemon.nome} accumula un'energia devastante...`;
+        document.getElementById("console-log").innerHTML += "<hr style='border-color: #444; margin: 15px 0;'>" + `\u26a0\ufe0f ${mioPokemon.nome} accumula un'energia devastante...`;
         eseguiAnimazioneUlt(mioPokemon, "img-giocatore", () => {
             calcolaEdEseguiDannoGiocatore(3.0, mioPokemon.mossaULT || "ULTIMATE");
         });
@@ -398,6 +444,12 @@ function turnoGiocatore() {
 // ----------------------------------------------------------
 
 function calcolaEdEseguiDannoGiocatore(moltMossa, nomeMossaUsata) {
+    if (nemicoPokemon.isInvulnerable) {
+        document.getElementById("console-log").innerHTML += "<hr style='border-color: #444; margin: 15px 0;'>" + `🛡️ L'attacco rimbalza! Il nemico è invulnerabile!`;
+        setTimeout(turnoNemico, isSkipAttivo ? 500 : 1000);
+        return;
+    }
+
     const moltiplicatoreTipo = CONFIG_DEBOLEZZE[mioPokemon.elemento.toLowerCase()]?.[nemicoPokemon.elemento.toLowerCase()] ?? 1.0;
 
     // --- SCHIVATA NEMICO ---
@@ -407,8 +459,7 @@ function calcolaEdEseguiDannoGiocatore(moltMossa, nomeMossaUsata) {
         schivataNemica = 70;
     }
     if (!isUlt && schivataNemica > 0 && Math.random() * 100 < schivataNemica) {
-        document.getElementById("console-log").innerHTML =
-            `\u{1f4a8} ${nemicoPokemon.nome} <strong>schiva l'attacco!</strong> (${schivataNemica}% schivata)`;
+        document.getElementById("console-log").innerHTML += "<hr style='border-color: #444; margin: 15px 0;'>" + `\u{1f4a8} ${nemicoPokemon.nome} <strong>schiva l'attacco!</strong> (${schivataNemica}% schivata)`;
         
         processaEffettiFineTurno(mioPokemon, false);
         if (nemicoPokemon.hpAttuali <= 0 || mioPokemon.hpAttuali <= 0) {
@@ -483,14 +534,12 @@ function calcolaEdEseguiDannoGiocatore(moltMossa, nomeMossaUsata) {
     if (nemicoPokemon.scudoPassivo > 0) {
         dannoFatto = 0;
         nemicoPokemon.scudoPassivo = 0;
-        document.getElementById("console-log").innerHTML =
-            `\u{1f6e1}\ufe0f ${nemicoPokemon.nome} usa il suo Scudo per bloccare l'attacco!`;
+        document.getElementById("console-log").innerHTML += "<hr style='border-color: #444; margin: 15px 0;'>" + `\u{1f6e1}\ufe0f ${nemicoPokemon.nome} usa il suo Scudo per bloccare l'attacco!`;
         aggiornaGrafica();
     } else {
         nemicoPokemon.hpAttuali = Math.max(0, nemicoPokemon.hpAttuali - dannoFatto);
         const msgEfficacia = getMessaggioEfficacia(moltiplicatoreTipo);
-        document.getElementById("console-log").innerHTML =
-            `${mioPokemon.nome} usa <strong>${nomeMossaUsata}</strong> ed infligge ${dannoFatto} danni!${msgEfficacia}`;
+        document.getElementById("console-log").innerHTML += "<hr style='border-color: #444; margin: 15px 0;'>" + `${mioPokemon.nome} usa <strong>${nomeMossaUsata}</strong> ed infligge ${dannoFatto} danni!${msgEfficacia}`;
         aggiornaGrafica();
     }
 
@@ -523,6 +572,13 @@ function calcolaEdEseguiDannoGiocatore(moltMossa, nomeMossaUsata) {
     if ((nemicoPokemon.isMiniboss || nemicoPokemon.boss) && !nemicoPokemon.inFase2 && nemicoPokemon.hpAttuali > 0 && nemicoPokemon.hpAttuali <= (nemicoPokemon.hpMax / 2)) {
         if (attivaFase2MiniBoss()) {
             return; // Interrompe il normale flusso (la fase 2 gestirà il proseguo)
+        }
+    }
+
+    // Controlla trigger fase Challenge (es. Reo Fase 2 -> Fase 3 al 60% HP)
+    if (typeof isChallengeBattle !== 'undefined' && isChallengeBattle) {
+        if (typeof controllaTriggerChallenge === 'function' && controllaTriggerChallenge()) {
+            return; // Il cambio fase gestisce il proseguo
         }
     }
     
@@ -564,8 +620,7 @@ function attivaFase2MiniBoss() {
     nemicoPokemon = f2;
     resettaEffettiSuTarget("nemico");
     
-    document.getElementById("console-log").innerHTML = 
-        `<span style="color: #e74c3c; font-weight: bold; font-size: 1.2em;">\u26A0\uFE0F IL MINI BOSS PASSA ALLA FASE 2! \u26A0\uFE0F</span><br>Le sue statistiche e il suo elemento sono cambiati!`;
+    document.getElementById("console-log").innerHTML += "<hr style='border-color: #444; margin: 15px 0;'>" + `<span style="color: #e74c3c; font-weight: bold; font-size: 1.2em;">\u26A0\uFE0F IL MINI BOSS PASSA ALLA FASE 2! \u26A0\uFE0F</span><br>Le sue statistiche e il suo elemento sono cambiati!`;
         
     aggiornaGrafica();
     
@@ -632,7 +687,24 @@ function cambiaFormaKul(forma) {
 }
 
 function turnoNemico() {
+    if (typeof isChallengeBattle !== 'undefined' && isChallengeBattle) {
+        if (typeof eseguiTurnoBossChallenge === 'function') {
+            return eseguiTurnoBossChallenge();
+        }
+    }
     if (!nemicoPokemon || nemicoPokemon.hpAttuali <= 0 || !mioPokemon) return;
+
+    if (processaEffettiInizioTurno(nemicoPokemon, true)) {
+        // Il nemico salta il turno
+        processaEffettiFineTurno(nemicoPokemon, true);
+        if (nemicoPokemon.hpAttuali <= 0 || mioPokemon.hpAttuali <= 0) {
+            if (nemicoPokemon.hpAttuali <= 0) gestisciKONemico();
+            if (mioPokemon.hpAttuali <= 0) gestisciKOGiocatore();
+        } else {
+            abilitaControlliGiocatore();
+        }
+        return;
+    }
 
     let usaUlt = false;
     let messaggioSpeciale = "";
@@ -809,8 +881,7 @@ function turnoNemico() {
         }
 
         const eseguiUlt = () => {
-            document.getElementById("console-log").innerHTML =
-                `\u26a0\ufe0f IL BOSS SI INFURIA! ${nemicoPokemon.nome} prepara l'attacco finale!${messaggioSpeciale}`;
+            document.getElementById("console-log").innerHTML += "<hr style='border-color: #444; margin: 15px 0;'>" + `\u26a0\ufe0f IL BOSS SI INFURIA! ${nemicoPokemon.nome} prepara l'attacco finale!${messaggioSpeciale}`;
             eseguiAnimazioneUlt(nemicoPokemon, "img-nemico", () => {
                 const mossaSat = nemicoPokemon.nome.toLowerCase().includes("sat") ? "Maremoto del Bomber" : nemicoPokemon.mossaULT;
                 calcolaEdEseguiDannoNemico(3.0, mossaSat || nemicoPokemon.mossaULT, false);
@@ -956,7 +1027,7 @@ function calcolaEdEseguiDannoNemico(moltMossa, nomeMossaUsata, isSplashSat = fal
     if (isUlt && nemicoPokemon.boss && nemicoPokemon.nome.toLowerCase().includes("lanza")) {
         miaSquadra.forEach((p, index) => {
             if (p) {
-                if (index === indicePokemonAttivo) {
+                if (p === mioPokemon) {
                     p.hpAttuali = 0;
                 } else {
                     p.hpAttuali -= Math.floor(p.hpAttuali * 0.5);
@@ -1075,6 +1146,11 @@ function calcolaEdEseguiDannoNemico(moltMossa, nomeMossaUsata, isSplashSat = fal
 // ----------------------------------------------------------
 
 function gestisciKOGiocatore() {
+    if (typeof isChallengeBattle !== 'undefined' && isChallengeBattle) {
+        if (typeof gestisciKOGiocatoreChallenge === 'function') {
+            return gestisciKOGiocatoreChallenge();
+        }
+    }
     // Mostra immagine KO del Pok\u00e9mon corrente
     const imgGiocatore = document.getElementById("img-giocatore");
     if (imgGiocatore && mioPokemon) {
@@ -1109,8 +1185,7 @@ function gestisciKOGiocatore() {
     const pokemonVivi = miaSquadra.filter(p => p.hpAttuali > 0);
 
     if (pokemonVivi.length > 0) {
-        document.getElementById("console-log").innerHTML =
-            `<strong>${mioPokemon.nome}</strong> \u00e8 esausto! Mandi in campo il prossimo!`;
+        document.getElementById("console-log").innerHTML += "<hr style='border-color: #444; margin: 15px 0;'>" + `<strong>${mioPokemon.nome}</strong> \u00e8 esausto! Mandi in campo il prossimo!`;
 
         setTimeout(() => {
             resettaEffettiSuTarget("giocatore");
@@ -1224,7 +1299,7 @@ function gestisciVittoriaIncontro() {
     if (moneteGuadagnate > 0) {
         msgVittoria += ` \u{1f4b0} +${moneteGuadagnate} monete!`;
     }
-    document.getElementById("console-log").innerHTML = msgVittoria;
+    document.getElementById("console-log").innerHTML += "<hr style='border-color: #444; margin: 15px 0;'>" + msgVittoria;
 
     // --- GESTIONE BOSS (avanzamento mappa) ---
     if (isBossFight) {
@@ -1239,7 +1314,7 @@ function gestisciVittoriaIncontro() {
                 document.getElementById("btn-attacco").style.display = "";
                 document.getElementById("btn-item").style.display = "";
                 document.getElementById("btn-pokemon").style.display = "";
-                document.getElementById("btn-fuga").style.display = "";
+                document.getElementById("btn-fuga").style.display = (typeof isChallengeBattle !== 'undefined' && isChallengeBattle) ? "none" : "";
                 cb();
             }, isSkipAttivo ? 1500 : 3000);
             return;
@@ -1250,8 +1325,13 @@ function gestisciVittoriaIncontro() {
         const indiceProssimo = chiaviMappe.indexOf(mappaAttuale) + 1;
 
         if (indiceProssimo >= chiaviMappe.length) {
-            document.getElementById("console-log").innerHTML =
-                "Y? COMPLIMENTI! Hai completato tutte le mappe! Y?";
+            document.getElementById("console-log").innerHTML += "<hr style='border-color: #444; margin: 15px 0;'>" + "🏆 COMPLIMENTI! Hai completato tutte le mappe! 🏆";
+            
+            // --- INSERIMENTO HALL OF FAME ---
+            if (typeof salvaInHallOfFame === "function") {
+                salvaInHallOfFame();
+            }
+
             const modale = document.getElementById("modal-vittoria-finale");
             if (modale) modale.style.display = "flex";
             return;
@@ -1287,7 +1367,7 @@ function gestisciVittoriaIncontro() {
             document.getElementById("btn-attacco").style.display = "";
             document.getElementById("btn-item").style.display = "";
             document.getElementById("btn-pokemon").style.display = "";
-            document.getElementById("btn-fuga").style.display = "";
+            document.getElementById("btn-fuga").style.display = (typeof isChallengeBattle !== 'undefined' && isChallengeBattle) ? "none" : "";
             // Torna alla mappa rimosso in quanto buggato e automatico
         });
     }, isSkipAttivo ? 1500 : 3000);
@@ -1404,8 +1484,7 @@ function avviaBossBattle(idBoss) {
 
             if (nemicoPokemon.vel > mioPokemon.vel) {
                 chiAttaccaPerPrimo = "nemico";
-                document.getElementById("console-log").innerHTML =
-                    `Il Boss <strong>${nemicoPokemon.nome}</strong> \u00e8 pi\u00f9 veloce e attacca per primo!`;
+                document.getElementById("console-log").innerHTML += "<hr style='border-color: #444; margin: 15px 0;'>" + `Il Boss <strong>${nemicoPokemon.nome}</strong> \u00e8 pi\u00f9 veloce e attacca per primo!`;
                 document.getElementById("btn-attacco").disabled = true;
                 document.getElementById("btn-pokemon").disabled = true;
                 document.getElementById("btn-fuga").disabled = true;
@@ -1413,8 +1492,7 @@ function avviaBossBattle(idBoss) {
                 setTimeout(turnoNemico, 1500);
             } else {
                 chiAttaccaPerPrimo = "giocatore";
-                document.getElementById("console-log").innerHTML =
-                    `Sei pi\u00f9 veloce! Tocca a ${mioPokemon.nome}.`;
+                document.getElementById("console-log").innerHTML += "<hr style='border-color: #444; margin: 15px 0;'>" + `Sei pi\u00f9 veloce! Tocca a ${mioPokemon.nome}.`;
                 abilitaControlliGiocatore();
             }
         }, 3000);
@@ -1474,12 +1552,12 @@ function attivaSkip() {
 function fugaBattaglia() {
     // Non \u00e8 possibile fuggire dalle Boss Fight
     if (isBossFight || (typeof tipoEventoAttuale !== 'undefined' && tipoEventoAttuale === "boss")) {
-        document.getElementById("console-log").innerHTML = "<br><span style='color:#e1b12c; font-weight:bold;'>Non puoi fuggire da una Boss Fight!</span>";
+        document.getElementById("console-log").innerHTML += "<hr style='border-color: #444; margin: 15px 0;'>" + "<br><span style='color:#e1b12c; font-weight:bold;'>Non puoi fuggire da una Boss Fight!</span>";
         return;
     }
 
     // Successo al 100%
-    document.getElementById("console-log").innerHTML = "<br><span style='color:#4cd137; font-weight:bold;'>Fuga riuscita con successo!</span>";
+    document.getElementById("console-log").innerHTML += "<hr style='border-color: #444; margin: 15px 0;'>" + "<br><span style='color:#4cd137; font-weight:bold;'>Fuga riuscita con successo!</span>";
     
     // Disabilita i controlli mentre si fugge
     document.getElementById("btn-attacco").disabled = true;
@@ -1501,6 +1579,13 @@ function fugaBattaglia() {
 
 
 function gestisciKONemico() {
+    if (typeof isChallengeBattle !== 'undefined' && isChallengeBattle) {
+        if (typeof gestisciKOBossChallenge === 'function') {
+            return gestisciKOBossChallenge();
+        }
+    }
+    
+    document.getElementById("img-nemico").classList.add("danno-subito");
     const fNem = getSpriteName(nemicoPokemon.nome);
     let folderPathNem = `../Sprite/personaggi/${fNem}`;
     if (nemicoPokemon.immagine) {
@@ -1516,8 +1601,7 @@ function gestisciKONemico() {
             nemicoPokemon = nemiciIncontro.shift();
             haUsatoUltNemico = false;
             resettaEffettiSuTarget("nemico");
-            document.getElementById("console-log").innerHTML =
-                `Il nemico manda in campo <strong>${nemicoPokemon.nome}</strong>! Tocca a te!`;
+            document.getElementById("console-log").innerHTML += "<hr style='border-color: #444; margin: 15px 0;'>" + `Il nemico manda in campo <strong>${nemicoPokemon.nome}</strong>! Tocca a te!`;
             aggiornaGrafica();
             abilitaControlliGiocatore();
         } else {
@@ -1534,6 +1618,21 @@ function applicaEffettoElementaleLv3(attaccante, bersaglio, elemento) {
     let targetId = (bersaglio === nemicoPokemon) ? "nemico" : "giocatore";
     let attId = (attaccante === mioPokemon) ? "giocatore" : "nemico";
     let msg = "";
+    if (bersaglio.isImmune === 1) {
+        const buffPersonali = ["VOLANTE", "BUIO", "NORMALE", "SPETTRO", "ACCIAIO", "DRAGO", "COLEOTTERO", "FOLLETTO"];
+        if (!buffPersonali.includes(elemento.toUpperCase())) {
+            let actionName = "applicare l'effetto di stato";
+            const el = elemento.toUpperCase();
+            if (el === "VELENO") actionName = "avvelenamento";
+            else if (el === "FUOCO") actionName = "scottatura";
+            else if (el === "ELETTRO") actionName = "paralisi";
+            else if (el === "GHIACCIO") actionName = "congelamento";
+            else if (el === "ERBA") actionName = "seme sanguisuga";
+            else if (el === "PSICO") actionName = "stordimento";
+            
+            return `<br>🛡️ Tentato ${actionName}, ma ${bersaglio.nome} è immune!`;
+        }
+    }
 
     switch(elemento.toUpperCase()) {
         case "FUOCO":
@@ -1554,7 +1653,7 @@ function applicaEffettoElementaleLv3(attaccante, bersaglio, elemento) {
         case "ELETTRO":
             // Paralisi: 25% prob di saltare il turno per 3 turni
             effettiAttivi[targetId].paralisi = { durata: 3 };
-            msg = `<br>\u26a1 ${bersaglio.nome} \u00e8 paralizzato!`;
+            msg = `<br>&#9889; <strong style="color:#f9ca24">${bersaglio.nome} è paralizzato! (Potrebbe tentennare)</strong>`;
             break;
         case "GHIACCIO":
             // Congelamento: 10% prob di saltare turno per 3 turni
@@ -1619,7 +1718,14 @@ function processaEffettiInizioTurno(pokemon, isNemico) {
     if (effettiAttivi[targetId].paralisi && effettiAttivi[targetId].paralisi.durata > 0) {
         effettiAttivi[targetId].paralisi.durata--;
         if (!saltato && Math.random() < 0.25) {
-            msg += `<br>\u26a1 ${pokemon.nome} è paralizzato e non può muoversi!`;
+            msg += `<br>&#9889; <strong style="color:#f9ca24">${pokemon.nome} tentenna!</strong>`;
+            const imgTargetId = isNemico ? "img-nemico" : "img-giocatore";
+            const imgEl = document.getElementById(imgTargetId);
+            if (imgEl) {
+                imgEl.classList.remove("animazione-tentenna");
+                void imgEl.offsetWidth; // Trigger reflow per riavviare l'animazione
+                imgEl.classList.add("animazione-tentenna");
+            }
             saltato = true;
         }
         if (effettiAttivi[targetId].paralisi.durata === 0) effettiAttivi[targetId].paralisi = null;

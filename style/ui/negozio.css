@@ -38,7 +38,7 @@
 
 
 /* ============================================================
-   SKIP BUTTON – Fisso top-left di #schermata-gioco
+   SKIP BUTTON E PAUSA AUTO — Fissi top-left di #schermata-gioco
    ============================================================ */
 #btn-skip-fixed {
     position: absolute;
@@ -72,6 +72,40 @@
     color: #4cd137;
     background: rgba(76, 209, 55, 0.2);
     box-shadow: 0 0 10px rgba(76,209,55,0.4), 0 4px 0 rgba(0,0,0,0.3);
+}
+
+#btn-pausa-auto-fixed {
+    position: absolute;
+    top: 15px;
+    left: 200px;
+    z-index: 20;
+    background: rgba(47, 54, 64, 0.85);
+    color: #f5f6fa;
+    border: 3px solid #718093;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Courier New', Courier, monospace;
+    transition: all 0.2s;
+    line-height: 1;
+    user-select: none;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+}
+
+#btn-pausa-auto-fixed:hover {
+    background: rgba(53, 59, 72, 0.95);
+    border-color: #f5f6fa;
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+}
+
+#btn-pausa-auto-fixed.attivo {
+    border-color: #e1b12c;
+    color: #e1b12c;
+    background: rgba(225, 177, 44, 0.2);
+    box-shadow: 0 0 10px rgba(225, 177, 44, 0.4), 0 4px 0 rgba(0,0,0,0.3);
 }
 
 

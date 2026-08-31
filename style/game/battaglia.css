@@ -220,7 +220,30 @@
     background-position: center;
     background-repeat: no-repeat;
     animation: shakeScreen 0.35s ease-in-out;
-    animation-delay: 0.5s; /* Si attiva in sincrono con la discesa del logo VS */
+    animation-delay: 0.5s;
+}
+
+.animazione-ko {
+    animation: fadeOutDown 1s forwards;
+}
+
+@keyframes fadeOutDown {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(30px); }
+}
+
+/* Animazione Tentenna (Elettro / Paralisi) */
+.animazione-tentenna {
+    animation: flinchShake 0.4s ease-in-out;
+}
+
+@keyframes flinchShake {
+    0% { margin-left: 0; filter: grayscale(0%); }
+    20% { margin-left: -15px; filter: grayscale(30%) sepia(50%) hue-rotate(20deg); }
+    40% { margin-left: 15px; }
+    60% { margin-left: -10px; }
+    80% { margin-left: 10px; filter: grayscale(30%) sepia(50%) hue-rotate(20deg); }
+    100% { margin-left: 0; filter: grayscale(0%); }
 }
 
 @keyframes shakeScreen {
@@ -545,10 +568,15 @@
     transform: translate(-10vw, 30vh) !important;
 }
 
-/* Rimuovi i limiti dai contenitori dei personaggi nell'arena (spesso bloccano l'immagine) */
-#gioco-container-arena div {
-    overflow: visible !important; 
-}
+  /* Rimuovi i limiti dai contenitori dei personaggi nell'arena (spesso bloccano l'immagine) */
+  #gioco-container-arena div:not(#console-log):not(.pannello-destro-log) {
+      overflow: visible !important; 
+  }
+  /* Il log di combattimento deve scrollare: NON toccare overflow */
+  #console-log {
+      overflow-y: scroll !important;
+      overflow-x: hidden !important;
+  }
 
 
 /* ==========================================================
@@ -558,12 +586,14 @@
     display: flex;
     flex-direction: row !important;
     width: 100% !important;
-    height: 180px !important; /* Leggermente più alto per display grandi */
-    flex-shrink: 0 !important; /* Impedisce che si rimpicciolisca */
-    z-index: 100 !important; /* Mantiene la barra sopra i personaggi */
+    height: 180px !important;
+    max-height: 180px !important;
+    flex-shrink: 0 !important;
+    z-index: 100 !important;
     position: relative !important;
     background-color: #2f3640 !important;
     box-sizing: border-box !important;
+    overflow: hidden !important;
     margin: 0 !important;
     padding: 0 !important;
 }
@@ -587,23 +617,30 @@
 
 .pannello-destro-log {
     width: 50% !important;
-    height: 100% !important;
+    height: 180px !important;
+    max-height: 180px !important;
     box-sizing: border-box !important;
     padding: 10px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
 }
 
 #console-log { 
+    display: block !important;
     width: 100% !important;
-    height: 100% !important;
+    height: 160px !important;
+    max-height: 160px !important;
     background-color: #1e272e !important; 
     color: #ffffff !important; 
-    padding: 15px !important; 
+    padding: 10px 15px !important; 
+    box-sizing: border-box !important;
     border-radius: 8px !important; 
     font-family: 'Courier New', Courier, monospace !important;
-    font-size: 16px !important; 
-    line-height: 1.5 !important;
-    overflow-y: auto !important;
-    box-sizing: border-box !important;
+    font-size: 14px !important; 
+    line-height: 1.4 !important;
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
     border: 2px solid #718093 !important;
 }
 

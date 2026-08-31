@@ -62,7 +62,8 @@ function aggiungiAZaino(dbId, qty = 1) {
 
 /**
  * Rimuove 1 unit\u00e0 di un item dallo zaino.
- * Se la quantit\u00e0 arriva a 0, rimuove l'entry completamente.
+ * Rimuove 1 unità di un item dallo zaino.
+ * Se la quantità arriva a 0, rimuove l'entry completamente.
  * @returns {boolean} true se la rimozione ha avuto successo
  */
 function rimuoviDaZaino(dbId) {
@@ -77,6 +78,33 @@ function rimuoviDaZaino(dbId) {
     }
     
     return true;
+}
+
+function vendiItem(dbId, quantita = 1) {
+    const item = getOggettoDb(dbId);
+    if (!item) return;
+    
+    const quantitaPosseduta = getQuantitaZaino(dbId);
+    if (quantitaPosseduta < quantita) {
+        mostraAvviso("Non possiedi abbastanza unità di questo oggetto!");
+        return;
+    }
+    
+    const ricavoSingolo = Math.floor(item.costo * 0.5);
+    const ricavoTotale = ricavoSingolo * quantita;
+
+    monete += ricavoTotale;
+    
+    for (let i = 0; i < quantita; i++) {
+        rimuoviDaZaino(dbId);
+    }
+    
+    aggiornaDisplayMonete();
+    _aggiornaDettaglioNegozio();
+    
+    if (typeof aggiornaPannelloZainoMappa === "function") {
+        aggiornaPannelloZainoMappa();
+    }
 }
 
 /** Recupera il record completo di un item dal DB_OGGETTI tramite id. */
@@ -203,9 +231,9 @@ function tornaAllaMappaDaCentro() {
 
 const CONFIG_NEGOZIO = {
     // Numero massimo di acquisti consentiti in una singola visita al centro medico
-    maxAcquistiPerVisita: 1, 
+    maxAcquistiPerVisita: 999, 
     // Se true, mostra i pulsanti + e - per comprare pi\u00f9 item alla volta
-    abilitaQuantitaMultipla: false,
+    abilitaQuantitaMultipla: true,
     // Se true, il semplice fatto di chiudere il negozio rimanda alla mappa,
     // chiudendo definitivamente il nodo del centro medico (impedendo la cura).
     chiudiCentroDopoNegozio: true
@@ -326,10 +354,16 @@ function _aggiornaDettaglioNegozio() {
     const det = document.getElementById("negozio-dettaglio");
     if (!det) return;
 
+    const quantitaZaino = getQuantitaZaino(item.id);
+    const valoreVenditaSingolo = Math.floor(item.costo * 0.5);
+    const ricavoTotale = valoreVenditaSingolo * _quantitaSelezionataNegozio;
+    const puoVendere = quantitaZaino >= _quantitaSelezionataNegozio;
+
     det.innerHTML = `
         <div>
             <div id="negozio-dettaglio-nome">${item.iconaFallback} ${item.nome}</div>
             <div id="negozio-dettaglio-desc">${item.descrizione}</div>
+            <div style="color:#aaa; font-size:12px; text-align:center; margin-top:5px;">Nello zaino: ${quantitaZaino}</div>
         </div>
         <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
             <div style="display: ${CONFIG_NEGOZIO.abilitaQuantitaMultipla ? 'flex' : 'none'}; align-items: center; gap: 15px; font-size: 20px; color: #fff;">
@@ -337,13 +371,28 @@ function _aggiornaDettaglioNegozio() {
                 <span>${_quantitaSelezionataNegozio}</span>
                 <button onclick="_cambiaQuantitaItem(1)" style="padding: 5px 15px; cursor: pointer; background: #333; color: white; border: 2px solid #555; border-radius: 5px;">+</button>
             </div>
-            <div id="negozio-dettaglio-costo">${costoTotale} \u{1f4b0}</div>
-            <button id="btn-acquista"
-                    onclick="acquistaItem('${item.id}', ${_quantitaSelezionataNegozio})"
-                    ${puoAcquistare ? '' : 'disabled'}
-                    style="width: 100%;">
-                ${puoAcquistare ? '\u2705 ACQUISTA' : (acquistiRimasti < _quantitaSelezionataNegozio ? '\u274c Limite Max Raggiunto' : '\u274c Monete insufficienti')}
-            </button>
+            
+            <div style="display: flex; justify-content: space-between; width: 100%; gap: 10px; align-items: stretch;">
+                <div style="flex:1; display:flex; flex-direction:column;">
+                    <div style="text-align:center; font-weight:bold; color:#e74c3c;">-${costoTotale} \u{1f4b0}</div>
+                    <button id="btn-acquista"
+                            onclick="acquistaItem('${item.id}', ${_quantitaSelezionataNegozio})"
+                            ${puoAcquistare ? '' : 'disabled'}
+                            style="width: 100%; height:100%; padding: 10px 5px; font-size: 14px;">
+                        ${puoAcquistare ? '\u2705 COMPRA' : (acquistiRimasti < _quantitaSelezionataNegozio ? '\u274c Max' : '\u274c No Monete')}
+                    </button>
+                </div>
+                
+                <div style="flex:1; display:flex; flex-direction:column;">
+                    <div style="text-align:center; font-weight:bold; color:#2ecc71;">+${ricavoTotale} \u{1f4b0}</div>
+                    <button id="btn-vendi"
+                            onclick="vendiItem('${item.id}', ${_quantitaSelezionataNegozio})"
+                            ${puoVendere ? '' : 'disabled'}
+                            style="width: 100%; height:100%; padding: 10px 5px; font-size: 14px;">
+                        ${puoVendere ? '\u{1f4e6} VENDI' : '\u274c Non possiedi'}
+                    </button>
+                </div>
+            </div>
         </div>
     `;
 }
@@ -574,6 +623,8 @@ function preparaUsoItemInBattaglia(dbId) {
  * @param {number} indexPokemon - Indice in miaSquadra del Pokémon bersaglio
  */
 function confermaUsoItemInBattaglia(dbId, indexPokemon) {
+    if (itemUsatiQuestoTurno) return; // Blocco anti-spam/doppio click
+    
     const cfg = getOggettoDb(dbId);
     if (!cfg) return;
     

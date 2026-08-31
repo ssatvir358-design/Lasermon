@@ -74,7 +74,7 @@ function avviaEventoScambio() {
         scheda.innerHTML = `
             <img src="${p.immagine}" alt="${p.nome}" style="width:100%; max-height: 120px; object-fit: contain; border-radius:5px; margin-bottom:10px;">
             <div style="font-size:13px; text-align:left; color:#333; line-height: 1.4; padding: 5px; width: 100%; box-sizing: border-box;">
-                <strong>${p.nome}</strong> <span style="font-size:11px;">(${p.raritaTipo ? p.raritaTipo.toUpperCase() : "COMUNE"})</span><br>
+                <strong>${p.nome}</strong><br>
                 Elemento: ${getHtmlElemento(p.elemento)}<br>
                 Lvl: ${p.livello} | HP: ${p.hpAttuali}/${p.hpMax}<br>
                 ATK: ${p.atk} DEF: ${p.def}<br>
@@ -133,7 +133,7 @@ function eseguiScambioDiretto(indexDaScambiare) {
         <div class="scheda-disco-pokemon" style="background-color: ${nuovoPkm.colore || '#ffffff'}; flex-shrink: 0; min-width: 180px; max-width: 220px; cursor: default;">
             <img src="${nuovoPkm.immagine}" alt="${nuovoPkm.nome}" style="width:100%; max-height: 120px; object-fit: contain; border-radius:5px; margin-bottom:10px;">
             <div style="font-size:13px; text-align:left; color:#333; line-height: 1.4; padding: 5px; width: 100%; box-sizing: border-box;">
-                <strong>${nuovoPkm.nome}</strong> <span style="font-size:11px;">(${nuovoPkm.raritaTipo ? nuovoPkm.raritaTipo.toUpperCase() : "COMUNE"})</span><br>
+                <strong>${nuovoPkm.nome}</strong> <br>
                 Elemento: ${getHtmlElemento(nuovoPkm.elemento)}<br>
                 Lvl: ${nuovoPkm.livello} | HP: ${nuovoPkm.hpAttuali}/${nuovoPkm.hpMax}<br>
                 ATK: ${nuovoPkm.atk} DEF: ${nuovoPkm.def}<br>
@@ -429,13 +429,7 @@ function avviaEventoItem() {
 }
 
 function selezionaItemEvento(item) {
-    // Controlla che ci sia almeno un pokemon nella squadra con uno slot libero
-    const pokemonConSlotLibero = miaSquadra.filter(p => p && (!p.oggetti || p.oggetti.length < (CONFIG_SLOT_ITEM_PER_POKEMON || 1)));
-    
-    if (pokemonConSlotLibero.length === 0) {
-        mostraAvviso("Tutti i tuoi Pok\u00e9mon hanno gi\u00e0 un oggetto equipaggiato! Rimuovi un oggetto per prendere questo.");
-        return;
-    }
+    // Il giocatore può sempre prendere l'oggetto, finirà nello zaino.
     
     // Aggiungiamo l'oggetto allo zaino globale usando il suo ID
     if (item.id) {

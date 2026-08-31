@@ -104,7 +104,7 @@ function generaMappaProcedurale() {
             }
 
             let elementoNpc = null;
-            if (tipoEvento === "npc") {
+            if (tipoEvento === "npc" || tipoEvento === "cespuglio") {
                 // Calcola i tipi possibili scansionando il database reale (escludendo luce e buio)
                 const tipiPresenti = new Set();
                 if (typeof pokemonDatabase !== "undefined") {
@@ -264,11 +264,56 @@ function generaMappaAlbero() {
                 bottone.id = `p${pianoIndex}-n${i}`;
                 bottone.className = `nodo-bottone evento-${tipoEvento}`;
 
+                // === GENERA TOOLTIP UNIVERSALE ===
+                const tooltipNodoObj = alberoMappa[pianoIndex][i];
+                let tooltipTitolo = "";
+                let tooltipTesto = "";
+                switch(tipoEvento) {
+                    case "npc":
+                        tooltipTitolo = "--- SFIDA ALLENATORE ---";
+                        tooltipTesto = tooltipNodoObj && tooltipNodoObj.elementoNpc ? `Tipo: ${tooltipNodoObj.elementoNpc.toUpperCase()}\n+2 Lvl` : "+2 Lvl";
+                        break;
+                    case "cespuglio":
+                        tooltipTitolo = "--- ERBA ALTA ---";
+                        tooltipTesto = tooltipNodoObj && tooltipNodoObj.elementoNpc ? `Tipo: ${tooltipNodoObj.elementoNpc.toUpperCase()}\n+1 Lvl` : "Mistero\n+1 Lvl";
+                        break;
+                    case "boss":
+                        tooltipTitolo = "--- SFIDA BOSS ---";
+                        tooltipTesto = "Pericolo\n+3 Lvl";
+                        break;
+                    case "centro-medico":
+                        tooltipTitolo = "--- CENTRO MEDICO / SHOP ---";
+                        tooltipTesto = "Cura la squadra\nAcquista strumenti";
+                        break;
+                    case "pokeball":
+                        tooltipTitolo = "--- POKÉBALL ---";
+                        tooltipTesto = "Cattura un Pokémon";
+                        break;
+                    case "disco":
+                        tooltipTitolo = "--- MACCHINA TECNICA ---";
+                        tooltipTesto = "Insegna Mossa";
+                        break;
+                    case "scambio":
+                        tooltipTitolo = "--- SCAMBIO ---";
+                        tooltipTesto = "Scambia Pokémon";
+                        break;
+                    case "mistero":
+                        tooltipTitolo = "--- EVENTO MISTERO ---";
+                        tooltipTesto = "Evento casuale";
+                        break;
+                    case "item":
+                        tooltipTitolo = "--- STRUMENTO ---";
+                        tooltipTesto = "Ottieni oggetto";
+                        break;
+                }
+                if (tooltipTitolo) {
+                    bottone.setAttribute("data-tooltip", `${tooltipTitolo}\n${tooltipTesto}`);
+                }
+
+
                 if (tipoEvento === "npc") {
                     const nodoObj = alberoMappa[pianoIndex][i];
                     if (nodoObj && nodoObj.elementoNpc) {
-                        bottone.setAttribute("data-tooltip", `Tipo: ${nodoObj.elementoNpc.toUpperCase()}\n+2 Lvl`);
-                        
                         // Rimuoviamo il background standard per non interferire
                         bottone.style.setProperty('background-image', 'none', 'important');
                         bottone.style.setProperty('background-color', 'transparent', 'important');
@@ -314,13 +359,11 @@ function generaMappaAlbero() {
                 if (tipoEvento === "cespuglio") {
                     const nodoObj = alberoMappa[pianoIndex][i];
                     if (nodoObj) {
-                        bottone.setAttribute("data-tooltip", "+1 Lvl");
-                    }
+                        }
                 }
 
                 // Nodo boss: usa l'immagine chibi del boss corrente
                 if (tipoEvento === "boss") {
-                    bottone.setAttribute("data-tooltip", "+3 Lvl");
                     const idBossCorrente = ARCHIVIO_MAPPE[mappaAttuale].idBoss;
                     let imgChibi = ARCHIVIO_BOSS[idBossCorrente].iconaChibi;
                     if (mappaAttuale === "mappa9") {
@@ -478,7 +521,7 @@ function avviaEvento(pianoSelezionato, indiceNodo, tipoEvento) {
         : `SFIDA ALLENATORE\n-- PIANO ${pianoAttuale} --`;
         
     let elementoFiltro = null;
-    if (tipoEvento === "npc" && alberoMappa[pianoAttuale] && alberoMappa[pianoAttuale][nodoSceltoAttuale]) {
+    if ((tipoEvento === "npc" || tipoEvento === "cespuglio") && alberoMappa[pianoAttuale] && alberoMappa[pianoAttuale][nodoSceltoAttuale]) {
         elementoFiltro = alberoMappa[pianoAttuale][nodoSceltoAttuale].elementoNpc;
     }
     

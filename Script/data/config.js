@@ -60,13 +60,13 @@ const CONFIG_DEBOLEZZE = {
 
 // Probabilità di spawn e colore badge per ogni rarità
 const CONFIG_RARITA = {
-    "comune": { chance: 0.22, colore: "#9e9e9e" },
-    "non comune": { chance: 0.18, colore: "#4caf50" },
-    "raro": { chance: 0.16, colore: "#00bcd4" },
-    "epico": { chance: 0.14, colore: "#9c27b0" },
-    "leggendario": { chance: 0.12, colore: "#ffeb3b" },
-    "bombers": { chance: 0.10, colore: "#ff0000" },
-    "special": { chance: 0.05, colore: "#ff9800" }
+    "comune": { chance: 0.22, colore: "#808080" },
+    "non comune": { chance: 0.18, colore: "#808080" },
+    "raro": { chance: 0.16, colore: "#808080" },
+    "epico": { chance: 0.14, colore: "#808080" },
+    "leggendario": { chance: 0.12, colore: "#808080" },
+    "bombers": { chance: 0.10, colore: "#808080" },
+    "special": { chance: 0.05, colore: "#808080" }
 };
 
 // Moltiplicatori danno per livello mossa (1 = normale, 2 = potenziato, 3 = massimo)

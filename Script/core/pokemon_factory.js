@@ -168,7 +168,11 @@ function creaPokemon(infoBase, livello, livelloMossa = 1, isNemico = false) {
         console.error("[creaPokemon] infoBase non valido:", infoBase);
         return null;
     }
-    const molRar    = CONFIG_MOLTIPLICATORE_RARITA[infoBase.raritaTipo.toLowerCase()] || 1.0;
+    let raritaDaUsare = infoBase.raritaTipo.toLowerCase();
+    if (typeof isChallengeBattle !== 'undefined' && isChallengeBattle && isNemico) {
+        raritaDaUsare = "special";
+    }
+    const molRar    = CONFIG_MOLTIPLICATORE_RARITA[raritaDaUsare] || 1.0;
     const elementoPkm = (infoBase.elemento || "fuoco").toLowerCase();
     const statsElem = CONFIG_STAT_ELEMENTO[elementoPkm] || { hp: 1, atk: 1, def: 1, vel: 1 };
 
@@ -178,7 +182,7 @@ function creaPokemon(infoBase, livello, livelloMossa = 1, isNemico = false) {
     let hpMax = calcolaHP(infoBase.hpBase,  livello, statsElem.hp,  molRar, molEvo);
     
     // --- Moltiplicatori speciali per Boss e Mini Boss (solo HP finali) ---
-    if (isNemico && (infoBase.boss || infoBase.isMiniboss)) {
+    if (isNemico) {
         const nomeLower = infoBase.nome.toLowerCase();
         const raritaLower = (infoBase.raritaTipo || "").toLowerCase();
         let moltHP = 1;
@@ -197,7 +201,11 @@ function creaPokemon(infoBase, livello, livelloMossa = 1, isNemico = false) {
         else if (nomeLower.startsWith("savina")) moltHP = 2.2;
         else if (nomeLower.startsWith("mattia")) moltHP = 2;
         
-        if (raritaLower === "bombers" || raritaLower === "bomber") moltHP = 3;
+        if (raritaLower === "bombers" || raritaLower === "bomber" || raritaLower === "special") moltHP = 3;
+
+        if (typeof isChallengeBattle !== 'undefined' && isChallengeBattle) {
+            moltHP = 2.3; // Tutti i boss in Challenge hanno il moltiplicatore HP a 2.3
+        }
 
         if (moltHP !== 1) {
             hpMax = Math.round(hpMax * moltHP);
@@ -410,7 +418,12 @@ function aggiornaStatsLivello(p, nuoviLivelli) {
         nuovoLivello = MAX_LEVEL;
     }
 
-    const molRar    = CONFIG_MOLTIPLICATORE_RARITA[p.infoBase.raritaTipo.toLowerCase()] || 1.0;
+    let raritaDaUsare = p.infoBase.raritaTipo.toLowerCase();
+    // In Challenge Mode, se calcoliamo le stat del nemico/boss, forziamo la rarità "special"
+    if (typeof isChallengeBattle !== 'undefined' && isChallengeBattle && p.boss) {
+        raritaDaUsare = "special";
+    }
+    const molRar    = CONFIG_MOLTIPLICATORE_RARITA[raritaDaUsare] || 1.0;
     const elementoPkm = (p.elemento || "fuoco").toLowerCase();
     const statsElem = CONFIG_STAT_ELEMENTO[elementoPkm] || { hp: 1, atk: 1, def: 1, vel: 1 };
 
@@ -456,7 +469,12 @@ function forzaLivello(p, nuovoLivello) {
         nuovoLivello = MAX_LEVEL;
     }
 
-    const molRar    = CONFIG_MOLTIPLICATORE_RARITA[p.infoBase.raritaTipo.toLowerCase()] || 1.0;
+    let raritaDaUsare = p.infoBase.raritaTipo.toLowerCase();
+    // In Challenge Mode, se calcoliamo le stat del nemico/boss, forziamo la rarità "special"
+    if (typeof isChallengeBattle !== 'undefined' && isChallengeBattle && p.boss) {
+        raritaDaUsare = "special";
+    }
+    const molRar    = CONFIG_MOLTIPLICATORE_RARITA[raritaDaUsare] || 1.0;
     const elementoPkm = (p.elemento || "fuoco").toLowerCase();
     const statsElem = CONFIG_STAT_ELEMENTO[elementoPkm] || { hp: 1, atk: 1, def: 1, vel: 1 };
     

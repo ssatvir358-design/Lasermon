@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini Poke-Clone Roguelike v4</title>
-    <link rel="stylesheet" href="../style/style.css?v=1785876804">
+    <link rel="stylesheet" href="../style/style.css?v=1788169632">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
@@ -123,6 +123,9 @@
             <button class="lobby-menu-btn" onclick="apriModalInfo()" title="Pokedex">
                 <img src="../Sprite/UI/Lobby/info.png" alt="Info DB">
             </button>
+            <button class="lobby-menu-btn info-game-btn" onclick="apriManualeDiGioco()" title="Manuale di Gioco">
+                <span style="color: white; font-size: 28px; font-weight: bold; font-family: monospace; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">?</span>
+            </button>
         </div>
 
         <!-- Modal Pokédex -->
@@ -186,7 +189,11 @@
 
                 <!-- Central Action Area -->
                 <div class="lobby-action-area">
-                    <button id="btn-start" onclick="apriSelezioneModalita()">⚔ NUOVA RUN</button>
+                    <button id="btn-start" onclick="apriSelezioneModalita()">&#128640; NUOVA RUN</button>
+                    <button id="btn-challenge" onclick="apriChallengeList()">&#128293; CHALLENGE</button>
+                    <button id="btn-hall-of-fame" onclick="apriHallOfFame()" style="margin-top:14px; background: linear-gradient(135deg, #c0392b, #8e44ad); border: 2px solid #f1c40f; color: #fff; font-family: monospace; font-size: 18px; font-weight: bold; padding: 14px 36px; border-radius: 12px; cursor: pointer; letter-spacing: 2px; transition: all 0.3s; box-shadow: 0 0 16px rgba(241,196,15,0.3);"
+                        onmouseover="this.style.boxShadow='0 0 28px rgba(241,196,15,0.7)';"
+                        onmouseout="this.style.boxShadow='0 0 16px rgba(241,196,15,0.3)';">&#127942; HALL OF FAME</button>
                     <button id="btn-continua-run" onclick="apriSchermataSlot('carica')" style="display:none; margin-top:14px; background: linear-gradient(135deg, #1a1a3e, #2c2c6e); border: 2px solid #7c5cbf; color: #c9a7ff; font-family: monospace; font-size: 18px; font-weight: bold; padding: 14px 36px; border-radius: 12px; cursor: pointer; letter-spacing: 2px; transition: all 0.3s; box-shadow: 0 0 16px rgba(124,92,191,0.3);"
                         onmouseover="this.style.background='linear-gradient(135deg,#2a1a5e,#4a2aae)';this.style.boxShadow='0 0 28px rgba(124,92,191,0.7)';"
                         onmouseout="this.style.background='linear-gradient(135deg,#1a1a3e,#2c2c6e)';this.style.boxShadow='0 0 16px rgba(124,92,191,0.3)';">📂 CONTINUA RUN</button>
@@ -258,11 +265,14 @@
             
             <!-- Top Left: Menu Buttons -->
             <div id="top-left-ui" style="position: absolute; top: 20px; left: calc(50% - (var(--map-scaled-width) / 2) - 80px); pointer-events: auto; display: flex; flex-direction: column; gap: 15px;">
-                <button class="lobby-menu-btn" onclick="tornaALobbyDaMappa()" title="Torna alla Lobby" style="font-size: 24px; padding: 10px;">
-                    🚪
+                <button class="lobby-menu-btn" onclick="tornaALobbyDaMappa()" title="Torna alla Lobby">
+                    <span style="font-size: 28px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">🏠</span>
                 </button>
                 <button class="lobby-menu-btn" onclick="apriModalImpostazioni()" title="Impostazioni">
                     <img src="../Sprite/UI/Lobby/impostazioni.png" alt="Impostazioni">
+                </button>
+                <button class="lobby-menu-btn info-game-btn" onclick="apriManualeDiGioco()" title="Manuale di Gioco">
+                    <span style="color: white; font-size: 28px; font-weight: bold; font-family: monospace; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">?</span>
                 </button>
             </div>
 
@@ -344,8 +354,10 @@
             <img src="../Sprite/UI/Combattimento/pokeball.png" class="banner-pokeball">
         </div>
 
-        <!-- Pulsante SKIP - fisso in alto a sinistra, toggle (? attivo / ? pausa) -->
+        <!-- Pulsante SKIP - fisso in alto a sinistra, toggle (▶ attivo / ⏸ pausa) -->
         <button id="btn-skip-fixed" onclick="attivaSkip()" title="Attiva/disattiva Skip animazioni">&#9654;&#9654; 2X Speed</button>
+        <!-- Pulsante PAUSA AUTO - visibile solo in modalità Auto-battle -->
+        <button id="btn-pausa-auto-fixed" onclick="togglePausaAutoBattle()" title="Metti in pausa la modalità auto-battle" style="display: none;">&#10074;&#10074; PAUSA AUTO</button>
 
         <div id="gioco-container-arena">
 
@@ -931,7 +943,7 @@
     <script>
         function mostraRicompensaNsfw() {
             document.getElementById('modal-vittoria-finale').style.display = 'none';
-            const numFoto = Math.floor(Math.random() * 5) + 1;
+            const numFoto = Math.floor(Math.random() * 10) + 1;
             document.getElementById('nsfw-messaggio').innerText = `Hai trovato la foto numero ${numFoto}, complimenti!`;
             document.getElementById('nsfw-immagine').src = `../Sprite/personaggi/0_casuali_o_riserve/nsfw/${numFoto}.png`;
             document.getElementById('modal-ricompensa-nsfw').style.display = 'flex';
@@ -964,155 +976,242 @@
          ============================================= -->
 
     <!-- 1. Dati statici -->
-    <script src="../Script/data/config.js?v=1785876804"></script>
-    <script src="../Script/data/characters/alex.js?v=1785876804"></script>
-    <script src="../Script/data/characters/altimani.js?v=1785876804"></script>
-    <script src="../Script/data/characters/mori.js?v=1785876804"></script>
-    <script src="../Script/data/characters/arman.js?v=1785876804"></script>
-    <script src="../Script/data/characters/babbonatale.js?v=1785876804"></script>
-    <script src="../Script/data/characters/bacchi.js?v=1785876804"></script>
-    <script src="../Script/data/characters/bellini.js?v=1785876804"></script>
-    <script src="../Script/data/characters/bonacina.js?v=1785876804"></script>
-    <script src="../Script/data/characters/bottardi.js?v=1785876804"></script>
-    <script src="../Script/data/characters/bottura.js?v=1785876804"></script>
-    <script src="../Script/data/characters/bussolotti.js?v=1785876804"></script>
-    <script src="../Script/data/characters/matteo.js?v=1785876804"></script>
-    <script src="../Script/data/characters/capiluppi.js?v=1785876804"></script>
-    <script src="../Script/data/characters/carnevali.js?v=1785876804"></script>
-    <script src="../Script/data/characters/carra.js?v=1785876804"></script>
-    <script src="../Script/data/characters/contini.js?v=1785876804"></script>
-    <script src="../Script/data/characters/danilo.js?v=1785876804"></script>
-    <script src="../Script/data/characters/danilof2.js?v=1785876804"></script>
-    <script src="../Script/data/characters/dinicolaF2.js?v=1785876804"></script>
-    <script src="../Script/data/characters/dinicola.js?v=1785876804"></script>
-    <script src="../Script/data/characters/donatoF2.js?v=1785876804"></script>
-    <script src="../Script/data/characters/donato.js?v=1785876804"></script>
-    <script src="../Script/data/characters/edo.js?v=1785876804"></script>
-    <script src="../Script/data/characters/fabio.js?v=1785876804"></script>
-    <script src="../Script/data/characters/falco.js?v=1785876804"></script>
-    <script src="../Script/data/characters/filippo.js?v=1785876804"></script>
-    <script src="../Script/data/characters/ghandu.js?v=1785876804"></script>
-    <script src="../Script/data/characters/gian.js?v=1785876804"></script>
-    <script src="../Script/data/characters/gio.js?v=1785876804"></script>
-    <script src="../Script/data/characters/giulia.js?v=1785876804"></script>
-    <script src="../Script/data/characters/giulio.js?v=1785876804"></script>
-    <script src="../Script/data/characters/graziani.js?v=1785876804"></script>
-    <script src="../Script/data/characters/kul.js?v=1785876804"></script>
-    <script src="../Script/data/characters/lanza.js?v=1785876804"></script>
-    <script src="../Script/data/characters/loconsole.js?v=1785876804"></script>
-    <script src="../Script/data/characters/maccioni.js?v=1785876804"></script>
-    <script src="../Script/data/characters/maccionif2.js?v=1785876804"></script>
-    <script src="../Script/data/characters/manuela.js?v=1785876804"></script>
-    <script src="../Script/data/characters/mattia.js?v=1785876804"></script>
-    <script src="../Script/data/characters/mattiaf2.js?v=1785876804"></script>
-    <script src="../Script/data/characters/mariel.js?v=1785876804"></script>
-    <script src="../Script/data/characters/max.js?v=1785876804"></script>
-    <script src="../Script/data/characters/maxf2.js?v=1785876804"></script>
-    <script src="../Script/data/characters/maxf3.js?v=1785876804"></script>
-    <script src="../Script/data/characters/monica.js?v=1785876804"></script>
-    <script src="../Script/data/characters/nicolas.js?v=1785876804"></script>
-    <script src="../Script/data/characters/nicolo.js?v=1785876804"></script>
-    <script src="../Script/data/characters/nico.js?v=1785876804"></script>
-    <script src="../Script/data/characters/nonamedonna.js?v=1785876804"></script>
-    <script src="../Script/data/characters/nonameuomo.js?v=1785876804"></script>
-    <script src="../Script/data/characters/paola.js?v=1785876804"></script>
-    <script src="../Script/data/characters/paolo.js?v=1785876804"></script>
-    <script src="../Script/data/characters/paroni.js?v=1785876804"></script>
-    <script src="../Script/data/characters/rauf.js?v=1785876804"></script>
-    <script src="../Script/data/characters/re_merlino.js?v=1785876804"></script>
-    <script src="../Script/data/characters/ruggiero.js?v=1785876804"></script>
-    <script src="../Script/data/characters/saad.js?v=1785876804"></script>
-    <script src="../Script/data/characters/salvatore.js?v=1785876804"></script>
-    <script src="../Script/data/characters/sat.js?v=1785876804"></script>
-    <script src="../Script/data/characters/savina.js?v=1785876804"></script>
-    <script src="../Script/data/characters/savinaf2.js?v=1785876804"></script>
-    <script src="../Script/data/characters/serghej.js?v=1785876804"></script>
-    <script src="../Script/data/characters/menza.js?v=1785876804"></script>
-    <script src="../Script/data/characters/solieri.js?v=1785876804"></script>
-    <script src="../Script/data/characters/tania.js?v=1785876804"></script>
-    <script src="../Script/data/characters/telemaco.js?v=1785876804"></script>
-    <script src="../Script/data/characters/tudor.js?v=1785876804"></script>
-    <script src="../Script/data/characters/valentina.js?v=1785876804"></script>
-    <script src="../Script/data/characters/venturini.js?v=1785876804"></script>
-        <script src="../Script/data/characters/valen.js?v=1785876804"></script>
-    <script src="../Script/data/characters/nyssa.js?v=1785876804"></script>
-    <script src="../Script/data/characters/cassian.js?v=1785876804"></script>
-    <script src="../Script/data/characters/kiora.js?v=1785876804"></script>
-    <script src="../Script/data/characters/zareen.js?v=1785876804"></script>
-    <script src="../Script/data/characters/elys.js?v=1785876804"></script>
-    <script src="../Script/data/characters/lucien.js?v=1785876804"></script>
-    <script src="../Script/data/characters/vesper.js?v=1785876804"></script>
-    <script src="../Script/data/characters/vesperlatabularasadelcapitale.js?v=1785876804"></script>
-    <script src="../Script/data/characters/ryden.js?v=1785876804"></script>
-    <script src="../Script/data/characters/van.js?v=1785876804"></script>
-    <script src="../Script/data/characters/mireya.js?v=1785876804"></script>
-    <script src="../Script/data/characters/darius.js?v=1785876804"></script>
-    <script src="../Script/data/characters/rivena.js?v=1785876804"></script>
-    <script src="../Script/data/characters/icer.js?v=1785876804"></script>
-    <script src="../Script/data/characters/evren.js?v=1785876804"></script>
-    <script src="../Script/data/characters/maelis.js?v=1785876804"></script>
-    <script src="../Script/data/characters/elyra.js?v=1785876804"></script>
-    <script src="../Script/data/characters/aster.js?v=1785876804"></script>
-    <script src="../Script/data/characters/bob.js?v=1785876804"></script>
-    <script src="../Script/data/characters/soraya.js?v=1785876804"></script>
-    <script src="../Script/data/characters/nerys.js?v=1785876804"></script>
-    <script src="../Script/data/characters/kit.js?v=1785876804"></script>
-    <script src="../Script/data/characters/nelly.js?v=1785876804"></script>
-    <script src="../Script/data/characters/virea.js?v=1785876804"></script>
-    <script src="../Script/data/characters/mauro.js?v=1785876804"></script>
-    <script src="../Script/data/characters/caelum.js?v=1785876804"></script>
-    <script src="../Script/data/characters/falcogenryusai.js?v=1785876804"></script>
-    <script src="../Script/data/characters/falcoroshi.js?v=1785876804"></script>
-    <script src="../Script/data/characters/falcomonkey.js?v=1785876804"></script>
-    <script src="../Script/data/characters/falcoaalk.js?v=1785876804"></script>
-    <script src="../Script/data/characters/falcomajin.js?v=1785876804"></script>
-    <script src="../Script/data/characters/falcoshoto.js?v=1785876804"></script>
-    <script src="../Script/data/characters/falcohero.js?v=1785876804"></script>
-    <script src="../Script/data/characters/falcochan.js?v=1785876804"></script>
-    <script src="../Script/data/characters/falcodragon.js?v=1785876804"></script>
-    <script src="../Script/data/characters/falconitsu.js?v=1785876804"></script>
-    <script src="../Script/data/characters/falcomalfalk.js?v=1785876804"></script>
-    <script src="../Script/data/characters/falcosing.js?v=1785876804"></script>
-    <script src="../Script/data/characters/marini.js?v=1785876804"></script>
-    <script src="../Script/data/characters/ilie.js?v=1785876804"></script>
-    <script src="../Script/data/characters/mattiasped.js?v=1785876804"></script>
-    <script src="../Script/data/characters/index.js?v=1785876804"></script>
-    <script src="../Script/data/database_veloce.js?v=1785876804"></script>
+    <script src="../Script/data/config.js?v=1788169632"></script>
+    <script src="../Script/data/characters/alex.js?v=1788169632"></script>
+    <script src="../Script/data/characters/altimani.js?v=1788169632"></script>
+    <script src="../Script/data/characters/mori.js?v=1788169632"></script>
+    <script src="../Script/data/characters/arman.js?v=1788169632"></script>
+    <script src="../Script/data/characters/babbonatale.js?v=1788169632"></script>
+    <script src="../Script/data/characters/bacchi.js?v=1788169632"></script>
+    <script src="../Script/data/characters/bellini.js?v=1788169632"></script>
+    <script src="../Script/data/characters/bonacina.js?v=1788169632"></script>
+    <script src="../Script/data/characters/bottardi.js?v=1788169632"></script>
+    <script src="../Script/data/characters/bottura.js?v=1788169632"></script>
+    <script src="../Script/data/characters/bussolotti.js?v=1788169632"></script>
+    <script src="../Script/data/characters/matteo.js?v=1788169632"></script>
+    <script src="../Script/data/characters/capiluppi.js?v=1788169632"></script>
+    <script src="../Script/data/characters/carnevali.js?v=1788169632"></script>
+    <script src="../Script/data/characters/carra.js?v=1788169632"></script>
+    <script src="../Script/data/characters/contini.js?v=1788169632"></script>
+    <script src="../Script/data/characters/danilo.js?v=1788169632"></script>
+    <script src="../Script/data/characters/danilof2.js?v=1788169632"></script>
+    <script src="../Script/data/characters/dinicolaF2.js?v=1788169632"></script>
+    <script src="../Script/data/characters/dinicola.js?v=1788169632"></script>
+    <script src="../Script/data/characters/donatoF2.js?v=1788169632"></script>
+    <script src="../Script/data/characters/donato.js?v=1788169632"></script>
+    <script src="../Script/data/characters/edo.js?v=1788169632"></script>
+    <script src="../Script/data/characters/fabio.js?v=1788169632"></script>
+    <script src="../Script/data/characters/falco.js?v=1788169632"></script>
+    <script src="../Script/data/characters/filippo.js?v=1788169632"></script>
+    <script src="../Script/data/characters/ghandu.js?v=1788169632"></script>
+    <script src="../Script/data/characters/gian.js?v=1788169632"></script>
+    <script src="../Script/data/characters/gio.js?v=1788169632"></script>
+    <script src="../Script/data/characters/giulia.js?v=1788169632"></script>
+    <script src="../Script/data/characters/giulio.js?v=1788169632"></script>
+    <script src="../Script/data/characters/graziani.js?v=1788169632"></script>
+    <script src="../Script/data/characters/kul.js?v=1788169632"></script>
+    <script src="../Script/data/characters/lanza.js?v=1788169632"></script>
+    <script src="../Script/data/characters/loconsole.js?v=1788169632"></script>
+    <script src="../Script/data/characters/maccioni.js?v=1788169632"></script>
+    <script src="../Script/data/characters/maccionif2.js?v=1788169632"></script>
+    <script src="../Script/data/characters/manuela.js?v=1788169632"></script>
+    <script src="../Script/data/characters/mattia.js?v=1788169632"></script>
+    <script src="../Script/data/characters/mattiaf2.js?v=1788169632"></script>
+    <script src="../Script/data/characters/mariel.js?v=1788169632"></script>
+    <script src="../Script/data/characters/max.js?v=1788169632"></script>
+    <script src="../Script/data/characters/maxf2.js?v=1788169632"></script>
+    <script src="../Script/data/characters/maxf3.js?v=1788169632"></script>
+    <script src="../Script/data/characters/monica.js?v=1788169632"></script>
+    <script src="../Script/data/characters/nicolas.js?v=1788169632"></script>
+    <script src="../Script/data/characters/nicolo.js?v=1788169632"></script>
+    <script src="../Script/data/characters/nico.js?v=1788169632"></script>
+    <script src="../Script/data/characters/nonamedonna.js?v=1788169632"></script>
+    <script src="../Script/data/characters/nonameuomo.js?v=1788169632"></script>
+    <script src="../Script/data/characters/paola.js?v=1788169632"></script>
+    <script src="../Script/data/characters/paolo.js?v=1788169632"></script>
+    <script src="../Script/data/characters/paroni.js?v=1788169632"></script>
+    <script src="../Script/data/characters/rauf.js?v=1788169632"></script>
+    <script src="../Script/data/characters/re_merlino.js?v=1788169632"></script>
+    <script src="../Script/data/characters/ruggiero.js?v=1788169632"></script>
+    <script src="../Script/data/characters/saad.js?v=1788169632"></script>
+    <script src="../Script/data/characters/salvatore.js?v=1788169632"></script>
+    <script src="../Script/data/characters/sat.js?v=1788169632"></script>
+    <script src="../Script/data/characters/savina.js?v=1788169632"></script>
+    <script src="../Script/data/characters/savinaf2.js?v=1788169632"></script>
+    <script src="../Script/data/characters/serghej.js?v=1788169632"></script>
+    <script src="../Script/data/characters/menza.js?v=1788169632"></script>
+    <script src="../Script/data/characters/solieri.js?v=1788169632"></script>
+    <script src="../Script/data/characters/tania.js?v=1788169632"></script>
+    <script src="../Script/data/characters/telemaco.js?v=1788169632"></script>
+    <script src="../Script/data/characters/tudor.js?v=1788169632"></script>
+    <script src="../Script/data/characters/valentina.js?v=1788169632"></script>
+    <script src="../Script/data/characters/venturini.js?v=1788169632"></script>
+        <script src="../Script/data/characters/valen.js?v=1788169632"></script>
+    <script src="../Script/data/characters/nyssa.js?v=1788169632"></script>
+    <script src="../Script/data/characters/cassian.js?v=1788169632"></script>
+    <script src="../Script/data/characters/kiora.js?v=1788169632"></script>
+    <script src="../Script/data/characters/zareen.js?v=1788169632"></script>
+    <script src="../Script/data/characters/elys.js?v=1788169632"></script>
+    <script src="../Script/data/characters/lucien.js?v=1788169632"></script>
+    <script src="../Script/data/characters/vesper.js?v=1788169632"></script>
+    <script src="../Script/data/characters/vesperlatabularasadelcapitale.js?v=1788169632"></script>
+    <script src="../Script/data/characters/ryden.js?v=1788169632"></script>
+    <script src="../Script/data/characters/van.js?v=1788169632"></script>
+    <script src="../Script/data/characters/mireya.js?v=1788169632"></script>
+    <script src="../Script/data/characters/darius.js?v=1788169632"></script>
+    <script src="../Script/data/characters/rivena.js?v=1788169632"></script>
+    <script src="../Script/data/characters/icer.js?v=1788169632"></script>
+    <script src="../Script/data/characters/evren.js?v=1788169632"></script>
+    <script src="../Script/data/characters/maelis.js?v=1788169632"></script>
+    <script src="../Script/data/characters/elyra.js?v=1788169632"></script>
+    <script src="../Script/data/characters/aster.js?v=1788169632"></script>
+    <script src="../Script/data/characters/bob.js?v=1788169632"></script>
+    <script src="../Script/data/characters/soraya.js?v=1788169632"></script>
+    <script src="../Script/data/characters/nerys.js?v=1788169632"></script>
+    <script src="../Script/data/characters/kit.js?v=1788169632"></script>
+    <script src="../Script/data/characters/nelly.js?v=1788169632"></script>
+    <script src="../Script/data/characters/virea.js?v=1788169632"></script>
+    <script src="../Script/data/characters/mauro.js?v=1788169632"></script>
+    <script src="../Script/data/characters/caelum.js?v=1788169632"></script>
+    <script src="../Script/data/characters/falcogenryusai.js?v=1788169632"></script>
+    <script src="../Script/data/characters/falcoroshi.js?v=1788169632"></script>
+    <script src="../Script/data/characters/falcomonkey.js?v=1788169632"></script>
+    <script src="../Script/data/characters/falcoaalk.js?v=1788169632"></script>
+    <script src="../Script/data/characters/falcomajin.js?v=1788169632"></script>
+    <script src="../Script/data/characters/falcoshoto.js?v=1788169632"></script>
+    <script src="../Script/data/characters/falcohero.js?v=1788169632"></script>
+    <script src="../Script/data/characters/falcochan.js?v=1788169632"></script>
+    <script src="../Script/data/characters/falcodragon.js?v=1788169632"></script>
+    <script src="../Script/data/characters/falconitsu.js?v=1788169632"></script>
+    <script src="../Script/data/characters/falcomalfalk.js?v=1788169632"></script>
+    <script src="../Script/data/characters/falcosing.js?v=1788169632"></script>
+    <script src="../Script/data/characters/marini.js?v=1788169632"></script>
+    <script src="../Script/data/characters/ilie.js?v=1788169632"></script>
+    <script src="../Script/data/characters/mattiasped.js?v=1788169632"></script>
+    <script src="../Script/data/characters/index.js?v=1788169632"></script>
+    <script src="../Script/data/database_veloce.js?v=1788169632"></script>
     <!-- Personaggi: un file per ciascuno (aggiungi qui nuovi personaggi) -->
     <!-- Index che assembla pokemonDatabase dai file sopra -->
-    <script src="../Script/data/mappe.js?v=1785876804"></script>
-    <script src="../Script/data/boss.js?v=1785876804"></script>
-    <script src="../Script/data/eventi_nodi.js?v=1785876804"></script>
-    <script src="../Script/data/eventi_misteriosi.js?v=1785876804"></script>
-    <script src="../Script/data/oggetti.js?v=1785876804"></script>
-    <script src="../Script/data/perks.js?v=1785876804"></script>
+    <script src="../Script/data/mappe.js?v=1788169632"></script>
+    <script src="../Script/data/boss.js?v=1788169632"></script>
+    <script src="../Script/data/eventi_nodi.js?v=1788169632"></script>
+    <script src="../Script/data/eventi_misteriosi.js?v=1788169632"></script>
+    <script src="../Script/data/oggetti.js?v=1788169632"></script>
+    <script src="../Script/data/perks.js?v=1788169632"></script>
+
+    <!-- ============= HALL OF FAME & DRAFT ============= -->
+    <div id="schermata-hall-of-fame" class="schermata" style="background-color: #111;">
+        <div class="lobby-particles" id="hof-particles"></div>
+        <div class="challenge-header">
+            <h1 class="pixel-text" style="color: #f1c40f; text-shadow: 2px 2px 0px rgba(0,0,0,0.8);">&#127942; HALL OF FAME</h1>
+            <button onclick="cambiaSchermata('schermata-hall-of-fame', 'schermata-start')" style="position:absolute; left:20px; top:20px; padding: 10px 20px; font-family: monospace; background: #2c3e50; color: white; border: 2px solid #fff; border-radius: 8px; cursor: pointer; font-size: 16px; z-index: 100;">INDIETRO</button>
+        </div>
+        <div class="hof-gallery-container" id="hof-gallery-container">
+            <!-- Popolato dinamicamente da hall_of_fame.js -->
+        </div>
+    </div>
+
+    <div id="schermata-challenge-draft" class="schermata" style="background-color: #111;">
+        <div class="lobby-particles" id="draft-particles"></div>
+        <div class="challenge-header" style="padding: 15px 0;">
+            <h1 class="pixel-text" style="color: #e74c3c; text-shadow: 2px 2px 0px rgba(0,0,0,0.8);">SELEZIONA IL TUO TEAM (MAX 6)</h1>
+            <button onclick="cambiaSchermata('schermata-challenge-draft', 'schermata-challenge-detail')" style="position:absolute; left:20px; top:15px; padding: 10px 20px; font-family: monospace; background: #2c3e50; color: white; border: 2px solid #fff; border-radius: 8px; cursor: pointer; font-size: 16px; z-index: 100;">INDIETRO</button>
+            <button id="btn-start-challenge-fight" onclick="avviaVeraChallengeFight()" style="position:absolute; right:20px; top:15px; padding: 10px 20px; font-family: monospace; background: #e74c3c; color: white; border: 2px solid #fff; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; z-index: 100; display: none;">INIZIA BOSS FIGHT &#9876;</button>
+        </div>
+        <div class="draft-layout">
+            <div class="draft-roster" id="draft-roster-container">
+                <!-- Roster dei PG disponibili -->
+            </div>
+            <div class="draft-squadra" id="draft-squadra-container">
+                <!-- I 6 slot del team selezionato -->
+            </div>
+        </div>
+    </div>
 
     <!-- 2. Core -->
-    <script src="../Script/core/stato.js?v=1785876804"></script>
-    <script src="../Script/core/pokemon_factory.js?v=1785876804"></script>
-    <script src="../Script/core/salvataggio.js?v=1785876804"></script>
+    <script src="../Script/core/stato.js?v=1788169632"></script>
+    <script src="../Script/core/pokemon_factory.js?v=1788169632"></script>
+    <script src="../Script/core/salvataggio.js?v=1788169632"></script>
 
     <!-- 3. UI Audio -->
-    <script src="../Script/ui/audio.js?v=1785876804"></script>
+    <script src="../Script/ui/audio.js?v=1788169632"></script>
 
     <!-- 4. UI Schermate -->
-    <script src="../Script/ui/schermate.js?v=1785876804"></script>
+    <script src="../Script/ui/schermate.js?v=1788169632"></script>
 
     <!-- 5. UI Negozio / Zaino -->
-    <script src="../Script/ui/negozio.js?v=1785876804"></script>
+    <script src="../Script/ui/negozio.js?v=1788169632"></script>
 
     <!-- 5b. UI Perk -->
-    <script src="../Script/ui/perk_ui.js?v=1785876804"></script>
+    <script src="../Script/ui/perk_ui.js?v=1788169632"></script>
 
     <!-- 5c. Sandbox / Debugger (carica DOPO stato.js, pokemon_factory.js e perk_ui.js) -->
-    <script src="../Script/sandbox/sandbox.js?v=1785876804"></script>
+    <script src="../Script/sandbox/sandbox.js?v=1788169632"></script>
 
     <!-- 6. Game -->
-    <script src="../Script/game/mappa.js?v=1785876804"></script>
-    <script src="../Script/game/battaglia.js?v=1785876804"></script>
+    <script src="../Script/game/mappa.js?v=1788169632"></script>
+    <script src="../Script/game/battaglia.js?v=1788169632"></script>
 
     <!-- 7. UI Eventi -->
-    <script src="../Script/ui/eventi.js?v=1785876804"></script>
+    <script src="../Script/ui/eventi.js?v=1788169632"></script>
+    
+    <!-- 8. Challenge Mode -->
+    <script src="../Script/game/challenge.js?v=1788169632"></script>
+    <script src="../Script/game/hall_of_fame.js?v=1788169632"></script>
+    <script src="../Script/game/challenge_battle.js?v=1788169632"></script>
+    <script src="../Script/game/boss_reo.js?v=1788169632"></script>
+
+    <!-- ============= SCHERMATE CHALLENGE ============= -->
+    <div id="schermata-challenge-list" class="schermata" style="background-color: #111;">
+        <div class="lobby-particles" id="challenge-particles"></div>
+        <div class="challenge-header">
+            <h1 class="pixel-text" style="color: #9b59b6; text-shadow: 2px 2px 0px rgba(0,0,0,0.8);">CHALLENGE MODE</h1>
+            <button onclick="chiudiChallengeList()" style="position:absolute; left:20px; top:20px; padding: 10px 20px; font-family: monospace; background: #2c3e50; color: white; border: 2px solid #fff; border-radius: 8px; cursor: pointer; font-size: 16px;">INDIETRO</button>
+        </div>
+        
+        <div class="challenge-cards-container" id="challenge-cards-container">
+            <!-- Cards dinamiche -->
+        </div>
+    </div>
+
+    <div id="schermata-challenge-detail" class="schermata" style="background-color: #111;">
+        <button onclick="tornaAChallengeList()" style="position:absolute; left:20px; top:20px; padding: 10px 20px; font-family: monospace; background: #2c3e50; color: white; border: 2px solid #fff; border-radius: 8px; cursor: pointer; font-size: 16px; z-index: 100;">INDIETRO</button>
+        
+        <div class="challenge-detail-layout">
+            <div class="challenge-detail-left">
+                <img id="challenge-detail-img" src="" alt="Boss">
+            </div>
+            <div class="challenge-detail-right">
+                <div class="challenge-detail-top">
+                    <h2 id="challenge-detail-title" class="pixel-text" style="color: #9b59b6; margin: 0 0 10px 0;"></h2>
+                    <p id="challenge-detail-lore" style="font-family: monospace; font-size: 16px; color: #ccc; line-height: 1.4;"></p>
+                </div>
+                <div class="challenge-detail-bottom">
+                    <div class="challenge-detail-hints">
+                        <h3 style="color: #f1c40f; font-family: monospace; margin: 0 0 10px 0;">INDIZI:</h3>
+                        <div id="challenge-detail-hints-list" style="margin-top: 20px; font-family: monospace; font-size: 14px; line-height: 1.5;">
+                            <!-- Indizi dinamici -->
+                        </div>
+                    </div>
+                    <div class="challenge-detail-actions">
+                        <button id="btn-challenge-continue" onclick="apriSalvataggiChallenge()" style="background: #bdc3c7; color: #2c3e50; padding: 15px; font-family: monospace; font-size: 18px; font-weight: bold; border: 3px solid #7f8c8d; border-radius: 10px; cursor: pointer; width: 100%; margin-bottom: 15px;">continua &#128190;</button>
+                        <button id="btn-challenge-fight" onclick="iniziaDraftChallenge()" style="background: #f1c40f; color: #000; padding: 15px; font-family: monospace; font-size: 18px; font-weight: bold; border: 3px solid #f39c12; border-radius: 10px; cursor: pointer; width: 100%;">combatti &#9876;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale Salvataggi Challenge -->
+    <div id="modal-challenge-saves" class="schermata" style="display:none; z-index: 10000; justify-content: center; align-items: center; background: rgba(0,0,0,0.9);">
+        <div style="background: #2c3e50; padding: 30px; border-radius: 15px; border: 4px solid #9b59b6; width: 400px; text-align: center; color: white; font-family: monospace;">
+            <h2 style="color: #9b59b6; margin-bottom: 20px;">SLOT SALVATAGGI</h2>
+            <div id="challenge-slots-container" style="display:flex; flex-direction:column; gap: 15px; margin-bottom: 20px;">
+                <!-- Slot dinamici -->
+            </div>
+            <button onclick="chiudiSalvataggiChallenge()" style="padding: 10px 20px; font-family: monospace; background: #e74c3c; color: white; border: 2px solid #fff; border-radius: 8px; cursor: pointer; font-size: 16px;">ANNULLA</button>
+        </div>
+    </div>
 
     <!-- ============= MODALE SELEZIONE MODALITA' ============= -->
     <div id="modal-selezione-modalita" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); z-index: 30000; justify-content: center; align-items: center; flex-direction: column; font-family: monospace;">
@@ -1178,6 +1277,108 @@
         <div id="lista-sostituzione-squadra" style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; max-width: 90vw; overflow-y: auto; max-height: 70vh; padding: 20px;">
         </div>
         <button class="btn-scegli" style="margin-top: 30px; background-color: #e74c3c; width: 200px; padding: 10px; border-radius: 5px; color: white; border: none; cursor: pointer; font-family: monospace; font-size: 16px; font-weight: bold;" onclick="chiudiModalSostituzione()">INDIETRO</button>
+    </div>
+
+    <!-- Modale MANUALE DI GIOCO -->
+    <div id="schermata-manuale" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5,5,20,0.96); z-index: 500000; justify-content: center; align-items: center; flex-direction: column; font-family: monospace;">
+        <h1 style="color: #3498db; font-size: 32px; letter-spacing: 3px; margin-bottom: 20px; text-shadow: 0 0 15px rgba(52, 152, 219, 0.6);">MANUALE DI GIOCO</h1>
+        
+        <!-- Tab Navigation -->
+        <div class="manuale-tabs" style="display: flex; gap: 10px; margin-bottom: 20px; max-width: 90vw; flex-wrap: wrap; justify-content: center;">
+            <button class="manuale-tab-btn attivo" onclick="cambiaTabManuale('tab-manuale-turni')">Turni & Statistiche</button>
+            <button class="manuale-tab-btn" onclick="cambiaTabManuale('tab-manuale-elementi')">Elementi</button>
+            <button class="manuale-tab-btn" onclick="cambiaTabManuale('tab-manuale-livelli')">Mosse e Livelli</button>
+            <button class="manuale-tab-btn" onclick="cambiaTabManuale('tab-manuale-status')">Effetti Status (Lv3)</button>
+            <button class="manuale-tab-btn" onclick="cambiaTabManuale('tab-manuale-oggetti')">Oggetti & Esplorazione</button>
+            <button class="manuale-tab-btn" onclick="cambiaTabManuale('tab-manuale-modalita')">Modalità di Gioco</button>
+        </div>
+
+        <!-- Contenitore Testi -->
+        <div class="manuale-content-box" style="background: rgba(10,10,25,0.8); border: 1px solid #3498db; border-radius: 8px; width: 90%; max-width: 800px; height: 60vh; overflow-y: auto; padding: 20px; color: #dcdde1; font-size: 14px; line-height: 1.6; box-shadow: 0 0 20px rgba(52, 152, 219, 0.2);">
+            
+            <!-- Tab Turni -->
+            <div id="tab-manuale-turni" class="manuale-tab-content active" style="display: block;">
+                <h2 style="color: #f1c40f; margin-bottom: 10px;">Turni e Velocità</h2>
+                <p>Durante il combattimento, chi ha la statistica <strong>Velocità (SPD)</strong> maggiore attaccherà per primo.</p>
+                <p>Se la statistica Velocità è identica, l'ordine di attacco verrà deciso dal caso.</p>
+                <br>
+                <h2 style="color: #f1c40f; margin-bottom: 10px;">Schivata</h2>
+                <p>La probabilità di schivare gli attacchi dipende dalla <strong>Velocità</strong> e da un <strong>Moltiplicatore Base</strong> legato all'elemento del personaggio.</p>
+                <p>Formula Probabilità Schivata: <code>(Velocità × Moltiplicatore Base) / (Velocità + 60)</code>.</p>
+                <p>Di seguito i Valori Moltiplicatore Base di partenza (non sono la percentuale di schivata, ma il valore che si inserisce nella formula):</p>
+                <div id="manuale-schivata-dyn" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; background: #111; padding: 10px; border-radius: 5px;"></div>
+            </div>
+
+            <!-- Tab Elementi -->
+            <div id="tab-manuale-elementi" class="manuale-tab-content" style="display: none;">
+                <h2 style="color: #f1c40f; margin-bottom: 10px;">Vantaggi Elementali (In Attacco)</h2>
+                <p>Questa tabella mostra i moltiplicatori di danno di un elemento <strong>quando attacca</strong>. Non riflette le difese! Se attacchi un avversario debole al tuo elemento aumenterai drasticamente i danni.</p>
+                <p style="color: #bdc3c7; font-style: italic;">Nota su Luce e Buio: Il Buio infligge danni maggiori (x1.25) a quasi tutti gli elementi, ma subisce danni doppi dalla Luce. La Luce infligge danni doppi al Buio ed è resistente al resto.</p>
+                <div id="manuale-elementi-dyn" style="margin-top: 15px; background: #111; padding: 10px; border-radius: 5px; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <!-- Iniettato via JS -->
+                </div>
+            </div>
+
+            <!-- Tab Livelli -->
+            <div id="tab-manuale-livelli" class="manuale-tab-content" style="display: none;">
+                <h2 style="color: #f1c40f; margin-bottom: 10px;">Mosse (Lv1 - Lv2 - Lv3)</h2>
+                <p>Ogni attacco base aumenta l'indicatore energetico del personaggio. Maggiore è l'energia accumulata, più forte sarà la mossa utilizzata!</p>
+                <ul id="manuale-mosse-dyn" style="margin-top: 10px; list-style-type: square; padding-left: 20px;">
+                    <!-- Iniettato via JS -->
+                </ul>
+            </div>
+
+            <!-- Tab Status -->
+            <div id="tab-manuale-status" class="manuale-tab-content" style="display: none;">
+                <h2 style="color: #f1c40f; margin-bottom: 10px;">Effetti Elementali (Mosse Livello 3)</h2>
+                <p>Le Mosse di Livello 3 (Ultimate) non infliggono danni enormi in un colpo solo, ma scatenano <strong>Effetti Passivi</strong> basati sull'elemento dell'attaccante!</p>
+                <ul id="manuale-status-dyn" style="margin-top: 10px; display:flex; flex-direction:column; gap:10px;">
+                    <!-- Iniettato via JS -->
+                </ul>
+            </div>
+
+            <!-- Tab Oggetti & Esplorazione -->
+            <div id="tab-manuale-oggetti" class="manuale-tab-content" style="display: none;">
+                <h2 style="color: #f1c40f; margin-bottom: 10px;">Oggetti ed Equipaggiamento</h2>
+                <p>Puoi equipaggiare fino a <strong>3 Oggetti</strong> per personaggio.</p>
+                <p>Gli oggetti migliorano le statistiche base in percentuale e possono avere fino a 3 tier di rarità, incrementando le statistiche del <strong>10%</strong>, <strong>20%</strong> o <strong>30%</strong>.</p>
+                <br>
+                <h2 style="color: #f1c40f; margin-bottom: 10px;">Nodi Mappa</h2>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin-bottom:8px;">⚔️ <strong>Battaglia:</strong> Nemici base per esperienza e monete.</li>
+                    <li style="margin-bottom:8px;">🔥 <strong>Miniboss/Boss:</strong> Nemici potentissimi (Hp e statistiche pompate). Rilasciano grandi ricompense.</li>
+                    <li style="margin-bottom:8px;">❓ <strong>Evento Misterioso:</strong> Situazioni impreviste (buff, debuff, regali, trappole).</li>
+                    <li style="margin-bottom:8px;">🏥 <strong>Centro Medico:</strong> Ripristina gli HP della squadra.</li>
+                    <li style="margin-bottom:8px;">💰 <strong>Negozio:</strong> Compra oggetti o cura alleati con le monete.</li>
+                </ul>
+            </div>
+
+            <!-- Tab Modalità -->
+            <div id="tab-manuale-modalita" class="manuale-tab-content" style="display: none;">
+                <h2 style="color: #f1c40f; margin-bottom: 10px;">Run Normale vs Run Veloce</h2>
+                <div style="background: #111; padding: 15px; border-radius: 5px; margin-bottom: 15px; border-left: 3px solid #3498db;">
+                    <h3 style="color: #3498db; margin-bottom: 5px;">Run Normale (Esplorazione)</h3>
+                    <p>Una modalità basata sulla strategia a lungo termine e sulla progressione lenta.</p>
+                    <ul style="margin-top: 10px; margin-left: 20px; color: #bdc3c7;">
+                        <li>La mappa è generata con <strong>molti più nodi (eventi, negozi, battaglie)</strong> per darti tempo di buildarti e farmare.</li>
+                        <li>Il livello massimo dei nemici (e la difficoltà) cresce più gradualmente.</li>
+                        <li>Gestire gli HP lungo più combattimenti è fondamentale.</li>
+                    </ul>
+                </div>
+                <div style="background: #111; padding: 15px; border-radius: 5px; border-left: 3px solid #e74c3c;">
+                    <h3 style="color: #e74c3c; margin-bottom: 5px;">Run Veloce (Boss Rush)</h3>
+                    <p>Modalità più intensa e immediata, dove ogni scontro conta tantissimo.</p>
+                    <ul style="margin-top: 10px; margin-left: 20px; color: #bdc3c7;">
+                        <li>La mappa ha <strong>pochi nodi</strong>. Si arriva molto in fretta ai Boss.</li>
+                        <li>Dato che ci sono meno combattimenti base, le ricompense e la difficoltà scalano molto più velocemente.</li>
+                        <li>Pensata per chi vuole arrivare subito all'azione senza perdere troppo tempo nei nodi standard.</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <button onclick="chiudiManualeDiGioco()" style="margin-top: 20px; background: transparent; color: #e74c3c; border: 2px solid #e74c3c; border-radius: 8px; padding: 10px 40px; font-family: monospace; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.2s;">CHIUDI</button>
     </div>
 </body>
 </html>
