@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lasermon · La Lega Laser</title>
+    <meta name="theme-color" content="#080e22">
+    <meta name="description" content="Costruisci la tua squadra e affronta la Lega Laser. Run roguelike, sfide boss e personaggi originali.">
+    <link rel="stylesheet" href="../style/style.css?v=1791214053">
+    <link rel="stylesheet" href="../CSS/battaglia_ui.css?v=20261007-studio1">
+    <link rel="stylesheet" href="../CSS/studio_ui.css?v=20261007-studio1">
+    <link rel="stylesheet" href="../CSS/tempesta_ui.css?v=20261007-tempesta1">
+    <link rel="stylesheet" href="../CSS/camp_ui.css?v=20261008-fight3">
+    <link rel="stylesheet" href="../CSS/combat_neon.css?v=20261008-neon2">
+    <link rel="stylesheet" href="../CSS/archipelago3d.css?v=20261008-biomes1">
+    <link rel="stylesheet" href="../CSS/battle_fx.css?v=20261008-biomes1">
+    <link rel="stylesheet" href="../CSS/biome_worlds.css?v=20261008-biomes1">
+    <link rel="stylesheet" href="../CSS/battle_refinements.css?v=20261008-fight3">
+    <link rel="stylesheet" href="../CSS/vs_motion.css?v=20261009-vs1">
+    <link rel="preload" as="image" href="../Sprite/UI/CampLobby/camp-night-v1.png">
+    <link rel="stylesheet" href="../CSS/items_v2.css?v=20261008-items2">
+    <link rel="stylesheet" href="../CSS/ultimate.css?v=20261009-ult1">
+</head>
+<body class="studio-theme tempesta-theme camp-theme">
+    <!-- ============= OVERLAY GLOBALI (sopra tutto) ============= -->
+    
+    <!-- Modal Conferma Lobby Globale -->
+    <div id="modal-conferma-lobby" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 9999999; justify-content: center; align-items: center;">
+        <div style="width: 380px; background: rgba(15, 15, 20, 0.98); border: 4px solid #e74c3c; box-shadow: 0 0 30px rgba(231, 76, 60, 0.5); border-radius: 20px; color: white; font-family: monospace; padding: 25px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; text-align: center;">
+            <h3 style="margin: 0 0 15px 0; color: #e74c3c; font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); font-weight: bold; letter-spacing: 1px;">ATTENZIONE</h3>
+            <p style="margin: 0 0 25px 0; font-size: 16px; color: #ecf0f1; line-height: 1.5;">Vuoi davvero abbandonare la run in corso e tornare alla lobby?<br><br><span style="color: #e74c3c; font-weight: bold;">I progressi andranno persi.</span></p>
+            <div style="display: flex; gap: 15px; width: 100%;">
+                <button onclick="document.getElementById('modal-conferma-lobby').style.display = 'none'" class="btn-battle" style="flex: 1; background-color: #7f8c8d; font-size: 16px; padding: 12px; cursor: pointer; color: white; border: none; border-radius: 8px;">Annulla</button>
+                <button onclick="location.reload()" class="btn-battle" style="flex: 1; background-color: #e74c3c; font-size: 16px; padding: 12px; cursor: pointer; color: white; border: none; border-radius: 8px;">Lobby</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Intro boss fight -->
+    <div id="intro-boss" style="display: none;">
+        <div class="contenitore-intro-boss">
+            <img id="img-boss-background" src="" alt="Boss Sfondo" class="boss-bg-animato">
+            <div class="scritta-boss-container">
+                <img src="../Sprite/UI/Combattimento/ScrittaBossFight.png" alt="BOSS FIGHT" class="scritta-boss-animata">
+            </div>
+        </div>
+    </div>
+
+    <!-- VS intro: live character portraits, names and elements, scalable frames. -->
+    <div id="intro-vs" style="display:none" role="status" aria-label="Presentazione dello scontro">
+        <div class="sfondo-vs-custom anime-style">
+            <div class="vs-arena-label">LA LEGA LASER <span id="vs-battle-kind">SCONTRO</span></div>
+            <div class="vs-panel vs-panel-player lato-giocatore">
+                <div class="vs-bg-effect"></div>
+                <img id="img-vs-giocatore" src="" alt="" class="vs-sprite-pokemon">
+                <div class="vs-identity"><small>LA TUA SQUADRA</small><strong id="vs-player-name">—</strong><span id="vs-player-element"></span></div>
+            </div>
+            <div class="vs-panel vs-panel-enemy lato-nemico">
+                <div class="vs-bg-effect"></div>
+                <img id="img-vs-nemico" src="" alt="" class="vs-sprite-pokemon">
+                <div class="vs-identity"><small>AVVERSARIO</small><strong id="vs-enemy-name">—</strong><span id="vs-enemy-element"></span></div>
+            </div>
+            <div class="vs-slash-line" aria-hidden="true"></div>
+            <div class="logo-vs-container scritta-vs"><span class="vs-lettering">VS</span></div>
+            <div class="vs-ready">PREPARATI ALLA BATTAGLIA <span aria-hidden="true">◆ ◆ ◆</span></div>
+        </div>
+    </div>
+
+    <!-- Overlay ULT animation (legacy, mantenuto per compatibilità) -->
+    <div id="schermata-ult" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.9); z-index: 999999; justify-content: center; align-items: center; flex-direction: column;">
+        <img id="img-ult-sequence" src="" alt="ULT Animation" style="max-width: 90vw; max-height: 80vh; object-fit: contain; animation: zoomUlt 0.6s ease-in-out infinite alternate;">
+    </div>
+
+    <!-- Game Over overlay -->
+    <div id="schermata-gameover" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 150; justify-content: center; align-items: center; flex-direction: column;">
+        <div style="text-align: center;">
+            <img src="../Sprite/UI/Combattimento/gameover.jpg" alt="Game Over" style="max-width: 80%; max-height: 40vh; object-fit: contain; margin-bottom: 30px;">
+            <br>
+            <button onclick="window.location.reload()" style="font-family: monospace; font-size: 28px; font-weight: bold; padding: 20px 60px; background-color: #c62828; color: white; border: 4px solid #fff; border-radius: 12px; cursor: pointer; box-shadow: 0px 0px 20px rgba(255, 0, 0, 0.6); transition: transform 0.2s;">
+                RIPROVA
+            </button>
+        </div>
+    </div>
+
+    <!-- Campo della Lega: scenery and effects are decorative; actions use real game modules. -->
+    <div id="schermata-start" class="schermata attiva camp-launcher">
+        <main class="camp-shell" aria-label="Campo della Lega Laser">
+            <section class="camp-stage" id="camp-stage" aria-label="Scegli la tua avventura">
+                <div class="camp-world" aria-hidden="true">
+                    <img class="camp-scenery" src="../Sprite/UI/CampLobby/camp-night-v1.png" alt="" fetchpriority="high" decoding="async">
+                    <canvas class="camp-portal" id="camp-portal" width="96" height="144"></canvas>
+                    <div class="camp-portal-halo"></div>
+                    <div class="camp-fire"><span class="camp-fire-light"></span><img src="../Sprite/UI/CampLobby/fire-v1.png" alt="" decoding="async"><i></i><i></i><i></i><i></i><i></i></div>
+                    <div class="camp-crystal-light"></div><div class="camp-trophy-light"></div>
+                </div>
+                <header class="camp-top">
+                    <div class="camp-tools">
+                        <button data-icon="settings" onclick="apriModalImpostazioni()" aria-label="Impostazioni" title="Impostazioni"></button>
+                        <button data-icon="dex" onclick="apriModalInfo()" aria-label="Pokédex" title="Pokédex"></button>
+                        <button onclick="apriManualeDiGioco()" aria-label="Manuale di gioco" title="Manuale di gioco">?</button>
+                    </div>
+                    <h1 class="camp-brand"><img src="../Sprite/UI/Lobby/Logo.png" alt="Lasermon · La Lega Laser"></h1>
+                </header>
+                <div id="mode-catalogue" aria-label="Modalità di gioco"></div>
+                <button id="btn-hall-of-fame" class="camp-landmark landmark-hall" data-landmark="hall" onclick="apriHallOfFame()">
+                    <span class="camp-sign"><span class="camp-sign-title"><span data-icon="trophy"></span>Hall of Fame</span><small>I campioni della tua Lega</small><span class="camp-sign-hint">Visita il trofeo <b aria-hidden="true">→</b></span></span>
+                </button>
+                <button id="btn-continua-run" class="camp-landmark landmark-continue" data-landmark="continue" onclick="apriSchermataSlot('carica')" style="display:none">
+                    <span class="camp-sign"><span class="camp-sign-title"><span aria-hidden="true">▣</span>Continua Run</span><small>Riprendi la tua avventura</small><span class="camp-sign-hint">Apri i salvataggi <b aria-hidden="true">→</b></span></span>
+                </button>
+                <p class="camp-mobile-caption">Il campo della Lega <span>La prossima avventura ti aspetta.</span></p>
+            </section>
+            <div id="camp-extra-modes" class="camp-extra-modes" aria-label="Altre modalità" hidden></div>
+            <footer class="camp-dock">
+                <button class="camp-profile" onclick="apriModalImpostazioni();switchImpostazioniTab('dati')" aria-label="Apri salvataggi e impostazioni">
+                    <img id="lobby-profile-avatar" src="../Sprite/UI/Combattimento/leone.png" alt="">
+                    <span><strong id="lobby-profile-name">Ospite</strong><small id="lobby-profile-status">Gioca come ospite</small></span><b aria-hidden="true">›</b>
+                </button>
+                <nav class="camp-dock-nav" aria-label="Archivio e strumenti">
+                    <button onclick="apriModalInfo()"><span data-icon="dex"></span><span>Pokédex<small><span id="lobby-roster-count">—</span> personaggi</small></span></button>
+                    <button onclick="apriManualeDiGioco()"><span data-icon="book"></span><span>Manuale<small>Regole e strategie</small></span></button>
+                    <button onclick="apriSchermataSlot('carica')"><span aria-hidden="true" class="camp-save-icon">▣</span><span>Salvataggi<small>Le tue avventure</small></span></button>
+                    <button onclick="apriModalImpostazioni()"><span data-icon="settings"></span><span>Impostazioni<small>Salvataggi e gioco</small></span></button>
+                </nav>
+                <span class="camp-record"><span data-icon="trophy"></span><strong id="lobby-champions-count">0</strong><small>campioni</small></span>
+            </footer>
+            <div class="camp-status"><span id="lobby-checkpoint-status">Il prossimo viaggio ti aspetta.</span><span>PROGRESSI LOCALI</span></div>
+        </main>
+    </div>
+
+    <!-- Global archive: accessible from every game screen. -->
+    <div id="modal-info" class="hud-modal studio-dex" role="dialog" aria-modal="true" aria-labelledby="dex-title">
+        <div class="hud-modal-dialog dex-dialog">
+            <header class="hud-modal-header"><div><span class="studio-eyebrow">ARCHIVIO DELLA LEGA</span><h2 id="dex-title">Pokédex</h2></div><span id="info-header" role="status" aria-live="polite"></span><button class="hud-modal-close" onclick="chiudiModalInfo()" aria-label="Chiudi Pokédex">×</button></header>
+            <div id="controlli-filtro-pokedex" class="dex-controls">
+                <label class="dex-search"><span data-icon="search"></span><input id="pokedex-search" type="search" placeholder="Cerca un personaggio per nome…" aria-label="Cerca nel Pokédex per nome" oninput="applicaFiltriPokedex()" autocomplete="off"></label>
+                <label>Elemento<select id="filtro-elemento-pokedex" onchange="cambiaElementoPokedex(this.value)"><option value="tutti">Tutti gli elementi</option></select></label>
+                <label>Ordina<select id="pokedex-sort" onchange="applicaFiltriPokedex()"><option value="rarity">Rarità</option><option value="name">Nome A–Z</option><option value="attack">Attacco base</option><option value="speed">Velocità base</option></select></label>
+                <button id="pokedex-favorites-toggle" class="studio-button" aria-pressed="false" onclick="StudioDex.toggleFavorites()">☆ Preferiti</button>
+                <button class="studio-button subtle" onclick="StudioDex.reset()" aria-label="Azzera i filtri del Pokédex">Azzera</button>
+            </div>
+            <div id="pokedex-rarita-tabs" class="dex-rarity-tabs" aria-label="Filtra per rarità"></div>
+            <div class="dex-body"><div id="info-griglia-schede"></div><aside id="pokedex-detail" class="dex-detail" aria-label="Scheda del personaggio" hidden></aside></div>
+        </div>
+    </div>
+
+    <!-- ============= SCHERMATA SELEZIONE STARTER E POKEBALL ============= -->
+    <div id="schermata-selezione" class="schermata" style="background: #111 !important;">
+        <h1 id="titolo-selezione" class="titolo-selezione">Scegli il tuo Pokémon</h1>
+        <div id="contenitore-starter"></div>
+        <button id="btn-torna-lobby" onclick="cambiaSchermata('schermata-selezione', 'schermata-start')" class="btn-battle" style="margin: 20px auto 0 auto; display: none; background-color: #e74c3c; width: 100%; max-width: 300px; font-size: 18px;">Torna alla Lobby</button>
+    </div>
+
+     <div id="schermata-mistero" class="schermata" style="background-color: #111;">
+        <div class="contenitore-selezione-retro" style="border-color: #9b59b6; width: 90%; max-width: 680px; text-align: center;">
+            <h1 class="titolo-selezione-retro" style="color: #9b59b6;">❓ EVENTO MISTERIOSO ❓</h1>
+            <h2 id="mistero-titolo-evento" style="font-family: monospace; color: #2f3640; font-size: 24px; margin-top: 20px;">-</h2>
+            <p id="mistero-descrizione" style="font-family: monospace; font-size: 16px; background: #f5f6fa; padding: 20px; border: 2px dashed #9b59b6; border-radius: 8px; margin: 20px 0;"></p>
+            <div id="mistero-scelte-container" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                <!-- Pulsanti scelte riempiti via JS -->
+            </div>
+            <p id="mistero-esitotesto" style="display: none; font-family: monospace; font-size: 16px; background: #2ecc71; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px;"></p>
+            <button id="btn-mistero-continua" class="btn-battle" onclick="chiudiEventoMistero()" style="display: none; background-color: #9b59b6; color: white; width: 100%; max-width: 300px; margin: 0 auto;">Continua il Cammino</button>
+        </div>
+    </div>
+    
+    <!-- Modale Selezione Bersaglio -->
+    <div id="modal-selezione-bersaglio" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:#2c3e50; border:3px solid #f1c40f; border-radius:10px; width:90%; max-width:600px; padding:20px; text-align:center;">
+            <h2 id="bersaglio-titolo" style="color:#f1c40f; margin-bottom:15px; font-family:monospace;">SELEZIONA BERSAGLIO</h2>
+            <div id="bersaglio-squadra-container" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
+                <!-- Riempiuto da JS -->
+            </div>
+            <button class="btn-battle" onclick="document.getElementById('modal-selezione-bersaglio').style.display='none'" style="margin-top:20px; background:#e74c3c;">Annulla</button>
+        </div>
+    </div>
+
+    <!-- ============= SCHERMATA EVENTO ITEM ============= -->
+    <div id="schermata-evento-item" class="schermata" style="background-color: #111;">
+        <div class="contenitore-selezione-retro" style="border-color: #3498db; width: 95%; max-width: 720px; text-align: center;">
+            <h1 class="titolo-selezione-retro" style="color: #3498db;">🎁 EVENTO ITEM 🎁</h1>
+            <p style="color: white; font-size: 18px; margin-bottom: 20px;">Scegli un oggetto da aggiungere allo zaino!</p>
+            <div id="evento-item-opzioni" style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                <!-- Opzioni riempite via JS -->
+            </div>
+            <button class="btn-battle" onclick="saltaEventoItem()" style="background-color: #e74c3c; color: white; width: 100%; max-width: 300px; margin: 20px auto 0 auto; display: block;">Rifiuta (Prosegui)</button>
+        </div>
+    </div>
+
+    <!-- ============= SCHERMATA MAPPA ============= -->
+    <div id="schermata-mappa" class="schermata">
+        
+        <!-- UI ESTERNA (non scalata, occupa tutto lo schermo) -->
+        <div id="ui-esterna-mappa" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50;">
+            
+            <nav class="map-mobile-tools" aria-label="Controlli mappa">
+                <button id="map-mobile-team" onclick="togglePannelloMappaMobile('squadra')" aria-expanded="false">Squadra</button>
+                <button id="map-mobile-bag" onclick="togglePannelloMappaMobile('borsa')" aria-expanded="false">Zaino</button>
+                <button onclick="apriSchermataSlot('salva')">Salva</button>
+                <button class="map-reset-visible" onclick="resettaRunConStarter()">Reset run</button>
+                <button onclick="togglePannelloMappaMobile('')">× Chiudi</button>
+            </nav>
+            <!-- Top Left: Menu Buttons -->
+            <div id="top-left-ui" style="position: absolute; top: 20px; left: calc(50% - (var(--map-scaled-width) / 2) - 80px); pointer-events: auto; display: flex; flex-direction: column; gap: 15px;">
+                <button class="lobby-menu-btn" onclick="tornaALobbyDaMappa()" title="Torna alla Lobby">
+                    <span style="font-size: 28px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">🏠</span>
+                </button>
+                <button class="lobby-menu-btn" onclick="apriModalImpostazioni()" title="Impostazioni">
+                    <img src="../Sprite/UI/Lobby/impostazioni.png" alt="Impostazioni">
+                </button>
+                <button class="lobby-menu-btn info-game-btn" onclick="apriManualeDiGioco()" title="Manuale di Gioco">
+                    <span style="color: white; font-size: 28px; font-weight: bold; font-family: monospace; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">?</span>
+                </button>
+                <button class="lobby-menu-btn" onclick="apriModalInfo()" title="Pokédex" aria-label="Apri Pokédex"><span data-icon="dex"></span></button>
+            </div>
+
+            <!-- Top Right: Monete -->
+            <div id="top-right-ui" style="position: absolute; top: 20px; left: calc(50% + (var(--map-scaled-width) / 2) + 20px); pointer-events: auto;">
+                <div id="monete-display-mappa" class="ui-box-moderno" style="padding: 5px 15px; font-size: 16px;">💰 0</div>
+            </div>
+
+            <!-- Right Sidebar: Zaino, Reset -->
+            <div id="right-sidebar-ui" style="position: absolute; top: 50%; left: calc(50% + (var(--map-scaled-width) / 2) + 20px); transform: translateY(-50%); pointer-events: auto; display: flex; flex-direction: column; align-items: flex-start; gap: 15px;">
+                
+                <!-- Zaino Persistente (Quadrato) -->
+                <div id="pannello-zaino-persistente" class="ui-box-moderno" style="height: 50vh; aspect-ratio: 1 / 1; max-width: calc(50vw - (var(--map-scaled-width) / 2) - 40px); max-height: calc(50vw - (var(--map-scaled-width) / 2) - 40px); display: flex; flex-direction: column; padding: 0; overflow: hidden; position: relative; align-items: stretch; width: 100%;">
+                    
+                    <div style="background: rgba(0,0,0,0.5); padding: 8px 10px; text-align: center; font-size: 14px; color: #f1c40f; border-bottom: 2px solid #3498db; display: flex; justify-content: space-between; align-items: center; white-space: nowrap;">
+                        <span style="font-weight: bold; margin-right: 10px;">🎒 ZAINO</span>
+                        <span id="zaino-capacita-counter" style="font-size: 12px; color: #bbb;">0/20</span>
+                    </div>
+                    
+                    <!-- Vista Principale: Griglia a celle -->
+                    <div id="zaino-mappa-lista" class="custom-scrollbar" style="flex-grow: 1; overflow-y: auto; padding: 10px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; align-content: start; justify-items: stretch;">
+                        <!-- riempito via JS con celle -->
+                    </div>
+
+                    <!-- Vista Assegnazione (Nascosta) -->
+                    <div id="zaino-vista-assegnazione" style="display: none; flex-direction: column; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 15, 26, 0.95); z-index: 10; padding: 10px; box-sizing: border-box;">
+                        <div id="zaino-assegnazione-titolo" style="color: #f1c40f; font-weight: bold; text-align: center; margin-bottom: 10px; font-size: 14px;">ASSEGNA A:</div>
+                        <div id="zaino-assegnazione-lista" class="custom-scrollbar" style="flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+                            <!-- riempito via JS -->
+                        </div>
+                        <button onclick="annullaAssegnazioneOggetto()" class="btn-battle" style="margin-top: 10px; background-color: #7f8c8d; font-size: 12px; padding: 5px;">ANNULLA</button>
+                    </div>
+
+                </div>
+
+                <!-- Tasto Salva Run -->
+                <button onclick="apriSchermataSlot('salva')" class="ui-btn-moderno" style="width: 80px; height: 80px; padding: 5px; font-size: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; background: linear-gradient(135deg, #1a1a3e, #2c2c6e); border-color: #7c5cbf;">
+                    <span style="font-size: 24px; margin-bottom: 5px;">💾</span>
+                    SALVA
+                </button>
+
+                <!-- Tasto Reset Run (Quadrato) -->
+                <button onclick="resettaRunConStarter()" class="ui-btn-moderno ui-btn-danger" style="width: 80px; height: 80px; padding: 5px; font-size: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2;">
+                    <span style="font-size: 24px; margin-bottom: 5px;">🔄</span>
+                    RESET
+                </button>
+            </div>
+
+            <!-- Middle Left: Squadra -->
+            <div id="left-squadra-ui" style="position: absolute; top: 50%; right: calc(50% + (var(--map-scaled-width) / 2) + 20px); transform: translateY(-50%); pointer-events: auto; display: flex; align-items: center;">
+                <div id="griglia-squadra" class="squadra-moderna"></div>
+            </div>
+            
+        </div>
+
+        <div id="map-scroll-viewport" tabindex="0" role="region" aria-label="Percorso della Run. Scorri per esplorare i nodi.">
+        <div id="contenitore-mappa-gioco">
+            <h2 id="titolo-percorso-mappa">PERCORSO</h2>
+            
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                <svg id="mappa-collegamenti" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2;"></svg>
+                <div id="albero-container" style="position: relative; width: 100%; height: 100%; z-index: 5;"></div>
+            </div>
+        </div>
+
+        </div>
+        <button class="map-next-node" onclick="GamePresentation.focusRoute()">Prossimo nodo ↓</button>
+    </div>
+
+    <!-- ============= SCHERMATA GIOCO (BATTAGLIA) ============= -->
+    <div id="schermata-gioco" class="schermata">
+        <h2 id="titolo-incontro" hidden>Combattimento</h2>
+        <!-- Overlay Warning Boss -->
+        <div id="warning-overlay" class="nascosto" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; background: rgba(0,0,0,0.5); z-index: 1000;">
+            <img src="../Sprite/UI/Combattimento/WARNING.png" alt="Warning" style="max-width: 80%; animation: warningBlinkZoom 1s infinite;">
+        </div>
+        
+        <div class="battle-shell">
+        <!-- Speed controls share the same frame as the arena. -->
+        <button id="btn-skip-fixed" onclick="attivaSkip()" title="Attiva/disattiva Skip animazioni" style="position: absolute; top: 10px; left: 10px; z-index: 100;">&#9654;&#9654; 2X Speed</button>
+        <!-- Pulsante PAUSA AUTO -->
+        <button id="btn-pausa-auto-fixed" onclick="togglePausaAutoBattle()" title="Metti in pausa la modalità auto-battle" style="display: none; position: absolute; top: 10px; left: 120px; z-index: 100;">&#10074;&#10074; PAUSA AUTO</button>
+
+        <!-- MAIN BATTLE HUD CONTAINER -->
+        <div class="battle-hud-container" id="battle-stage" data-action="menu">
+            
+            <!-- TOP CENTER: TURNO -->
+            <div class="turn-counter-container">
+                <div class="turn-label">TURNO</div>
+                <div id="turn-number">01</div>
+            </div>
+
+            <!-- ACCOUNT CARD: bottom left on desktop -->
+            <div class="trainer-card">
+                <div class="trainer-avatar">
+                    <img id="trainer-avatar-img" src="../Sprite/UI/Combattimento/leone.png" onerror="this.src='../Sprite/UI/Combattimento/leone.png'" alt="Avatar">
+                </div>
+                <div class="trainer-info">
+                    <div id="trainer-name">Giocatore</div><span class="trainer-role">ESPLORATORE</span>
+                    <div id="trainer-pokeballs" class="trainer-pokeballs">
+                        <!-- pokeballs will be injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- TOP RIGHT: ENEMY CARD -->
+            <div class="enemy-card-container">
+                <div class="enemy-card">
+                    <img id="enemy-hud-portrait" class="hud-fighter-portrait" src="../Sprite/UI/Combattimento/leone.png" alt="" data-fallback="../Sprite/UI/Combattimento/leone.png">
+                    <div class="enemy-info-row">
+                        <span id="nome-nemico">---</span>
+                        <span id="lvl-nemico">L. --</span>
+                    </div>
+                    <div class="enemy-hp-row">
+                        <span class="ps-label">PS</span>
+                        <div class="barra-hp-container-arena">
+                            <div id="barra-nemico" class="barra-hp"></div>
+                        </div>
+                    </div>
+                    <div class="enemy-hp-text-row">
+                        <span id="hp-nemico">-/-</span>
+                    </div>
+                </div>
+                <div id="enemy-phase-dots" class="enemy-phase-dots">
+                    <!-- dots injected here -->
+                </div>
+            </div>
+
+            <!-- LEFT MENU -->
+            <div class="left-menu">
+                <button class="menu-btn" onclick="apriPannelloDestro('borsa')" id="btn-menu-zaino" aria-label="Zaino" title="Zaino" disabled>
+                    <img src="../Sprite/UI/Combattimento/zaino.png" class="menu-icon"> ZAINO
+                </button>
+                <button class="menu-btn" onclick="apriPannelloDestro('squadra')" id="btn-menu-squadra" aria-label="Squadra" title="Squadra" disabled>
+                    <img src="../Sprite/UI/Combattimento/pokeball.png" class="menu-icon"> SQUADRA
+                </button>
+                <button class="menu-btn" onclick="apriDiario()" aria-label="Diario di combattimento" title="Diario">
+                    <span class="menu-symbol" aria-hidden="true">▤</span> DIARIO
+                </button>
+                <button class="menu-btn" onclick="apriImpostazioni()" aria-label="Impostazioni" title="Impostazioni">
+                    <span class="menu-symbol" aria-hidden="true">⚙</span> IMPOSTAZIONI
+                </button>
+            </div>
+
+            <!-- ACTIVE FIGHTER CARD: top left on desktop -->
+            <div class="player-card">
+                <img id="player-hud-portrait" class="hud-fighter-portrait" src="../Sprite/UI/Combattimento/leone.png" alt="" data-fallback="../Sprite/UI/Combattimento/leone.png">
+                <div class="player-info-row">
+                    <span id="nome-giocatore">---</span>
+                    <span id="lvl-giocatore">L. --</span>
+                </div>
+                <div class="player-hp-row">
+                    <span class="ps-label">PS</span>
+                    <div class="barra-hp-container-arena">
+                        <div id="barra-giocatore" class="barra-hp"></div>
+                    </div>
+                </div>
+                <div class="player-hp-text-row">
+                    <span id="hp-giocatore">-/-</span>
+                </div>
+            </div>
+
+            <!-- BOTTOM CENTER: ACTION BUTTONS -->
+            <div class="action-buttons-container">
+                <div class="hex-buttons">
+                    <button id="btn-attacco" class="hex-btn hex-rosso" onclick="apriPannelloDestro('lotta')">
+                        <div class="hex-content">
+                            <svg id="fight-button-icon" class="action-symbol" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3l14 14M3 6l3-3M15 18l3-3M20 3L6 17M18 3l3 3M3 15l3 3M18 18l3 3M3 21l3-3"/></svg>
+                            <span id="fight-button-label">LOTTA</span>
+                        </div>
+                    </button>
+                    <button id="btn-pokemon" aria-controls="panel-content-squadra" class="hex-btn hex-verde" onclick="apriPannelloDestro('squadra')" disabled>
+                        <div class="hex-content">
+                            <svg class="action-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h6m6 0h6"/><circle cx="12" cy="12" r="3"/></svg>
+                            <span>POKÉMON</span>
+                        </div>
+                    </button>
+                    <button id="btn-item" class="hex-btn hex-blu" onclick="apriPannelloDestro('borsa')" disabled>
+                        <div class="hex-content">
+                            <svg class="action-symbol" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6V3h8v3M8 6l-4 6v8a1 1 0 001 1h14a1 1 0 001-1v-8l-4-6z"/><path d="M9 13h6m-3-3v6"/></svg>
+                            <span>BORSA</span>
+                        </div>
+                    </button>
+                    <button id="btn-fuga" class="hex-btn hex-oro" onclick="fugaBattaglia()">
+                        <div class="hex-content">
+                            <svg class="action-symbol" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15l3-7 4 5 8 1 2 4H3zM8 9l3-3M13 14l-1 3M17 14l-1 3"/></svg>
+                            <span>FUGA</span>
+                        </div>
+                    </button>
+                    <div id="panel-content-lotta" class="panel-content battle-move-slots"><div id="lista-mosse" class="scrollable-list"></div></div>
+                </div>
+                <div class="action-dialog">
+                    <span id="dialog-testo">Cosa farà il tuo Pokémon?</span>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: party / bag replace the log; closing restores it. -->
+            <aside id="right-panel" class="right-panel" data-view="log" aria-label="Azioni e log di combattimento">
+                <button id="btn-close-panel" class="btn-close-panel" onclick="chiudiPannelloDestro()" aria-label="Chiudi la lista" hidden>×</button>
+                <div id="panel-content-squadra" class="panel-content">
+                    <div class="panel-title">◉ SCEGLI UN POKÉMON</div>
+                    <div id="squadra-list" class="scrollable-list"></div>
+                </div>
+                <div id="panel-content-borsa" class="panel-content">
+                    <div class="panel-title">BORSA</div>
+                    <div id="borsa-list" class="scrollable-list"></div>
+                </div>
+                <section id="panel-content-log" class="panel-content active" aria-label="Log di combattimento">
+                    <div class="panel-title">▤ LOG DI COMBATTIMENTO</div>
+                    <div id="console-log" role="log" aria-live="polite" aria-relevant="additions text">Scontro iniziato! Preparati alla battaglia.</div>
+                </section>
+            </aside>
+
+            <!-- SPRITES IN ARENA -->
+            <div class="battle-viewport" id="battle-viewport"><div class="arena-sprites" id="arena-world">
+                <img id="battle-background" class="battle-background" src="../Sprite/UI/Combattimento/Combattimento1.png" alt="" decoding="async">
+                <div class="box-sprite-arena-grande sprite-player-container">
+                    <img id="img-giocatore" src="" alt="Sprite Giocatore" class="sprite-pokemon-grande">
+                </div>
+                <div class="box-sprite-arena-grande sprite-enemy-container">
+                    <img id="img-nemico" src="" alt="Sprite Nemico" class="sprite-pokemon-grande">
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <!-- ============= SCHERMATA CENTRO MEDICO ============= -->
+    <div id="schermata-centro-medico" class="schermata">
+        <div class="contenitore-disco-full">
+            <h1 class="titolo-selezione-retro">🏥 CENTRO MEDICO 🏥</h1>
+
+            <!-- FASE 1: Scelta iniziale (cura o negozio).
+                 display:none di default — apriCentroMedico() lo mette a flex -->
+            <div id="centro-fase-scelta">
+                <button id="btn-cura-squadra" class="centro-scelta-btn" onclick="scegliCura()">
+                    <span class="scelta-emoji">🩹</span>
+                    <span>CURA SQUADRA</span>
+                    <span id="testo-cura-squadra" style="font-size: 12px; font-weight: normal; color: #718093;">Ripristina tutti gli HP</span>
+                </button>
+                <button class="centro-scelta-btn btn-negozio" onclick="apriNegozio()">
+                    <span class="scelta-emoji">🛒</span>
+                    <span>NEGOZIO</span>
+                    <span style="font-size: 12px; font-weight: normal; color: #856a00;">Acquista item con le monete</span>
+                </button>
+                <button class="centro-scelta-btn" onclick="tornaAllaMappaDaCentro()" style="background: #2d3436; color: #dfe6e9; border: 2px solid #636e72;">
+                    <span class="scelta-emoji">🚪</span>
+                    <span>ESCI DAL CENTRO</span>
+                    <span style="font-size: 12px; font-weight: normal; color: #b2bec3;">Torna alla mappa</span>
+                </button>
+            </div>
+
+            <!-- FASE 2: Team curato.
+                 display:none di default — scegliCura() lo mette a block -->
+            <div id="centro-fase-cura">
+                <p class="sottotitolo-disco">Tutti i Pokémon della tua squadra sono stati completamente curati!</p>
+                <div id="contenitore-medico-squadra" class="griglia-opzioni-disco"></div>
+                <button class="btn-scegli" onclick="tornaAllaMappaDaCentro()">Riprendi il Cammino</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============= OVERLAY NEGOZIO ============= -->
+    <!-- OVERLAY FISSO — NON usa .schermata/.attiva.
+         Parte con display:none (inline style) e viene aperto/chiuso
+         solo da JS via style.display. Garantisce zero bleeding su altre schermate. -->
+    <div id="schermata-negozio"
+         style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:20000; flex-direction:column; background:#1a1a2e; font-family:monospace; overflow:hidden;">
+        <div id="negozio-header">
+            <h1>&#x1F6D2; NEGOZIO</h1>
+            <span id="negozio-monete-header">&#x1F4B0; 0</span>
+        </div>
+        <div id="negozio-layout">
+            <div id="negozio-lista"></div>
+            <div id="negozio-dettaglio">
+                <p style="color:#555;font-size:14px;text-align:center;margin-top:60px;font-family:monospace;">
+                    &#x2190; Seleziona un articolo per vedere i dettagli.
+                </p>
+            </div>
+        </div>
+        <div id="negozio-footer">
+            <button id="btn-chiudi-negozio" onclick="chiudiNegozio()">&#x2715; Chiudi Negozio</button>
+        </div>
+    </div>
+
+    <!-- ============= SCHERMATA SCAMBIO IN BATTAGLIA ============= -->
+    <div id="schermata-scambio-battaglia"
+         style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:20000; flex-direction:column; background:#1a1a2e; font-family:monospace; overflow:hidden;">
+        <div id="scambio-battaglia-header" style="padding:15px 30px; display:flex; justify-content:space-between; align-items:center; background:#0f0f1a; border-bottom:4px solid #3498db; flex-shrink:0;">
+            <h1 style="color:#3498db; font-size:24px; text-shadow:2px 2px 0px #000; margin:0;">&#x1F504; SOSTITUISCI POKÉMON</h1>
+        </div>
+        <div id="scambio-battaglia-layout" style="display:flex; flex:1; overflow:hidden;">
+            <div id="scambio-battaglia-lista" style="flex:1; background:#1a1a2e; border-right:4px solid #0f0f1a; padding:15px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;"></div>
+            <div id="scambio-battaglia-dettaglio" style="flex:1; background:#2c3e50; padding:20px; overflow-y:auto; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:15px;">
+                <p style="color:#ccc; font-size:16px; text-align:center; margin-top:60px;">&#x2190; Seleziona un Pokémon per i dettagli.</p>
+            </div>
+        </div>
+        <div id="scambio-battaglia-footer" style="padding:15px; background:#0f0f1a; border-top:4px solid #3498db; text-align:center; flex-shrink:0;">
+            <button onclick="chiudiScambioBattaglia()" style="background:#e74c3c; color:white; border:2px solid #fff; border-radius:8px; padding:10px 20px; font-family:monospace; font-weight:bold; font-size:18px; cursor:pointer; text-transform:uppercase; box-shadow:0 4px 6px rgba(0,0,0,0.5);">&#x2715; Annulla</button>
+        </div>
+    </div>
+
+    <!-- ============= SCHERMATA DETTAGLIO POKÉMON ============= -->
+    <div id="schermata-dettaglio" class="schermata">
+        <div class="contenitore-dettaglio-scheda">
+            <div class="scheda-info-pokedex info-scheda-dettaglio">
+                <div class="blocco-foto-pokedex">
+                    <img id="dettaglio-img" src="" alt="Foto Pokémon">
+                </div>
+                <div class="blocco-stats-pokedex">
+                    <div class="info-titolo">
+                        <div id="dettaglio-nome" class="nome-pkm">---</div>
+                        <div id="dettaglio-rarita" class="rarita-pkm">---</div>
+                    </div>
+                    <hr class="separatore-pkm">
+                    <div class="valori-stats">
+                        <div>LVL: <span id="dettaglio-livello">-</span></div>
+                        <div>HP: <span id="dettaglio-hp">-/-</span></div>
+                        <div>ATK: <span id="dettaglio-atk">-</span></div>
+                        <div>DEF: <span id="dettaglio-def">-</span></div>
+                        <div>ATK SP.: <span id="dettaglio-spatk">-</span></div>
+                        <div>DIF SP.: <span id="dettaglio-spdef">-</span></div>
+                        <div>VEL: <span id="dettaglio-vel">-</span></div>
+                        <div style="margin-top: 8px; font-size: 15px; color: #1e272e;">MOSSA: <span id="dettaglio-mossa" style="color: #2ecc71; font-weight: bold;">-</span></div>
+                    </div>
+
+                    <div id="dettaglio-oggetti" style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed #ccc;">
+                        <!-- Renderizzato in JS -->
+                    </div>
+                </div>
+
+                <div id="blocco-cambio-in-battaglia" style="display:none; width: 100%; text-align: center; margin-top: 10px;">
+                    <button class="btn-battle" id="btn-esegui-cambio-battaglia" onclick="eseguiCambioInBattaglia()" style="background-color: #f39c12; width: 100%;">MANDA IN CAMPO</button>
+                </div>
+
+                <button class="btn-battle btn-win" onclick="chiudiDettaglio()" style="margin-top: 15px; width: 100%;">CHIUDI</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============= SCHERMATA DISCO MOSSA ============= -->
+    <div id="schermata-disco" class="schermata">
+        <div class="contenitore-disco-full">
+            <h1 class="titolo-selezione-retro">💿 DISCO MOSSA TROVATO! 💿</h1>
+            <p class="sottotitolo-disco">
+                Scegli quale Pokémon della tua squadra vuoi potenziare (Max Lvl 3):
+            </p>
+            <div id="contenitore-opzioni-disco" class="griglia-opzioni-disco"></div>
+            <button class="btn-battle" onclick="tornaAllaMappaDaDisco()" style="background-color: #e74c3c; width: 100%; max-width: 300px; margin: 20px auto 0; display: block;">Lascia il disco (Indietro)</button>
+        </div>
+    </div>
+
+    <!-- ============= SCHERMATA ZONA SCAMBIO ============= -->
+    <div id="schermata-scambio" class="schermata" style="background: rgba(0, 0, 0, 0.95) !important; display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 20000; flex-direction: column; justify-content: center; align-items: center;">
+        <h2 id="scambio-titolo" style="color: white; margin-bottom: 20px; font-family: monospace; font-size: 24px; text-align: center;">Scegli il Pokémon da scambiare</h2>
+        
+        <div id="scambio-fase-selezione" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+            <div id="scambio-squadra-list" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; max-width: 90vw; overflow-y: auto; max-height: 65vh; padding: 20px;"></div>
+            <button onclick="annullaScambio()" style="margin-top: 30px; background-color: #e74c3c; width: 200px; padding: 12px; border-radius: 5px; color: white; border: none; cursor: pointer; font-family: monospace; font-size: 16px; font-weight: bold;">NO, GRAZIE</button>
+        </div>
+
+        <div id="scambio-fase-risultato" style="display: none; text-align: center; width: 100%; flex-direction: column; align-items: center;">
+            <h2 style="color: #2ecc71; font-family: monospace; font-size: 28px; margin-bottom: 15px;">Scambio Effettuato!</h2>
+            <p id="testo-risultato-scambio" style="font-family: monospace; font-weight: bold; font-size: 18px; color: white; margin-bottom: 20px;"></p>
+            <div id="card-nuovo-pokemon" style="display: flex; justify-content: center; margin: 20px 0;"></div>
+            <button onclick="chiudiEventoScambio()" style="margin-top: 20px; background-color: #3498db; width: 250px; padding: 12px; border-radius: 5px; color: white; border: none; cursor: pointer; font-family: monospace; font-size: 16px; font-weight: bold;">CONTINUA IL CAMMINO</button>
+        </div>
+    </div>
+
+    <!-- ============= SCHERMATA SANDBOX / DEBUGGER ============= -->
+    <!-- Accessibile via ?sandbox nell'URL oppure tramite apriSandbox() -->
+    <div id="schermata-sandbox" class="schermata" style="display:none; background:#0a0a12; flex-direction:column; overflow:hidden;">
+
+        <!-- Header -->
+        <div style="background:#0f0f1a; border-bottom:4px solid #9b59b6; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+            <h2 style="color:#9b59b6; font-family:monospace; margin:0; font-size:20px;">&#x1F527; SANDBOX DEBUGGER</h2>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <span style="color:#7f8fa6; font-size:12px; font-family:monospace;">Simula battaglie e bilanciamento</span>
+            </div>
+        </div>
+
+        <!-- Corpo principale: 2 colonne (Giocatore | Nemico) -->
+        <div style="display:flex; flex:1; gap:0; overflow:hidden;">
+
+            <!-- === COLONNA GIOCATORE === -->
+            <div style="flex:1; padding:15px; overflow-y:auto; background:#111827; border-right:3px solid #0f0f1a;">
+                <h3 style="color:#3498db; font-family:monospace; font-size:14px; margin:0 0 12px 0; text-align:center; border-bottom:2px solid #3498db; padding-bottom:6px;">&#x1F535; GIOCATORE</h3>
+
+                <div style="display:flex; flex-direction:column; gap:8px; font-family:monospace; font-size:13px;">
+                    <!-- Selezione Pokemon -->
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Pokemon:</label>
+                        <select id="sb-gio-nome" style="flex:1; background:#1a1a2e; color:white; border:2px solid #3498db; border-radius:6px; padding:4px; font-family:monospace;" onchange="aggiornaDatiSandbox('gio')"></select>
+                    </div>
+                    <div style="display:flex; gap:15px;">
+                        <span style="color:#7f8fa6;">Elem: <span id="sb-gio-elemento" style="color:#f1c40f;">-</span></span>
+                        <span style="color:#7f8fa6;">Rarit&#xE0;: <span id="sb-gio-rarita" style="color:#f1c40f;">-</span></span>
+                    </div>
+
+                    <!-- Livello e Mossa -->
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Livello:</label>
+                        <input type="number" id="sb-gio-lvl" value="50" min="1" max="100" style="width:70px; background:#1a1a2e; color:white; border:2px solid #555; border-radius:6px; padding:4px; font-family:monospace;" oninput="calcolaStatsSandbox('gio')">
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Mossa:</label>
+                        <select id="sb-gio-lvl-mossa" style="flex:1; background:#1a1a2e; color:white; border:2px solid #555; border-radius:6px; padding:4px; font-family:monospace;">
+                            <option value="1">LVL 1</option>
+                            <option value="2">LVL 2</option>
+                            <option value="3">LVL 3</option>
+                        </select>
+                    </div>
+
+                    <!-- Moltiplicatore Rarita -->
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Rarit&#xE0;x:</label>
+                        <input type="number" id="sb-gio-molt-rarita" step="0.01" style="width:80px; background:#1a1a2e; color:white; border:2px solid #555; border-radius:6px; padding:4px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('gio')">
+                        <label style="color:#7f8fa6; font-size:11px;"><input type="checkbox" id="chk-m-rarita-gio" onchange="toggleManualRarita('gio')"> Override</label>
+                    </div>
+
+                    <!-- Moltiplicatore Schivata -->
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Schivata:</label>
+                        <input type="number" id="sb-gio-molt-schivata" value="30" step="1" style="width:70px; background:#1a1a2e; color:white; border:2px solid #555; border-radius:6px; padding:4px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('gio')">
+                        <label style="color:#7f8fa6; font-size:11px;"><input type="checkbox" id="chk-m-schivata-gio" onchange="toggleManualSchivata('gio')"> Override</label>
+                    </div>
+
+                    <!-- STATS -->
+                    <div style="background:#1a1a2e; border-radius:8px; padding:10px; margin-top:4px;">
+                        <div style="color:#f1c40f; font-size:12px; margin-bottom:8px;">&#x1F4CA; STATISTICHE</div>
+
+                        <!-- HP -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#e74c3c; min-width:65px;">HP:</span>
+                            <div data-formula="" style="flex:1; position:relative;">
+                                <input type="number" id="sb-gio-hp" readonly style="width:100%; background:#0a0a12; color:#e74c3c; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-gio-elem-hp" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('gio')" title="Molt. Elemento HP">
+                            <label title="Override moltiplicatore elemento"><input type="checkbox" id="chk-m-elem-gio-hp" onchange="toggleManualElem('hp','gio')"></label>
+                            <input type="number" id="sb-gio-m-hp" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('gio')" title="Divisore custom (0=default)">
+                        </div>
+
+                        <!-- ATK -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#e67e22; min-width:65px;">ATK:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-gio-atk" readonly style="width:100%; background:#0a0a12; color:#e67e22; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-gio-elem-atk" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('gio')" title="Molt. Elemento ATK">
+                            <label><input type="checkbox" id="chk-m-elem-gio-atk" onchange="toggleManualElem('atk','gio')"></label>
+                            <input type="number" id="sb-gio-m-atk" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('gio')" title="Divisore custom">
+                        </div>
+
+                        <!-- ATK SPEC -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#e67e22; min-width:65px;">ATK Spe:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-gio-atk-spec" readonly style="width:100%; background:#0a0a12; color:#e67e22; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-gio-elem-atk-spec" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('gio')" title="Molt. Elemento ATK Spec">
+                            <label><input type="checkbox" id="chk-m-elem-gio-atk-spec" onchange="toggleManualElem('atk-spec','gio')"></label>
+                            <input type="number" id="sb-gio-m-atk-spec" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('gio')" title="Divisore custom">
+                        </div>
+
+                        <!-- DEF -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#3498db; min-width:65px;">DEF:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-gio-def" readonly style="width:100%; background:#0a0a12; color:#3498db; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-gio-elem-def" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('gio')" title="Molt. Elemento DEF">
+                            <label><input type="checkbox" id="chk-m-elem-gio-def" onchange="toggleManualElem('def','gio')"></label>
+                            <input type="number" id="sb-gio-m-def" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('gio')" title="Divisore custom">
+                        </div>
+
+                        <!-- DEF SPEC -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#3498db; min-width:65px;">DEF Spe:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-gio-def-spec" readonly style="width:100%; background:#0a0a12; color:#3498db; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-gio-elem-def-spec" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('gio')" title="Molt. Elemento DEF Spec">
+                            <label><input type="checkbox" id="chk-m-elem-gio-def-spec" onchange="toggleManualElem('def-spec','gio')"></label>
+                            <input type="number" id="sb-gio-m-def-spec" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('gio')" title="Divisore custom">
+                        </div>
+
+                        <!-- VEL -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#2ecc71; min-width:65px;">VEL:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-gio-vel" readonly style="width:100%; background:#0a0a12; color:#2ecc71; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-gio-elem-vel" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('gio')" title="Molt. Elemento VEL">
+                            <label><input type="checkbox" id="chk-m-elem-gio-vel" onchange="toggleManualElem('vel','gio')"></label>
+                            <input type="number" id="sb-gio-m-vel" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('gio')" title="Divisore custom">
+                        </div>
+
+                        <!-- SCHIVATA RISULTANTE -->
+                        <div style="display:flex; gap:6px; align-items:center; padding-top:8px; border-top:1px dashed #333;">
+                            <span style="color:#f39c12; min-width:65px;">Schivata:</span>
+                            <span id="sb-gio-res-schivata" style="color:#f39c12; font-weight:bold;">0</span><span style="color:#7f8fa6;">%</span>
+                        </div>
+                    </div>
+
+                    <!-- Oggetto equipaggiato -->
+                    <div style="margin-top:6px;">
+                        <label style="color:#f1c40f; font-size:12px;">&#x1F392; OGGETTO:</label>
+                        <div style="display:flex; gap:6px; align-items:center; margin-top:4px;">
+                            <span title="Nessuna descrizione" style="cursor:help; color:#3498db;">&#x2139;</span>
+                            <select id="sb-gio-item" style="flex:1; background:#1a1a2e; color:white; border:2px solid #f1c40f; border-radius:6px; padding:4px; font-family:monospace; font-size:12px;" onchange="toggleValore(this,'sb-gio-val-item'); aggiornaTooltip(this,'item'); calcolaStatsSandbox('gio')"></select>
+                            <input type="number" id="sb-gio-val-item" placeholder="Val" style="width:60px; display:none; background:#1a1a2e; color:#f1c40f; border:1px solid #f1c40f; border-radius:4px; padding:3px; font-family:monospace;" oninput="aggiornaTooltip(document.getElementById('sb-gio-item'),'item'); calcolaStatsSandbox('gio')">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- === COLONNA NEMICO === -->
+            <div style="flex:1; padding:15px; overflow-y:auto; background:#1a0a0a;">
+                <h3 style="color:#e74c3c; font-family:monospace; font-size:14px; margin:0 0 12px 0; text-align:center; border-bottom:2px solid #e74c3c; padding-bottom:6px;">&#x1F534; NEMICO</h3>
+
+                <div style="display:flex; flex-direction:column; gap:8px; font-family:monospace; font-size:13px;">
+                    <!-- Selezione Pokemon -->
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Pokemon:</label>
+                        <select id="sb-nem-nome" style="flex:1; background:#1a1a2e; color:white; border:2px solid #e74c3c; border-radius:6px; padding:4px; font-family:monospace;" onchange="aggiornaDatiSandbox('nem')"></select>
+                    </div>
+                    <div style="display:flex; gap:15px;">
+                        <span style="color:#7f8fa6;">Elem: <span id="sb-nem-elemento" style="color:#f1c40f;">-</span></span>
+                        <span style="color:#7f8fa6;">Rarit&#xE0;: <span id="sb-nem-rarita" style="color:#f1c40f;">-</span></span>
+                    </div>
+
+                    <!-- Livello e Mossa -->
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Livello:</label>
+                        <input type="number" id="sb-nem-lvl" value="50" min="1" max="100" style="width:70px; background:#1a1a2e; color:white; border:2px solid #555; border-radius:6px; padding:4px; font-family:monospace;" oninput="calcolaStatsSandbox('nem')">
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Mossa:</label>
+                        <select id="sb-nem-lvl-mossa" style="flex:1; background:#1a1a2e; color:white; border:2px solid #555; border-radius:6px; padding:4px; font-family:monospace;">
+                            <option value="1">LVL 1</option>
+                            <option value="2">LVL 2</option>
+                            <option value="3">LVL 3</option>
+                        </select>
+                    </div>
+
+                    <!-- Moltiplicatore Rarita -->
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Rarit&#xE0;x:</label>
+                        <input type="number" id="sb-nem-molt-rarita" step="0.01" style="width:80px; background:#1a1a2e; color:white; border:2px solid #555; border-radius:6px; padding:4px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('nem')">
+                        <label style="color:#7f8fa6; font-size:11px;"><input type="checkbox" id="chk-m-rarita-nem" onchange="toggleManualRarita('nem')"> Override</label>
+                    </div>
+
+                    <!-- Moltiplicatore Schivata -->
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="color:#bdc3c7; min-width:60px;">Schivata:</label>
+                        <input type="number" id="sb-nem-molt-schivata" value="30" step="1" style="width:70px; background:#1a1a2e; color:white; border:2px solid #555; border-radius:6px; padding:4px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('nem')">
+                        <label style="color:#7f8fa6; font-size:11px;"><input type="checkbox" id="chk-m-schivata-nem" onchange="toggleManualSchivata('nem')"> Override</label>
+                    </div>
+
+                    <!-- STATS -->
+                    <div style="background:#1a0a0a; border-radius:8px; padding:10px; margin-top:4px; border:1px solid #2c1010;">
+                        <div style="color:#f1c40f; font-size:12px; margin-bottom:8px;">&#x1F4CA; STATISTICHE</div>
+
+                        <!-- HP -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#e74c3c; min-width:65px;">HP:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-nem-hp" readonly style="width:100%; background:#0a0a12; color:#e74c3c; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-nem-elem-hp" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('nem')" title="Molt. Elemento HP">
+                            <label><input type="checkbox" id="chk-m-elem-nem-hp" onchange="toggleManualElem('hp','nem')"></label>
+                            <input type="number" id="sb-nem-m-hp" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('nem')" title="Divisore custom">
+                        </div>
+
+                        <!-- ATK -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#e67e22; min-width:65px;">ATK:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-nem-atk" readonly style="width:100%; background:#0a0a12; color:#e67e22; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-nem-elem-atk" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('nem')" title="Molt. Elemento ATK">
+                            <label><input type="checkbox" id="chk-m-elem-nem-atk" onchange="toggleManualElem('atk','nem')"></label>
+                            <input type="number" id="sb-nem-m-atk" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('nem')" title="Divisore custom">
+                        </div>
+
+                        <!-- ATK SPEC -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#e67e22; min-width:65px;">ATK Spe:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-nem-atk-spec" readonly style="width:100%; background:#0a0a12; color:#e67e22; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-nem-elem-atk-spec" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('nem')" title="Molt. Elemento ATK Spec">
+                            <label><input type="checkbox" id="chk-m-elem-nem-atk-spec" onchange="toggleManualElem('atk-spec','nem')"></label>
+                            <input type="number" id="sb-nem-m-atk-spec" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('nem')" title="Divisore custom">
+                        </div>
+
+                        <!-- DEF -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#3498db; min-width:65px;">DEF:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-nem-def" readonly style="width:100%; background:#0a0a12; color:#3498db; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-nem-elem-def" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('nem')" title="Molt. Elemento DEF">
+                            <label><input type="checkbox" id="chk-m-elem-nem-def" onchange="toggleManualElem('def','nem')"></label>
+                            <input type="number" id="sb-nem-m-def" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('nem')" title="Divisore custom">
+                        </div>
+
+                        <!-- DEF SPEC -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#3498db; min-width:65px;">DEF Spe:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-nem-def-spec" readonly style="width:100%; background:#0a0a12; color:#3498db; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-nem-elem-def-spec" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('nem')" title="Molt. Elemento DEF Spec">
+                            <label><input type="checkbox" id="chk-m-elem-nem-def-spec" onchange="toggleManualElem('def-spec','nem')"></label>
+                            <input type="number" id="sb-nem-m-def-spec" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('nem')" title="Divisore custom">
+                        </div>
+
+                        <!-- VEL -->
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <span style="color:#2ecc71; min-width:65px;">VEL:</span>
+                            <div data-formula="" style="flex:1;">
+                                <input type="number" id="sb-nem-vel" readonly style="width:100%; background:#0a0a12; color:#2ecc71; border:1px solid #333; border-radius:4px; padding:3px; font-family:monospace;">
+                            </div>
+                            <input type="number" id="sb-nem-elem-vel" step="0.01" style="width:55px; background:#0f0f1a; color:#aaa; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" readonly oninput="calcolaStatsSandbox('nem')" title="Molt. Elemento VEL">
+                            <label><input type="checkbox" id="chk-m-elem-nem-vel" onchange="toggleManualElem('vel','nem')"></label>
+                            <input type="number" id="sb-nem-m-vel" step="0.01" placeholder="Div" style="width:55px; background:#0f0f1a; color:#9b59b6; border:1px solid #444; border-radius:4px; padding:3px; font-size:11px; font-family:monospace;" oninput="calcolaStatsSandbox('nem')" title="Divisore custom">
+                        </div>
+
+                        <!-- SCHIVATA RISULTANTE -->
+                        <div style="display:flex; gap:6px; align-items:center; padding-top:8px; border-top:1px dashed #333;">
+                            <span style="color:#f39c12; min-width:65px;">Schivata:</span>
+                            <span id="sb-nem-res-schivata" style="color:#f39c12; font-weight:bold;">0</span><span style="color:#7f8fa6;">%</span>
+                        </div>
+                    </div>
+
+                    <!-- Oggetto equipaggiato -->
+                    <div style="margin-top:6px;">
+                        <label style="color:#f1c40f; font-size:12px;">&#x1F392; OGGETTO:</label>
+                        <div style="display:flex; gap:6px; align-items:center; margin-top:4px;">
+                            <span title="Nessuna descrizione" style="cursor:help; color:#e74c3c;">&#x2139;</span>
+                            <select id="sb-nem-item" style="flex:1; background:#1a1a2e; color:white; border:2px solid #f1c40f; border-radius:6px; padding:4px; font-family:monospace; font-size:12px;" onchange="toggleValore(this,'sb-nem-val-item'); aggiornaTooltip(this,'item'); calcolaStatsSandbox('nem')"></select>
+                            <input type="number" id="sb-nem-val-item" placeholder="Val" style="width:60px; display:none; background:#1a1a2e; color:#f1c40f; border:1px solid #f1c40f; border-radius:4px; padding:3px; font-family:monospace;" oninput="aggiornaTooltip(document.getElementById('sb-nem-item'),'item'); calcolaStatsSandbox('nem')">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer: pulsante AVVIA -->
+        <div style="background:#0f0f1a; border-top:4px solid #9b59b6; padding:12px 20px; display:flex; justify-content:center; align-items:center; gap:20px; flex-shrink:0;">
+            <div style="color:#7f8fa6; font-size:11px; font-family:monospace; text-align:center;">
+                Colonne: <b>Stat calcolata</b> | <b>Molt. Elemento</b> | <b>Override</b> | <b>Divisore custom</b>
+            </div>
+            <button onclick="avviaSandbox()" style="background:linear-gradient(135deg,#9b59b6,#6c3483); color:white; border:3px solid #fff; border-radius:12px; padding:12px 40px; font-family:monospace; font-size:18px; font-weight:bold; cursor:pointer; text-transform:uppercase; box-shadow:0 0 20px rgba(155,89,182,0.5); transition:transform 0.1s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                &#x25B6; AVVIA SIMULAZIONE
+            </button>
+        </div>
+    </div>
+
+    <!-- Audio del gioco -->
+    <audio id="musica-gioco" src="../Audio/lobby.mp3"></audio>
+
+    <!-- ============= MODALE AVVISO CUSTOM ============= -->
+    <div id="custom-alert-modal" class="schermata" style="display:none; z-index: 9999; justify-content: center; align-items: center; background: rgba(0,0,0,0.8);">
+        <div style="background: #1e272e; border: 4px solid #3498db; border-radius: 12px; padding: 25px; max-width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.8); animation: fadeInScale 0.3s ease-out;">
+            <div style="font-size: 30px; margin-bottom: 10px;">⚠️</div>
+            <div id="custom-alert-msg" style="color: white; font-family: 'Courier New', Courier, monospace; font-size: 16px; font-weight: bold; margin-bottom: 20px; line-height: 1.4;">
+                Messaggio di prova
+            </div>
+            <button onclick="chiudiAvviso()" style="background: #e74c3c; color: white; border: 2px solid #c0392b; border-radius: 8px; padding: 10px 25px; font-family: monospace; font-size: 16px; font-weight: bold; cursor: pointer; transition: transform 0.1s, background 0.2s;">
+                OK
+            </button>
+        </div>
+    </div>
+    
+    <!-- ============= MODALE VITTORIA FINALE ============= -->
+    <div id="modal-vittoria-finale" class="schermata" style="display:none; z-index: 10000; justify-content: center; align-items: center; background: rgba(0,0,0,0.9);">
+        <div style="background: #27ae60; border: 4px solid #f1c40f; border-radius: 12px; padding: 40px; max-width: 500px; text-align: center; box-shadow: 0 10px 35px rgba(241,196,15,0.4); animation: fadeInScale 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+            <div style="font-size: 60px; margin-bottom: 20px;">🏆</div>
+            <h2 style="color: white; font-family: 'Courier New', Courier, monospace; font-size: 28px; font-weight: bold; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">RUN COMPLETATA!</h2>
+            <div style="color: #ecf0f1; font-family: 'Courier New', Courier, monospace; font-size: 16px; margin-bottom: 30px; line-height: 1.5;">
+                Congratulazioni, hai sconfitto tutte le minacce e completato l'intero percorso! Sei un vero maestro.
+            </div>
+            <div style="display: flex; gap: 20px; justify-content: center; margin-top: 20px;">
+                <button onclick="mostraRicompensaNsfw()" style="background: #e74c3c; color: white; border: 2px solid #c0392b; border-radius: 8px; padding: 15px 30px; font-family: monospace; font-size: 18px; font-weight: bold; cursor: pointer; transition: transform 0.1s, background 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                    RICOMPENSA NSFW
+                </button>
+                <button onclick="tornaAllaLobbyDaVittoria()" style="background: #f1c40f; color: #2c3e50; border: 2px solid #f39c12; border-radius: 8px; padding: 15px 30px; font-family: monospace; font-size: 18px; font-weight: bold; cursor: pointer; transition: transform 0.1s, background 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                    TORNA ALLA LOBBY
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ============= MODALE RICOMPENSA NSFW ============= -->
+    <div id="modal-ricompensa-nsfw" class="schermata" style="display:none; z-index: 20000; justify-content: center; align-items: center; background: rgba(0,0,0,0.95); flex-direction: column;">
+        <h2 id="nsfw-messaggio" style="color: #ff9ff3; font-family: 'Courier New', Courier, monospace; font-size: 28px; font-weight: bold; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); z-index: 2;"></h2>
+        <img id="nsfw-immagine" src="" style="max-width: 90vw; max-height: 70vh; border: 4px solid #ff9ff3; border-radius: 10px; box-shadow: 0 0 30px rgba(255,159,243,0.5); object-fit: contain; animation: fadeInScale 1s ease-out; z-index: 2;">
+        <button onclick="tornaAllaLobbyDaVittoria()" style="margin-top: 30px; background: #f1c40f; color: #2c3e50; border: 2px solid #f39c12; border-radius: 8px; padding: 15px 30px; font-family: monospace; font-size: 18px; font-weight: bold; cursor: pointer; transition: transform 0.1s, background 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 2;">
+            TORNA ALLA LOBBY
+        </button>
+    </div>
+    
+    <script>
+        function mostraRicompensaNsfw() {
+            document.getElementById('modal-vittoria-finale').style.display = 'none';
+            const numFoto = Math.floor(Math.random() * 10) + 1;
+            document.getElementById('nsfw-messaggio').innerText = `Hai trovato la foto numero ${numFoto}, complimenti!`;
+            document.getElementById('nsfw-immagine').src = `../Sprite/personaggi/0_casuali_o_riserve/nsfw/${numFoto}.png`;
+            document.getElementById('modal-ricompensa-nsfw').style.display = 'flex';
+        }
+    </script>
+
+    <style>
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        #custom-alert-modal button:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+        #custom-alert-modal button:active {
+            transform: scale(0.95);
+        }
+    </style>
+
+    <!-- =============================================
+         MODULI JS — ordine di caricamento:
+         1. data/     → dati statici (zero dipendenze)
+         2. core/     → stato globale + factory
+         3. ui/audio  → audio (dipende solo da stato)
+         4. ui/schermate → UI (dipende da factory+audio)
+         5. ui/negozio → negozio/zaino (dipende da schermate+oggetti)
+         6. game/     → logica di gioco (dipende da tutto)
+         7. ui/eventi → eventi speciali (dipende da tutto)
+         ============================================= -->
+
+    <!-- 1. Dati statici -->
+    <script src="../Script/data/config.js?v=1791214053"></script>
+    <script src="../Script/data/characters/alex.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/altimani.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/mori.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/arman.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/babbonatale.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/bacchi.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/bellini.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/bonacina.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/bottardi.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/bottura.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/bussolotti.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/matteo.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/capiluppi.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/carnevali.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/carra.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/contini.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/danilo.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/danilof2.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/dinicolaF2.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/dinicola.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/donatoF2.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/donato.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/edo.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/fabio.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/falco.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/filippo.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/ghandu.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/gian.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/gio.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/giulia.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/giulio.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/graziani.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/kul.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/lanza.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/loconsole.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/maccioni.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/maccionif2.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/manuela.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/mattia.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/mattiaf2.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/mariel.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/max.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/maxf2.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/maxf3.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/monica.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/nicolas.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/nicolo.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/nico.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/nonamedonna.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/nonameuomo.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/paola.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/paolo.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/paroni.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/rauf.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/re_merlino.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/ruggiero.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/saad.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/salvatore.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/sat.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/savina.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/savinaf2.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/serghej.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/menza.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/solieri.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/tania.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/telemaco.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/tudor.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/valentina.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/venturini.js?v=20261009-gender1"></script>
+        <script src="../Script/data/characters/valen.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/nyssa.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/cassian.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/kiora.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/zareen.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/elys.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/lucien.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/vesper.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/vesperlatabularasadelcapitale.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/ryden.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/van.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/mireya.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/darius.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/rivena.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/icer.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/evren.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/maelis.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/elyra.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/aster.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/bob.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/soraya.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/nerys.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/kit.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/nelly.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/virea.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/mauro.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/caelum.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/falcogenryusai.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/falcoroshi.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/falcomonkey.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/falcoaalk.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/falcomajin.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/falcoshoto.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/falcohero.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/falcochan.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/falcodragon.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/falconitsu.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/falcomalfalk.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/falcosing.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/marini.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/ilie.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/mattiasped.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/reo.js?v=20261009-gender1"></script>
+    <script src="../Script/data/characters/index.js?v=20261009-gender1"></script>
+    <script src="../Script/data/ultimates.js?v=20261009-ult1"></script>
+    <script src="../Script/data/future_characters.js?v=20261009-ult1"></script>
+    <script src="../Script/data/database_veloce.js?v=1791214053"></script>
+    <!-- Personaggi: un file per ciascuno (aggiungi qui nuovi personaggi) -->
+    <!-- Index che assembla pokemonDatabase dai file sopra -->
+    <script src="../Script/data/mappe.js?v=1791214053"></script>
+    <script src="../Script/data/boss.js?v=1791214053"></script>
+    <script src="../Script/data/fasi_boss.js?v=20261007-ui2"></script>
+    <script src="../Script/data/eventi_nodi.js?v=1791214053"></script>
+    <script src="../Script/data/eventi_misteriosi.js?v=20261008-items2"></script>
+    <script src="../Script/data/oggetti.js?v=20261008-items2"></script>
+
+    <!-- ============= HALL OF FAME & DRAFT ============= -->
+    <div id="schermata-hall-of-fame" class="schermata" style="background-color: #111;">
+        <div class="lobby-particles" id="hof-particles"></div>
+        <div class="challenge-header">
+            <h1 class="pixel-text" style="color: #f1c40f; text-shadow: 2px 2px 0px rgba(0,0,0,0.8);">Hall of Fame</h1>
+            <button onclick="cambiaSchermata('schermata-hall-of-fame', 'schermata-start')" style="position:absolute; left:20px; top:20px; padding: 10px 20px; font-family: monospace; background: #2c3e50; color: white; border: 2px solid #fff; border-radius: 8px; cursor: pointer; font-size: 16px; z-index: 100;">INDIETRO</button>
+        </div>
+        <div class="hof-gallery-container" id="hof-gallery-container">
+            <!-- Popolato dinamicamente da hall_of_fame.js -->
+        </div>
+    </div>
+
+    <div id="schermata-challenge-draft" class="schermata" style="background-color: #111;">
+        <div class="lobby-particles" id="draft-particles"></div>
+        <div class="challenge-header" style="padding: 15px 0;">
+            <h1 class="pixel-text" style="color: #e74c3c; text-shadow: 2px 2px 0px rgba(0,0,0,0.8);">Prepara la squadra · 6 posti</h1>
+            <button onclick="cambiaSchermata('schermata-challenge-draft', 'schermata-challenge-detail')" style="position:absolute; left:20px; top:15px; padding: 10px 20px; font-family: monospace; background: #2c3e50; color: white; border: 2px solid #fff; border-radius: 8px; cursor: pointer; font-size: 16px; z-index: 100;">INDIETRO</button>
+            <button id="btn-start-challenge-fight" onclick="avviaVeraChallengeFight()" style="position:absolute; right:20px; top:15px; padding: 10px 20px; font-family: monospace; background: #e74c3c; color: white; border: 2px solid #fff; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; z-index: 100; display: none;">INIZIA BOSS FIGHT &#9876;</button>
+        </div>
+        <div class="draft-layout">
+            <div class="draft-roster" id="draft-roster-container">
+                <!-- Roster dei PG disponibili -->
+            </div>
+            <div class="draft-squadra" id="draft-squadra-container">
+                <!-- I 6 slot del team selezionato -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Core -->
+    <script src="../Script/core/stato.js?v=20261008-fight3"></script>
+    <script src="../Script/game/item_effects.js?v=20261009-ult1"></script>
+    <script src="../Script/game/ultimate_system.js?v=20261009-ult1"></script>
+    <script src="../Script/core/pokemon_factory.js?v=20261009-ult1"></script>
+    <script src="../Script/core/local_storage.js"></script>
+    <script src="../Script/core/salvataggio.js?v=20261009-ult1"></script>
+
+    <!-- 3. UI Audio -->
+    <script src="../Script/ui/audio.js?v=20261007-ui2"></script>
+
+    <!-- 4. UI Schermate -->
+    <script src="../Script/ui/schermate.js?v=20261008-fight3"></script>
+
+    <!-- 5. UI Negozio / Zaino -->
+    <script src="../Script/ui/negozio.js?v=20261008-items2"></script>
+
+
+    <script src="../Script/sandbox/sandbox.js?v=20261008-items2"></script>
+
+    <!-- 6. Game -->
+    <script src="../Script/game/mappa.js?v=20261008-biomes1"></script>
+    <script src="../Script/game/battaglia.js?v=20261009-ult1"></script>
+<!-- 7. UI Eventi -->
+    <script src="../Script/ui/eventi.js?v=20261008-items2"></script>
+    
+    <!-- 8. Challenge Mode -->
+    <script src="../Script/game/challenge.js?v=1791214053"></script>
+    <script src="../Script/game/hall_of_fame.js?v=20261009-ult1"></script>
+    <script src="../Script/game/challenge_battle.js?v=20261009-ult1"></script>
+    <script src="../Script/game/boss_reo.js?v=20261009-ult1"></script>
+
+    <!-- ============= SCHERMATE CHALLENGE ============= -->
+    <div id="schermata-challenge-list" class="schermata" style="background-color: #111;">
+        <div class="lobby-particles" id="challenge-particles"></div>
+        <div class="challenge-header">
+            <h1 class="pixel-text" style="color: #9b59b6; text-shadow: 2px 2px 0px rgba(0,0,0,0.8);">Le sfide della Lega</h1>
+            <button onclick="chiudiChallengeList()" style="position:absolute; left:20px; top:20px; padding: 10px 20px; font-family: monospace; background: #2c3e50; color: white; border: 2px solid #fff; border-radius: 8px; cursor: pointer; font-size: 16px;">INDIETRO</button>
+        </div>
+        
+        <div class="challenge-cards-container" id="challenge-cards-container">
+            <!-- Cards dinamiche -->
+        </div>
+    </div>
+
+    <div id="schermata-challenge-detail" class="schermata" style="background-color: #111;">
+        <button onclick="tornaAChallengeList()" style="position:absolute; left:20px; top:20px; padding: 10px 20px; font-family: monospace; background: #2c3e50; color: white; border: 2px solid #fff; border-radius: 8px; cursor: pointer; font-size: 16px; z-index: 100;">INDIETRO</button>
+        
+        <div class="challenge-detail-layout">
+            <div class="challenge-detail-left">
+                <img id="challenge-detail-img" src="" alt="Boss">
+            </div>
+            <div class="challenge-detail-right">
+                <div class="challenge-detail-top">
+                    <h2 id="challenge-detail-title" class="pixel-text" style="color: #9b59b6; margin: 0 0 10px 0;"></h2>
+                    <p id="challenge-detail-lore" style="font-family: monospace; font-size: 16px; color: #ccc; line-height: 1.4;"></p>
+                </div>
+                <div class="challenge-detail-bottom">
+                    <div class="challenge-detail-hints">
+                        <h3 style="color: #f1c40f; font-family: monospace; margin: 0 0 10px 0;">INDIZI:</h3>
+                        <div id="challenge-detail-hints-list" style="margin-top: 20px; font-family: monospace; font-size: 14px; line-height: 1.5;">
+                            <!-- Indizi dinamici -->
+                        </div>
+                    </div>
+                    <div class="challenge-detail-actions">
+                        <button id="btn-challenge-continue" onclick="apriSalvataggiChallenge()" style="background: #bdc3c7; color: #2c3e50; padding: 15px; font-family: monospace; font-size: 18px; font-weight: bold; border: 3px solid #7f8c8d; border-radius: 10px; cursor: pointer; width: 100%; margin-bottom: 15px;">continua &#128190;</button>
+                        <button id="btn-challenge-fight" onclick="iniziaDraftChallenge()" style="background: #f1c40f; color: #000; padding: 15px; font-family: monospace; font-size: 18px; font-weight: bold; border: 3px solid #f39c12; border-radius: 10px; cursor: pointer; width: 100%;">combatti &#9876;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale Salvataggi Challenge -->
+    <div id="modal-challenge-saves" class="schermata" style="display:none; z-index: 10000; justify-content: center; align-items: center; background: rgba(0,0,0,0.9);">
+        <div style="background: #2c3e50; padding: 30px; border-radius: 15px; border: 4px solid #9b59b6; width: 400px; text-align: center; color: white; font-family: monospace;">
+            <h2 style="color: #9b59b6; margin-bottom: 20px;">SLOT SALVATAGGI</h2>
+            <div id="challenge-slots-container" style="display:flex; flex-direction:column; gap: 15px; margin-bottom: 20px;">
+                <!-- Slot dinamici -->
+            </div>
+            <button onclick="chiudiSalvataggiChallenge()" style="padding: 10px 20px; font-family: monospace; background: #e74c3c; color: white; border: 2px solid #fff; border-radius: 8px; cursor: pointer; font-size: 16px;">ANNULLA</button>
+        </div>
+    </div>
+
+    <div id="modal-selezione-modalita" class="hud-modal" role="dialog" aria-modal="true" aria-labelledby="run-select-title" style="display:none">
+        <div class="hud-modal-dialog run-select-dialog"><header class="hud-modal-header"><div><span class="studio-eyebrow">INIZIA IL VIAGGIO</span><h2 id="run-select-title">La tua prossima run</h2></div><button class="hud-modal-close" onclick="BattleUI.closeModal('modal-selezione-modalita')" aria-label="Chiudi selezione run">×</button></header>
+            <div class="run-variants">
+                <button id="card-run-normale" class="run-variant" onclick="scegliModalita('normale')"><span class="variant-number">01</span><span class="studio-badge">ESPLORAZIONE</span><h3>Run classica</h3><p>Un viaggio completo. Costruisci la squadra, gestisci le risorse e scegli la strada verso i boss.</p><ul><li>6 statistiche e controllo manuale</li><li>Cambio Pokémon ed equipaggiamento</li><li>Eventi, negozi e consumabili</li></ul><strong>Inizia la run <span>→</span></strong></button>
+                <button id="card-run-veloce" class="run-variant variant-fast" onclick="scegliModalita('veloce')"><span class="variant-number">02</span><span class="studio-badge">AUTO BATTLE</span><h3>Run veloce</h3><p>Una strada più breve verso lo scontro. Prepara la squadra e lascia spazio all’azione.</p><ul><li>4 statistiche e combattimento automatico</li><li>Percorso compatto verso i boss</li><li>Ritmo rapido, senza consumabili</li></ul><strong>Inizia la run <span>→</span></strong></button>
+            </div><p class="dialog-footnote">Dopo la scelta potrai selezionare il tuo primo alleato.</p>
+        </div>
+    </div>
+
+    <!-- ============= SCHERMATA SALVATAGGI ============= -->
+    <div id="schermata-salvataggi" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(5,5,20,0.96); z-index:500000; justify-content:center; align-items:center; flex-direction:column; font-family:monospace;">
+        <h1 id="salvataggi-titolo" style="color:#c9a7ff; font-size:28px; letter-spacing:3px; margin-bottom:8px; text-shadow:0 0 20px rgba(180,120,255,0.6);">💾 SALVA PARTITA</h1>
+        <p style="color:#7f8c8d; font-size:13px; margin-bottom:36px;">Scegli uno slot</p>
+        <div id="salvataggi-slots-container" style="display:flex; gap:24px; flex-wrap:wrap; justify-content:center; max-width:960px; padding:0 20px;"></div>
+        <button onclick="chiudiSchermataSlot()" style="margin-top:40px; background:none; border:2px solid #555; color:#888; padding:10px 36px; border-radius:10px; font-family:monospace; font-size:14px; cursor:pointer; transition:all 0.3;"
+            onmouseover="this.style.borderColor='#aaa';this.style.color='#eee';"
+            onmouseout="this.style.borderColor='#555';this.style.color='#888';">✕ CHIUDI</button>
+    </div>
+
+    <!-- Modal Sostituzione Membro -->
+    <div id="schermata-sostituzione" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.95); z-index: 200000; justify-content: center; align-items: center; flex-direction: column;">
+        <h2 style="color: white; margin-bottom: 20px; font-family: monospace; font-size: 24px;">Scegli chi sostituire</h2>
+        <div id="lista-sostituzione-squadra" style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; max-width: 90vw; overflow-y: auto; max-height: 70vh; padding: 20px;">
+        </div>
+        <button class="btn-scegli" style="margin-top: 30px; background-color: #e74c3c; width: 200px; padding: 10px; border-radius: 5px; color: white; border: none; cursor: pointer; font-family: monospace; font-size: 16px; font-weight: bold;" onclick="chiudiModalSostituzione()">INDIETRO</button>
+    </div>
+
+    <!-- Modale MANUALE DI GIOCO -->
+    <div id="schermata-manuale" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5,5,20,0.96); z-index: 500000; justify-content: center; align-items: center; flex-direction: column; font-family: monospace;">
+        <h1 style="color: #3498db; font-size: 32px; letter-spacing: 3px; margin-bottom: 20px; text-shadow: 0 0 15px rgba(52, 152, 219, 0.6);">MANUALE DI GIOCO</h1>
+        
+        <!-- Tab Navigation -->
+        <div class="manuale-tabs" style="display: flex; gap: 10px; margin-bottom: 20px; max-width: 90vw; flex-wrap: wrap; justify-content: center;">
+            <button class="manuale-tab-btn attivo" onclick="cambiaTabManuale('tab-manuale-turni')">Turni & Statistiche</button>
+            <button class="manuale-tab-btn" onclick="cambiaTabManuale('tab-manuale-elementi')">Elementi</button>
+            <button class="manuale-tab-btn" onclick="cambiaTabManuale('tab-manuale-livelli')">Mosse e Livelli</button>
+            <button class="manuale-tab-btn" onclick="cambiaTabManuale('tab-manuale-status')">Effetti Status (Lv3)</button>
+            <button class="manuale-tab-btn" onclick="cambiaTabManuale('tab-manuale-oggetti')">Oggetti & Esplorazione</button>
+            <button class="manuale-tab-btn" onclick="cambiaTabManuale('tab-manuale-modalita')">Modalità di Gioco</button>
+        </div>
+
+        <!-- Contenitore Testi -->
+        <div class="manuale-content-box" style="background: rgba(10,10,25,0.8); border: 1px solid #3498db; border-radius: 8px; width: 90%; max-width: 800px; height: 60vh; overflow-y: auto; padding: 20px; color: #dcdde1; font-size: 14px; line-height: 1.6; box-shadow: 0 0 20px rgba(52, 152, 219, 0.2);">
+            
+            <!-- Tab Turni -->
+            <div id="tab-manuale-turni" class="manuale-tab-content active" style="display: block;">
+                <h2 style="color: #f1c40f; margin-bottom: 10px;">Turni e Velocità</h2>
+                <p>Durante il combattimento, chi ha la statistica <strong>Velocità (SPD)</strong> maggiore attaccherà per primo.</p>
+                <p>Se la statistica Velocità è identica, l'ordine di attacco verrà deciso dal caso.</p>
+                <br>
+                <h2 style="color: #f1c40f; margin-bottom: 10px;">Schivata</h2>
+                <p>La probabilità di schivare gli attacchi dipende dalla <strong>Velocità</strong> e da un <strong>Moltiplicatore Base</strong> legato all'elemento del personaggio.</p>
+                <p>Formula Probabilità Schivata: <code>(Velocità × Moltiplicatore Base) / (Velocità + 60)</code>.</p>
+                <p>Di seguito i Valori Moltiplicatore Base di partenza (non sono la percentuale di schivata, ma il valore che si inserisce nella formula):</p>
+                <div id="manuale-schivata-dyn" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; background: #111; padding: 10px; border-radius: 5px;"></div>
+            </div>
+
+            <!-- Tab Elementi -->
+            <div id="tab-manuale-elementi" class="manuale-tab-content" style="display: none;">
+                <h2 style="color: #f1c40f; margin-bottom: 10px;">Vantaggi Elementali (In Attacco)</h2>
+                <p>Questa tabella mostra i moltiplicatori di danno di un elemento <strong>quando attacca</strong>. Non riflette le difese! Se attacchi un avversario debole al tuo elemento aumenterai drasticamente i danni.</p>
+                <p style="color: #bdc3c7; font-style: italic;">Nota su Luce e Buio: Il Buio infligge danni maggiori (x1.25) a quasi tutti gli elementi, ma subisce danni doppi dalla Luce. La Luce infligge danni doppi al Buio ed è resistente al resto.</p>
+                <div id="manuale-elementi-dyn" style="margin-top: 15px; background: #111; padding: 10px; border-radius: 5px; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <!-- Iniettato via JS -->
+                </div>
+            </div>
+
+            <!-- Tab Livelli -->
+            <div id="tab-manuale-livelli" class="manuale-tab-content" style="display: none;">
+                <h2 style="color: #f1c40f; margin-bottom: 10px;">Mosse (Lv1 - Lv2 - Lv3)</h2>
+                <p>Ogni attacco base aumenta l'indicatore energetico del personaggio. Maggiore è l'energia accumulata, più forte sarà la mossa utilizzata!</p>
+                <ul id="manuale-mosse-dyn" style="margin-top: 10px; list-style-type: square; padding-left: 20px;">
+                    <!-- Iniettato via JS -->
+                </ul>
+            </div>
+
+            <!-- Tab Status -->
+            <div id="tab-manuale-status" class="manuale-tab-content" style="display: none;">
+                <h2 style="color: #f1c40f; margin-bottom: 10px;">Effetti Elementali (Mosse Livello 3)</h2>
+                <p>Gli <strong>attacchi elementali</strong> richiedono livello mossa 3 e hanno 10 utilizzi per PG. Le <strong>Ultimate</strong> richiedono livello personaggio 50 e hanno effetti e utilizzi specifici. Difese e rapporti elementali si applicano anche alle Ultimate, tranne al danno puro. Gli utilizzi si ripristinano al centro medico e dopo il boss finale della mappa, anche per i PG KO. Bottardi è un’eccezione: una sola fuga per run, mai dai boss. In Challenge la squadra parte con tutti gli utilizzi, che non si ricaricano tra le fasi.</p>
+                <ul id="manuale-status-dyn" style="margin-top: 10px; display:flex; flex-direction:column; gap:10px;">
+                    <!-- Iniettato via JS -->
+                </ul>
+            </div>
+
+            <!-- Tab Oggetti & Esplorazione -->
+            <div id="tab-manuale-oggetti" class="manuale-tab-content" style="display: none;">
+                <h2 style="color: #f1c40f; margin-bottom: 10px;">Oggetti ed Equipaggiamento</h2>
+                <p>Puoi equipaggiare <strong>1 oggetto</strong> per personaggio. Alcune reliquie richiedono un elemento specifico o un alleato Luce in squadra.</p>
+                <p>I nodi Strumento offrono reliquie e consumabili adatti alla mappa attuale. In combattimento puoi usare <strong>un consumabile per turno</strong> e poi attaccare. Le cure e le resurrezioni funzionano anche dalla mappa.</p>
+                <p>I bonus offensivi durano per i turni del portatore; le protezioni per i turni nemici. Una nuova dose dello stesso effetto ne rinnova la durata.</p>
+                <div id="manuale-oggetti-catalogo"></div>
+                <br>
+                <h2 style="color: #f1c40f; margin-bottom: 10px;">Nodi Mappa</h2>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin-bottom:8px;">⚔️ <strong>Battaglia:</strong> Nemici base per esperienza e monete.</li>
+                    <li style="margin-bottom:8px;">🔥 <strong>Miniboss/Boss:</strong> Nemici potentissimi (Hp e statistiche pompate). Rilasciano grandi ricompense.</li>
+                    <li style="margin-bottom:8px;">❓ <strong>Evento Misterioso:</strong> Situazioni impreviste (buff, debuff, regali, trappole).</li>
+                    <li style="margin-bottom:8px;">🏥 <strong>Centro Medico:</strong> Ripristina gli HP della squadra.</li>
+                    <li style="margin-bottom:8px;">💰 <strong>Negozio:</strong> Compra oggetti o cura alleati con le monete.</li>
+                </ul>
+            </div>
+
+            <!-- Tab Modalità -->
+            <div id="tab-manuale-modalita" class="manuale-tab-content" style="display: none;">
+                <h2 style="color: #f1c40f; margin-bottom: 10px;">Run Normale vs Run Veloce</h2>
+                <div style="background: #111; padding: 15px; border-radius: 5px; margin-bottom: 15px; border-left: 3px solid #3498db;">
+                    <h3 style="color: #3498db; margin-bottom: 5px;">Run Normale (Esplorazione)</h3>
+                    <p>Una modalità basata sulla strategia a lungo termine e sulla progressione lenta.</p>
+                    <ul style="margin-top: 10px; margin-left: 20px; color: #bdc3c7;">
+                        <li>La mappa è generata con <strong>molti più nodi (eventi, negozi, battaglie)</strong> per darti tempo di buildarti e farmare.</li>
+                        <li>Il livello massimo dei nemici (e la difficoltà) cresce più gradualmente.</li>
+                        <li>Gestire gli HP lungo più combattimenti è fondamentale.</li>
+                    </ul>
+                </div>
+                <div style="background: #111; padding: 15px; border-radius: 5px; border-left: 3px solid #e74c3c;">
+                    <h3 style="color: #e74c3c; margin-bottom: 5px;">Run Veloce (Boss Rush)</h3>
+                    <p>Modalità più intensa e immediata, dove ogni scontro conta tantissimo.</p>
+                    <ul style="margin-top: 10px; margin-left: 20px; color: #bdc3c7;">
+                        <li>La mappa ha <strong>pochi nodi</strong>. Si arriva molto in fretta ai Boss.</li>
+                        <li>Dato che ci sono meno combattimenti base, le ricompense e la difficoltà scalano molto più velocemente.</li>
+                        <li>Pensata per chi vuole arrivare subito all'azione senza perdere troppo tempo nei nodi standard.</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <button onclick="chiudiManualeDiGioco()" style="margin-top: 20px; background: transparent; color: #e74c3c; border: 2px solid #e74c3c; border-radius: 8px; padding: 10px 40px; font-family: monospace; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.2s;">CHIUDI</button>
+    </div>
+
+
+    <!-- Full combat diary -->
+    <div id="modal-diario" class="hud-modal" role="dialog" aria-modal="true" aria-labelledby="diary-title">
+        <div class="hud-modal-dialog">
+            <header class="hud-modal-header">
+                <h2 id="diary-title">▤ DIARIO DI COMBATTIMENTO</h2>
+                <button class="hud-modal-close" onclick="chiudiDiario()" aria-label="Chiudi il diario">×</button>
+            </header>
+            <div class="diary-filters">
+                <label>Cerca nel combattimento
+                    <input type="search" id="diario-search" placeholder="Nome, mossa, effetto…" oninput="filtraDiario()">
+                </label>
+                <label>Categoria
+                    <select id="diario-filter" onchange="filtraDiario()">
+                        <option value="all">Tutti i messaggi</option>
+                        <option value="danni">Danni e attacchi</option>
+                        <option value="cure">Cure e rianimazioni</option>
+                        <option value="status">Status e modificatori</option>
+                        <option value="buff">Buff</option><option value="debuff">Debuff</option><option value="risorse">Utilizzi e risorse</option><option value="turni">Turni persi</option><option value="cambi">Sostituzioni</option><option value="mosse">Mosse</option>
+                        <option value="fasi">Fasi e trasformazioni</option>
+                    </select>
+                </label>
+                <span id="diario-count" aria-live="polite"></span>
+            </div>
+            <div id="diario-log-content"></div>
+        </div>
+    </div>
+
+    <!-- One shared settings dialog for lobby, map and battle -->
+    <div id="modal-impostazioni" class="hud-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+        <div class="hud-modal-dialog settings-dialog">
+            <header class="hud-modal-header">
+                <h2 id="settings-title">⚙ IMPOSTAZIONI</h2>
+                <span>Gioco locale</span>
+                <button class="hud-modal-close" onclick="chiudiImpostazioni()" aria-label="Chiudi le impostazioni">×</button>
+            </header>
+            <nav class="settings-tabs" role="tablist" aria-label="Impostazioni">
+                <button id="tab-dati" role="tab" aria-controls="content-tab-dati" aria-selected="true" onclick="switchImpostazioniTab('dati')">Salvataggi</button>
+                <button id="tab-gioco" role="tab" aria-controls="content-tab-gioco" aria-selected="false" onclick="switchImpostazioniTab('gioco')">Gioco</button>
+            </nav>
+            <div class="settings-content">
+                <section id="content-tab-dati" role="tabpanel" aria-labelledby="tab-dati">
+                    <div class="settings-form">
+                        <h3>Progressi su questo dispositivo</h3>
+                        <p>I progressi rimangono in questo browser. La run viene salvata automaticamente sulla mappa; un combattimento interrotto riparte dal checkpoint. Sono disponibili tre slot manuali.</p>
+                        <div class="settings-buttons">
+                            <button class="settings-button" onclick="chiudiImpostazioni();apriSchermataSlot('salva')">Salva in uno slot</button>
+                            <button class="settings-button secondary" onclick="chiudiImpostazioni();apriSchermataSlot('carica')">Carica uno slot</button>
+                            <button class="settings-button secondary" onclick="if(caricaCheckpointLocale())chiudiImpostazioni();else localMessage('Nessun autosalvataggio disponibile.')">Riprendi autosalvataggio</button>
+                        </div>
+                        <div class="modal-section settings-form">
+                            <h3>Trasferisci i progressi</h3>
+                            <p>Il backup JSON contiene salvataggi, Hall of Fame, Challenge e preferenze. Per giocare su un altro PC, esportalo qui e importalo sull’altro dispositivo.</p>
+                            <div class="settings-buttons">
+                                <button class="settings-button" onclick="esportaProgressiLocali()">Esporta backup</button>
+                                <label class="settings-button secondary" for="import-file">Importa backup</label>
+                                <input id="import-file" type="file" accept=".json,application/json" onchange="importaProgressiLocali(event)" hidden>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section id="content-tab-gioco" role="tabpanel" aria-labelledby="tab-gioco" hidden>
+                    <div class="settings-form">
+                        <h3>Audio e velocità</h3>
+                        <label>Volume musica<input type="range" id="slider-volume" min="0" max="1" step="0.05" value="0.25" oninput="regolaVolume(this.value)"></label>
+                        <label class="settings-check"><input type="checkbox" id="chk-muto" onchange="toggleMuto(this.checked)">Muta audio</label>
+                        <label class="settings-check"><input type="checkbox" id="chk-autoskip" onchange="toggleAutoskip(this.checked)">Velocità 2× automatica</label>
+                        <div class="modal-section settings-form"><h3>Interfaccia e movimento</h3><label>Animazioni<select id="pref-motion" onchange="StudioUI.setPreference('motion',this.value)"><option value="full">Complete</option><option value="reduced">Ridotte</option><option value="system">Segui il dispositivo</option></select></label><label class="settings-check"><input type="checkbox" id="pref-contrast" onchange="StudioUI.setPreference('contrast',this.checked)">Contrasto elevato</label><label>Dimensione testo<select id="pref-text" onchange="StudioUI.setPreference('text',this.value)"><option value="normal">Standard</option><option value="large">Grande</option></select></label><button class="settings-button secondary" onclick="StudioUI.fullscreen()">Attiva / disattiva schermo intero</button><p id="interface-message" role="status" aria-live="polite"></p></div><p>Queste preferenze vengono conservate in questo browser.</p>
+                    </div>
+                </section>
+            </div>
+            <p id="local-message" role="status" aria-live="polite"></p>
+        </div>
+    </div>
+    <script src="../Script/ui/battaglia_ui.js?v=20261009-ult1"></script>
+    <script src="../Script/ui/studio_ui.js?v=20261009-ult1"></script>
+    <script src="../Script/ui/camp_lobby.js?v=20261008-camp1"></script>
+    <script src="../Script/data/battle_environments.js?v=20261008-biomes1"></script>
+    <script src="../Script/data/battle_sprite_bounds.js?v=20261008-biomes1"></script>
+    <script src="../Script/ui/game_presentation.js?v=20261009-vs1"></script>
+    <script src="../Script/render/scene3d.js?v=20261008-biomes1"></script>
+    <script src="../Script/data/ambientazioni3d.js?v=20261008-biomes1"></script>
+    <script src="../Sprite/nodi/3D/modelli.js?v=20261008-biomes1"></script>
+    <script src="../Script/data/map_sprite_assets.js?v=20261008-biomes1"></script>
+<script src="../Script/ui/map_sprites.js?v=20261008-biomes1"></script>
+<script src="../Script/ui/archipelago3d.js?v=20261008-biomes1"></script>
+    <script src="../Script/ui/battle_fx.js?v=20261009-ult1"></script>
+    <script src="../Script/game/ultimate_actions.js?v=20261009-ult1"></script>
+    <script src="../Script/game/ultimate_integration.js?v=20261009-ult1"></script>
+</body>
+</html>

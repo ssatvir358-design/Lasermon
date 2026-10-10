@@ -1,0 +1,44 @@
+body.camp-theme #schermata-mappa[data-map3d]{background:#09162b!important;overflow:hidden!important;}
+.camp-theme #schermata-mappa[data-map3d] #map-scroll-viewport{position:absolute!important;inset:0!important;overflow:hidden!important;border:0;box-shadow:none;border-radius:0;touch-action:none;}
+.camp-theme #schermata-mappa[data-map3d] #contenitore-mappa-gioco{display:none!important;}
+#archipelago-canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;}
+.archipelago-heading{position:absolute;top:18px;left:230px;right:100px;pointer-events:none;}
+.archipelago-kicker{font:13px var(--camp-vt);letter-spacing:3px;color:#d2bf8e;}
+.archipelago-heading h2{font:clamp(28px,3vw,44px)/1 var(--camp-vt);margin:4px 0;color:#edf8ff;text-shadow:2px 2px #061326;}
+.archipelago-heading p{font:17px var(--camp-vt);color:#bdd6e3;margin:4px 0;}
+.archipelago-camera{position:absolute;left:18px;bottom:98px;display:flex;flex-wrap:wrap;gap:5px;max-width:calc(100% - 330px);}
+.archipelago-camera button,.archipelago-travel button{font:21px var(--camp-vt);min-width:40px;min-height:40px;color:#d6edfa;border:1px solid #6787a1;border-radius:3px;background:#08172cdd;padding:5px 9px;cursor:pointer;}
+.archipelago-camera button[aria-pressed=true]{color:#f5d490;border-color:#d2af65;background:#423b31;}
+.archipelago-travel{position:absolute;left:18px;bottom:151px;display:flex;align-items:center;gap:8px;padding:5px;background:#07182bdb;border:1px solid #4b6b85;border-radius:4px;color:#c6dbe9;}
+.archipelago-travel label{font:18px var(--camp-vt);min-width:62px;}.archipelago-travel input{width:150px;accent-color:#e3c487;cursor:pointer;}
+.archipelago-inspector{position:absolute;right:18px;bottom:100px;width:278px;max-height:calc(100% - 150px);overflow:auto;padding:20px;background:linear-gradient(125deg,#10263cf2,#081327f7);border:1px solid #6d8ca4;border-top:3px solid #e0c280;border-radius:5px;box-shadow:0 8px 28px #0005;}
+.archipelago-inspector>span{font:14px var(--camp-vt);letter-spacing:2px;color:#d6bd87;}.archipelago-inspector h3{font:31px/1 var(--camp-vt);margin:8px 0;color:#f0f6ff;}.archipelago-inspector p{font:17px/1.2 var(--camp-vt);color:#bdd1e1;margin:0 0 15px;}
+.archipelago-inspector select{width:100%;min-height:40px;font:18px var(--camp-vt);background:#0b1e34;border:1px solid #56748c;border-radius:3px;color:#dceaf3;margin:0 0 8px;padding:6px;}
+.archipelago-inspector>button{width:100%;min-height:44px;font:22px var(--camp-vt);color:#fff3c8;border:1px solid #ccab62;background:linear-gradient(110deg,#73562e,#a7874c);border-radius:3px;cursor:pointer;}.archipelago-inspector>button:disabled{color:#8da1b6;background:#15293b;border-color:#415a72;cursor:default;}
+.archipelago-inspector .archipelago-fixed-type{display:block;font:13px/1.2 var(--camp-vt);letter-spacing:1px;color:#97b7ca;margin-bottom:10px;}
+.archipelago-hint{position:absolute;bottom:78px;left:22px;color:#b5cedd;font:15px var(--camp-vt);pointer-events:none;}
+.camp-theme #schermata-mappa[data-map3d] .map-next-node{display:none;}
+.camp-theme #schermata-mappa[data-map3d] #top-left-ui{position:fixed!important;left:12px!important;top:14px!important;flex-direction:row!important;gap:5px!important;}
+.camp-theme #schermata-mappa[data-map3d] #top-left-ui .lobby-menu-btn{width:44px!important;height:44px!important;padding:6px!important;}.camp-theme #schermata-mappa[data-map3d] #top-left-ui .lobby-menu-btn img{width:27px!important;height:27px!important;}
+.camp-theme #schermata-mappa[data-map3d] .map-mobile-tools{display:flex!important;position:fixed;left:12px;right:12px;bottom:max(8px,env(safe-area-inset-bottom));min-height:56px;gap:7px;padding:6px;background:#061326ed;border:1px solid #6c7e87;pointer-events:auto;}
+.camp-theme #schermata-mappa[data-map3d] .map-mobile-tools button{flex:1;min-height:44px;font:21px var(--camp-vt);color:#d9edf7;background:#122940;border:1px solid #53758d;border-radius:3px;cursor:pointer;}
+.camp-theme #schermata-mappa[data-map3d] :is(#left-squadra-ui,#right-sidebar-ui){display:none!important;position:fixed!important;inset:auto 12px 82px 12px!important;width:auto!important;max-height:min(65dvh,650px);overflow:auto;transform:none!important;background:#091b2ef5;padding:16px;border:2px solid #6d8eaa;z-index:60;}
+.camp-theme #schermata-mappa[data-map3d][data-mobile-panel=squadra] #left-squadra-ui{display:block!important;}
+.camp-theme #schermata-mappa[data-map3d][data-mobile-panel=borsa] #right-sidebar-ui{display:flex!important;}
+.camp-theme #schermata-mappa[data-map3d] #right-sidebar-ui>button{width:100%!important;height:44px!important;flex-direction:row!important;gap:8px;}
+.camp-theme #schermata-mappa[data-map3d] #griglia-squadra{display:flex;flex-wrap:wrap;gap:12px;}.camp-theme #schermata-mappa[data-map3d] #pannello-zaino-persistente{height:40dvh!important;}
+#schermata-mappa[data-map3d] :is(button,select,input,canvas):focus-visible{outline:3px solid #ffdda1;outline-offset:3px;}
+#schermata-mappa[data-map3d] :is(.archipelago-camera button,.archipelago-travel button,.archipelago-inspector>button,.map-mobile-tools button){transition:filter .16s,transform .16s,border-color .16s;}
+@media(hover:hover){#schermata-mappa[data-map3d] :is(.archipelago-camera button,.archipelago-travel button,.archipelago-inspector>button,.map-mobile-tools button):not(:disabled):hover{filter:brightness(1.22);border-color:#ffe0a1;transform:translateY(-2px);}}
+#schermata-mappa[data-map3d] :is(.archipelago-camera button,.archipelago-travel button,.archipelago-inspector>button,.map-mobile-tools button):not(:disabled):active{transform:translateY(1px);}
+@media(max-width:719px){
+ .archipelago-heading{top:70px;left:14px;right:12px;}.archipelago-kicker{font-size:11px;letter-spacing:2px;}.archipelago-heading h2{font-size:30px;margin:3px 0;}.archipelago-heading p{font-size:16px;}
+ .archipelago-inspector{left:10px;right:10px;bottom:82px;width:auto;padding:12px;max-height:182px;display:grid;grid-template-columns:minmax(0,1fr) 125px;gap:4px 9px;}
+ .archipelago-inspector>span{grid-column:1;font-size:12px;}.archipelago-inspector h3{grid-column:1;font-size:26px;margin:0;}.archipelago-inspector p{grid-column:1;font-size:15px;line-height:1.1;margin:3px 0;}
+ .archipelago-inspector select{grid-column:2;grid-row:1/3;font-size:16px;align-self:center;padding:5px;margin:0;}.archipelago-inspector>button{grid-column:2;grid-row:3;font-size:18px;line-height:1.1;align-self:center;padding:6px;}
+ .archipelago-inspector .archipelago-fixed-type{grid-column:2;grid-row:1/3;font-size:12px;margin:0;align-self:center;}
+ .archipelago-camera{left:10px;bottom:286px;max-width:none;gap:4px;}.archipelago-camera button{min-width:34px;min-height:34px;font-size:18px;padding:4px 7px;}
+ .archipelago-travel{left:10px;right:10px;bottom:239px;min-height:38px;padding:3px;gap:6px;}.archipelago-travel input{width:auto;min-width:0;flex:1;}.archipelago-travel button{min-height:30px;min-width:30px;}.archipelago-hint{display:none;}
+ .camp-theme #schermata-mappa[data-map3d] .map-mobile-tools{left:8px;right:8px;gap:3px;padding:4px;}.camp-theme #schermata-mappa[data-map3d] .map-mobile-tools button{font-size:18px;padding:7px 3px!important;}
+}
+@media(max-height:540px) and (min-width:720px){.archipelago-heading h2{font-size:28px;}.archipelago-heading p{font-size:14px;}.archipelago-inspector{padding:12px;bottom:82px;max-height:calc(100% - 100px);}.archipelago-inspector h3{font-size:26px;}.archipelago-inspector p{font-size:15px;}.archipelago-camera{bottom:82px;}.archipelago-travel{bottom:131px;}.archipelago-hint{display:none;}}

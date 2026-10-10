@@ -1,0 +1,2 @@
+// ===== GIO =====
+const CHAR_GIO = { nome: "Gio", sesso: "maschio", hpBase: 4, atkBase: 2, defBase: 4, atkSpec: 10, defSpec: 6, velBase: 7, raritaTipo: "bombers", elemento: "buio", immagine: "../Sprite/personaggi/Gio/Gio.jpeg", immagineAtk: "../Sprite/personaggi/Gio/Gio_atk.jpeg", mossaLvl1: "Rifatta DLL ora ok", mossaLvl2: "Malattia", mossaLvl3: "Nicolassata", boss: true, isEvoluzione: false, numFrameUlt: 2, mossaULT: "Bombardamento Totale" };

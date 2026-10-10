@@ -1,0 +1,94 @@
+#schermata-sandbox {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px;
+    gap: 20px;
+    height:max-content;
+}
+
+fieldset { 
+    border: 1px solid #444; 
+    padding: 15px; 
+    border-radius: 8px; 
+    background-color: #2d2d2d; 
+    color: #fff;
+    width: 300px;
+}
+
+.input-stats { display: none; } 
+.val-perk, .val-item { display: none; } /* Nascosti di default */
+
+input, select {
+    background-color: #3d3d3d;
+    color: #fff;
+    border: 1px solid #555;
+    padding: 8px;
+    border-radius: 4px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+input[id*="-elem-"] {
+    width: 40px !important;
+    min-width: 40px;
+}
+
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip-container:hover::after {
+    content: attr(data-formula);
+    position: absolute;
+    background: #333;
+    color: #fff;
+    padding: 12px; /* Aumentato leggermente per leggibilità */
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: pre; 
+    text-align: left; /* Allineato a sinistra per leggere la leggenda */
+    z-index: 1000;
+    pointer-events: none;
+    top: 100%;
+    left: 0;
+    margin-top: 5px;
+    border: 1px solid #555;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    min-width: 250px; /* Imposta una larghezza minima per la leggenda */
+    width: max-content;
+    max-width: none;
+}
+
+button {
+    padding: 15px 30px; 
+    font-size: 20px;
+    background: #4cd137;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: #000;
+}
+
+.info-icon {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background-color: #555;
+    color: white;
+    text-align: center;
+    border-radius: 50%;
+    cursor: help;
+    font-size: 12px;
+    margin-left: 5px;
+    line-height: 18px;
+    font-weight: bold;
+}
+
+.info-icon:hover {
+    background-color: #3498db;
+}

@@ -1,0 +1,45 @@
+/* Arena geometry belongs to the viewport, never to a cropped illustration. */
+.camp-theme #schermata-gioco .battle-viewport{bottom:13%;}
+.camp-theme #schermata-gioco #arena-world{--player-x:30%;--enemy-x:62%;--player-y:76%;--enemy-y:76%;--platform-width:23%;--platform-height:16%;width:100%;height:100%;}
+.camp-theme #schermata-gioco .battle-background{object-fit:cover;object-position:center 55%;}
+.camp-theme #schermata-gioco .arena-platform{position:absolute;left:var(--player-x);top:var(--player-y);width:var(--platform-width);height:var(--platform-height);transform:translate(-50%,-34.375%);z-index:1;pointer-events:none;}
+.camp-theme #schermata-gioco .arena-platform-enemy{left:var(--enemy-x);top:var(--enemy-y);}
+.camp-theme #schermata-gioco .arena-platform svg{display:block;width:100%;height:100%;overflow:visible;}
+.camp-theme #schermata-gioco .box-sprite-arena-grande{width:15%!important;height:32%!important;overflow:visible;z-index:2;}
+.camp-theme #schermata-gioco .sprite-enemy-container{width:15%!important;height:32%!important;}
+.camp-theme #schermata-gioco .sprite-pokemon-grande[data-art-fit]{position:absolute!important;left:var(--art-left)!important;top:var(--art-top)!important;width:var(--art-width)!important;height:var(--art-height)!important;object-fit:fill!important;margin:0!important;}
+.camp-theme #schermata-gioco .player-card{bottom:13.8%;height:13%;width:30%;padding-top:2%;padding-bottom:1%;}
+.camp-theme #schermata-gioco .action-buttons-container{left:15%;width:70%;height:11%;bottom:1.3%;}
+.camp-theme #schermata-gioco .hex-btn{font-size:clamp(14px,1.85cqw,30px);padding:8px 13%;}
+.camp-theme #schermata-gioco .action-symbol{width:clamp(21px,2.4cqw,39px);height:clamp(21px,2.4cqw,39px);}
+.camp-theme #schermata-gioco .left-menu{width:11%;}
+.camp-theme #schermata-gioco .menu-btn{height:3.9cqw;min-height:40px;font-size:clamp(11px,1.1cqw,18px);padding:7px 12%;}
+.camp-theme #schermata-gioco :is(.menu-icon,.menu-symbol){width:clamp(18px,1.8cqw,29px);height:clamp(18px,1.8cqw,29px);font-size:clamp(20px,2.2cqw,34px);}
+.camp-theme #schermata-gioco :is(#btn-skip-fixed,#btn-pausa-auto-fixed){bottom:28.5%!important;}
+.camp-theme #schermata-gioco .right-panel{bottom:19%;}
+.camp-theme #schermata-gioco .mossa-riga{padding-top:7px;padding-bottom:7px;}
+.camp-theme #schermata-gioco .mossa-nome{font-size:clamp(15px,1.55cqw,25px);}
+.camp-theme #schermata-gioco .mossa-usi{font-size:clamp(15px,1.4cqw,23px);}
+.camp-theme #schermata-gioco [data-move-kind=speciale] .mossa-nome{font-size:clamp(19px,1.9cqw,31px);}
+.archipelago-heading{padding:12px 16px;background:linear-gradient(110deg,#06162be6,#06162b88,transparent);border-left:2px solid #b5e8ed;}
+.archipelago-hint{color:#f0f7ff;text-shadow:1px 2px #051326;}
+@media(orientation:portrait),(max-width:600px){
+ .camp-theme #schermata-gioco .battle-viewport{bottom:auto;}
+ .camp-theme #schermata-gioco #arena-world{--player-x:27%;--enemy-x:73%;--player-y:76%;--enemy-y:76%;--platform-width:35%;--platform-height:19%;}
+ .camp-theme #schermata-gioco .box-sprite-arena-grande{width:23%!important;height:45%!important;}
+ .camp-theme #schermata-gioco .sprite-enemy-container{width:23%!important;height:45%!important;}
+ .camp-theme #schermata-gioco .player-card{inset:auto;width:100%;height:98px;padding:17px 18px 14px 20px;}
+ .camp-theme #schermata-gioco .action-buttons-container{inset:auto;width:100%;height:auto;}
+ .camp-theme #schermata-gioco .hex-buttons{grid-auto-rows:64px;}
+ .camp-theme #schermata-gioco .hex-btn{min-height:60px;font-size:22px;padding:8px 20px;}
+ .camp-theme #schermata-gioco .action-symbol{width:25px;height:25px;}
+ .camp-theme #schermata-gioco .left-menu{width:100%;}
+ .camp-theme #schermata-gioco .menu-btn{height:58px;font-size:13px;}
+ .camp-theme #schermata-gioco .right-panel{bottom:auto;}
+ .camp-theme #schermata-gioco :is(#btn-skip-fixed,#btn-pausa-auto-fixed){bottom:auto!important;}
+ .camp-theme #schermata-gioco #battle-stage[data-action=moves] .hex-buttons{grid-auto-rows:92px;}
+ .camp-theme #schermata-gioco .mossa-riga{min-height:88px;}
+ .camp-theme #schermata-gioco .mossa-nome{font-size:21px;}
+ .camp-theme #schermata-gioco .mossa-usi{font-size:18px;}
+ .camp-theme #schermata-gioco [data-move-kind=speciale] .mossa-nome{font-size:26px;}
+}

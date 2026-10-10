@@ -1,0 +1,2 @@
+// ===== KUL =====
+const CHAR_KUL = { nome: "Kul", sesso: "maschio", hpBase: 5, atkBase: 7, defBase: 4, atkSpec: 4, defSpec: 4, velBase: 9, raritaTipo: "bombers", elemento: "luce", immagine: "../Sprite/personaggi/Kul/Kul.jpeg", immagineAtk: "../Sprite/personaggi/Kul/Kul_atk.jpeg", mossaLvl1: "Rifatta DLL ora ok", mossaLvl2: "Malattia", mossaLvl3: "Nicolassata", boss: true, isEvoluzione: false, numFrameUlt: 1, mossaULT: "Velocita Assoluta" };

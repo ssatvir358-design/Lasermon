@@ -1,0 +1,2 @@
+// ===== RE E MERLINO =====
+const CHAR_REEMERLINO = { nome: "Re e Merlino", sesso: "maschio", hpBase: 4, atkBase: 3, defBase: 5, atkSpec: 4, defSpec: 5, velBase: 3, raritaTipo: "raro", elemento: "terra", immagine: "../Sprite/personaggi/ReeMerlino/ReeMerlino.jpeg", immagineAtk: "../Sprite/personaggi/ReeMerlino/ReeMerlino_atk.jpeg", mossaLvl1: "Attacco 1", mossaLvl2: "Attacco 2", mossaLvl3: "|", boss: false, isEvoluzione: false };

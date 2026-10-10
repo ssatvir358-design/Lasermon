@@ -1,0 +1,15 @@
+/* Inventory assets share the same pixel treatment throughout the game. */
+.item-detail-icon{display:block;width:96px;height:96px;object-fit:contain;image-rendering:pixelated;margin:0 auto 12px;filter:drop-shadow(0 4px 3px #0008)}
+.equipped-item-icon{width:42px;height:42px;object-fit:contain;image-rendering:pixelated;margin-right:8px}
+.item-v2 img,.negozio-item-row img,.card-item-shop img,.bag-row img,.pannello-item-row img,#dettaglio-oggetti img{image-rendering:pixelated;object-fit:contain;flex-shrink:0}
+#zaino-mappa-lista{grid-template-columns:1fr!important;align-content:start;overflow-y:auto;min-height:0}
+#zaino-mappa-lista .item-v2{width:100%;height:auto;min-height:86px;display:grid;grid-template-columns:58px minmax(0,1fr) auto;gap:9px;text-align:left;padding:10px;background:linear-gradient(125deg,#10233c,#071221);border:1px solid #315773;border-left:3px solid #e2b65b;color:#f3f7ff;cursor:pointer;transition:background .18s,border-color .18s,transform .18s;box-sizing:border-box}
+#zaino-mappa-lista .item-v2[data-category=consumabile]{border-left-color:#5fdfcc}
+#zaino-mappa-lista .item-v2:hover,#zaino-mappa-lista .item-v2:focus-visible{background:#18344d;border-color:#f1ca72;transform:translateY(-2px);outline:2px solid #e2b65b;outline-offset:1px}
+.item-v2 img{width:58px;height:58px;filter:drop-shadow(0 3px 2px #0009)}
+.item-v2-copy{display:grid;gap:5px;min-width:0}.item-v2-copy strong{font-size:12px;line-height:1.35}.item-v2-copy small{font-size:11px;line-height:1.45;color:#b3c5d8}.item-v2-qty{font-size:12px;color:#f4c766}
+.item-target-disabled{opacity:.55;cursor:not-allowed!important}.item-target-reason{color:#ffc18f;font-size:11px;line-height:1.4}.item-bag-empty{padding:20px;color:#adbed1;line-height:1.6;font-size:13px}
+.bag-row small{line-height:1.4!important}.bag-row img{width:54px!important;height:54px!important}
+.manual-item-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:10px;margin:14px 0 24px}.manual-item{display:flex;gap:10px;padding:12px;background:#0c1c30;border:1px solid #314f6f;align-items:flex-start}.manual-item img{width:58px;height:58px;object-fit:contain;image-rendering:pixelated}.manual-item strong{color:#f0cc84}.manual-item p{font-size:12px;line-height:1.55;margin:5px 0;color:#c0cfe0}.manual-item small{color:#70c9d8;font-size:11px}
+@media(max-width:600px){#zaino-mappa-lista .item-v2{grid-template-columns:48px minmax(0,1fr) auto;min-height:80px}.item-v2 img{width:48px;height:48px}}
+@media(prefers-reduced-motion:reduce){#zaino-mappa-lista .item-v2{transition:none;transform:none}}

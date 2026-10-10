@@ -1,0 +1,26 @@
+/* ==========================================================
+   FOGLIO DI STILE PRINCIPALE
+   Questo file funge da "entry point" per caricare tutti
+   i sottomoduli CSS del progetto organizzati in cartelle.
+   ========================================================== */
+
+/* 1. Core Styles */
+@import url("core/base.css");
+
+/* 2. UI Components */
+@import url("ui/menu.css");
+@import url("ui/mappa.css");
+@import url("ui/eventi.css");
+@import url("ui/negozio.css");
+@import url("ui/perk.css");
+@import url("ui/challenge.css");
+
+/* 3. Game State / Battle */
+@import url("game/battaglia.css");
+
+@import url("sandbox/sandbox.css");
+@keyframes warningBlinkZoom {
+    0% { opacity: 0; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.1); }
+    100% { opacity: 0; transform: scale(0.9); }
+}

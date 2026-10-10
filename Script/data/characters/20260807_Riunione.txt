@@ -1,0 +1,52 @@
+Rarità:
+	- Innalzamento rarità evoluzioni altri personaggi
+	- Permettere ai meno rari di evolversi a livelli di rarità più alti
+	- Tolgo visibilmente la rarità
+	- Aggiustare percentuale di ritrovo dei personaggi in base alle rarità nelle mappe
+	- Cambiare rarità di Falco
+	- Aggiungere nuovi pg (esempio leggendari)
+
+
+Evoluzioni:
+	- Falco:
+		più rare tramite evento:
+			Falcoaalk
+			Falco Majin
+			Falco Shoto
+			Falco Hero
+			Falco Chan
+			Falco Dragon
+		quelle normali tramite livello (FARE RIFERIMENTO ALLA TABELLA, FOGLIO LISTA OPERATORI AUTOBATTLE)
+
+
+Item:
+	- Pop up alert per oggetti specifici (es. acqua fresca)
+	- Aggiustare item comprabili (sia costi, che ordine di mappa, che effetti)
+	- Ribalanciarli tutti anche dato il fatto che ne limitiamo l'uso
+	- Vendita degli item nel mercato (in caso di esempio zaino pieno, t da il 50% dell'oro speso)
+
+
+UI:
+	- In combattimento fare sfondi inerenti all'azienda
+	- 2x salva il salvataggio in cache
+	- Mettere pulsante info/guida dove mettere le debolezze, le mosse al 3 e info degli item e le info necessarie alla comprensione dei combattimenti
+	- Bug che non ti fa prendere item da nodo item quando hai tutti i pg equipaggiati (nonostante zaino sia vuoto)  
+	- VS 
+	- MOMENTANEAMENTE FACCIAMO SPARIRE LE RARITÀ NELLA PROSSIMA PATCH
+
+
+Combattimento:
+	- Quando c'è una debolezza a 0 renderlo palese graficamente nel log
+	- Log scorribile preservabile
+	- Permettere di mettere in pausa nell'auto-battle
+	- Ribilanciamento dei DoT, mettere un cap al danno (fare una tabella per definire quanti per ogni DoT)
+	- Scrivere il nemico "tentenna" anziché è paralizzato RENDERLO VISIBILE E PALESE
+	- Mettere il limite di 1 utilizzo di oggetto a turno
+	- Percentuale di schivate (cambiare coeff)
+
+
+Modalità challenge:
+	- Introdurre modalità challenge per boss POST MAX
+	- Introdurre PG healer e buffer e shielder
+
+

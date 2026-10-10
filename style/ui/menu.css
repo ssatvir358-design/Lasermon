@@ -1,0 +1,732 @@
+/* ==========================================================
+   SCHERMATA START E LOBBY
+   ========================================================== */
+#schermata-start {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at center, #181530 0%, #08060f 100%) !important;
+    overflow: hidden !important;
+    z-index: 10;
+}
+
+#schermata-start.attiva {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+/* Scanline / Grid effect for CRT screen vibe */
+#schermata-start::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06)) !important;
+    background-size: 100% 4px, 6px 100% !important;
+    pointer-events: none !important;
+    z-index: 11 !important;
+}
+
+/* Starry background animations */
+.stars-container {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
+}
+.star {
+    position: absolute !important;
+    background-color: #fff !important;
+    width: 3px !important;
+    height: 3px !important;
+    border-radius: 50% !important;
+    opacity: 0.8 !important;
+    box-shadow: 0 0 8px #fff !important;
+}
+.s1 { top: 15%; left: 10%; animation: pulseStar 3s infinite alternate; }
+.s2 { top: 25%; left: 80%; animation: pulseStar 4s infinite alternate; }
+.s3 { top: 65%; left: 15%; animation: pulseStar 2.5s infinite alternate; }
+.s4 { top: 75%; left: 85%; animation: pulseStar 3.5s infinite alternate; }
+.s5 { top: 10%; left: 50%; animation: pulseStar 5s infinite alternate; }
+.s6 { top: 85%; left: 45%; animation: pulseStar 4.5s infinite alternate; }
+.s7 { top: 40%; left: 5%; animation: pulseStar 3.2s infinite alternate; }
+.s8 { top: 50%; left: 95%; animation: pulseStar 2.8s infinite alternate; }
+
+@keyframes pulseStar {
+    0% { transform: scale(0.6); opacity: 0.3; }
+    100% { transform: scale(1.3); opacity: 1; filter: brightness(1.5); }
+}
+
+/* Premium Top Left Lobby Buttons */
+.lobby-menu-btn {
+    background: rgba(22, 22, 37, 0.8) !important;
+    border: 2px solid #3498db !important;
+    border-radius: 12px !important;
+    cursor: pointer !important;
+    padding: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4) !important;
+}
+.lobby-menu-btn img {
+    width: 36px !important;
+    height: 36px !important;
+    object-fit: contain !important;
+}
+.lobby-menu-btn:hover {
+    transform: scale(1.1) !important;
+    border-color: #f1c40f !important;
+    box-shadow: 0 0 15px rgba(241, 196, 15, 0.4) !important;
+}
+
+/* Main Content elements */
+.lobby-content {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 12 !important;
+}
+
+/* Floating animation for Title Logo */
+@keyframes floatLogo {
+    0% { transform: translateY(0px); filter: drop-shadow(0 0 15px rgba(52, 152, 219, 0.5)); }
+    50% { transform: translateY(-12px); filter: drop-shadow(0 0 25px rgba(52, 152, 219, 0.8)); }
+    100% { transform: translateY(0px); filter: drop-shadow(0 0 15px rgba(52, 152, 219, 0.5)); }
+}
+.lobby-logo {
+    max-width: 520px !important;
+    width: 75vw !important;
+    height: auto !important;
+    margin-bottom: 2vh !important;
+    animation: floatLogo 4s ease-in-out infinite !important;
+    user-select: none !important;
+}
+
+/* Starters Showcase Showcase styling */
+.lobby-showcase {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 95vw !important;
+    max-width: none !important;
+    margin-top: 2vh !important;
+}
+
+.showcase-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    background: rgba(22, 22, 37, 0.85) !important;
+    border: 4px solid #3498db !important;
+    border-radius: 16px !important;
+    padding: 15px !important;
+    width: clamp(150px, 28vw, 600px) !important; /* Scalabile fino a 600px */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+}
+.showcase-card:hover {
+    transform: translateY(-8px) scale(1.05) !important;
+    border-color: #f1c40f !important;
+    box-shadow: 0 12px 30px rgba(241, 196, 15, 0.3) !important;
+}
+
+.showcase-img {
+    width: 100% !important; /* Prende la larghezza della card */
+    height: auto !important; /* Mantiene proporzioni */
+    aspect-ratio: 1 / 1 !important; /* Quadrata */
+    object-fit: cover !important;
+    border-radius: 12px !important;
+    border: 3px solid #1a1a2e !important;
+    margin-bottom: 10px !important;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5) !important;
+}
+
+.showcase-name {
+    font-family: 'Press Start 2P', monospace !important;
+    font-size: 11px !important;
+    color: #fff !important;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+    letter-spacing: 1px !important;
+}
+
+/* Action central Area & button */
+.lobby-action-area {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 15px !important;
+}
+
+#btn-start {
+    font-family: 'Press Start 2P', monospace !important;
+    font-size: 26px !important;
+    font-weight: bold !important;
+    color: #0f0b1e !important;
+    background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%) !important;
+    border: 4px solid #fff !important;
+    border-radius: 16px !important;
+    padding: 18px 45px !important;
+    cursor: pointer !important;
+    box-shadow: 0 0 20px rgba(241, 196, 15, 0.6), inset 0 -4px 0 rgba(0,0,0,0.2) !important;
+    transition: all 0.15s ease !important;
+    animation: pulseButton 2s infinite alternate !important;
+    text-shadow: 1px 1px 0px rgba(255,255,255,0.4) !important;
+}
+
+#btn-start:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 30px rgba(241, 196, 15, 0.9), inset 0 -4px 0 rgba(0,0,0,0.2) !important;
+    background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%) !important;
+}
+
+#btn-start:active {
+    transform: scale(0.95) !important;
+    box-shadow: 0 0 10px rgba(241, 196, 15, 0.4) !important;
+}
+
+#btn-challenge {
+    font-family: 'Press Start 2P', monospace !important;
+    font-size: 26px !important;
+    font-weight: bold !important;
+    color: #fff !important;
+    background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%) !important;
+    border: 4px solid #fff !important;
+    border-radius: 16px !important;
+    padding: 18px 45px !important;
+    cursor: pointer !important;
+    box-shadow: 0 0 20px rgba(142, 68, 173, 0.6), inset 0 -4px 0 rgba(0,0,0,0.2) !important;
+    transition: all 0.2s ease-in-out !important;
+    text-transform: uppercase !important;
+    text-shadow: 1px 1px 0px rgba(0,0,0,0.4) !important;
+    margin-top: 15px;
+}
+
+#btn-challenge:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 30px rgba(142, 68, 173, 0.9), inset 0 -4px 0 rgba(0,0,0,0.2) !important;
+    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%) !important;
+}
+
+#btn-challenge:active {
+    transform: scale(0.95) !important;
+    box-shadow: 0 0 10px rgba(142, 68, 173, 0.4) !important;
+}
+
+@keyframes pulseButton {
+    0% { transform: scale(1); filter: brightness(1); }
+    100% { transform: scale(1.03); filter: brightness(1.1) drop-shadow(0 0 8px rgba(241, 196, 15, 0.4)); }
+}
+
+.lobby-subtitle {
+    font-family: 'Press Start 2P', monospace !important;
+    font-size: 10px !important;
+    color: #3498db !important;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+    letter-spacing: 1px !important;
+    margin-top: 5px !important;
+}
+
+/* Footer elements */
+.lobby-footer {
+    position: absolute !important;
+    bottom: 20px !important;
+    font-family: 'Press Start 2P', monospace !important;
+    font-size: 9px !important;
+    color: #7f8c8d !important;
+    letter-spacing: 1px !important;
+    z-index: 12 !important;
+    pointer-events: none !important;
+}
+
+
+/* ==========================================================
+   SCHERMATA DI SELEZIONE STARTER (A SCHERMO INTERO GIGANTE)
+   ========================================================== */
+#schermata-selezione {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url("../../Sprite/UI/Lobby/Sfondo.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 10;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+/* Forziamo la schermata attiva ad allineare il titolo in alto e il contenitore sotto */
+#schermata-selezione.attiva {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 3vh 2vw !important;
+    box-sizing: border-box !important;
+}
+
+.titolo-selezione { 
+    font-size: 28px; 
+    margin-bottom: 20px; 
+    color: #333; 
+}
+
+/* Il contenitore reale delle 3 schede riempie il 75% dell'altezza dello schermo */
+#schermata-selezione #contenitore-starter { 
+    display: flex !important; 
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 3vw !important;          /* Spazio proporzionale tra le 3 colonne */
+    width: 95vw !important;        /* Sfrutta quasi tutta la larghezza dello schermo */
+    height: 75vh !important;       /* Prende il 75% dell'altezza totale dello schermo */
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    flex-wrap: nowrap !important;  /* Impedisce tassativamente alle schede di andare a capo */
+}
+
+/* Le colonne degli starter si espandono per dividersi equamente lo schermo */
+#schermata-selezione .colonna-starter {
+    flex: 1 !important;            /* Si dividono lo schermo in 3 parti esattamente uguali */
+    width: auto !important;        /* Rimuove il vecchio limite fisso a 200px */
+    max-width: 28vw !important;    /* Evita che diventino troppo larghe su monitor giganti */
+    height: 100% !important;       /* Altezza massima dentro il contenitore */
+    background-color: white; 
+    border: 3px solid #333; 
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden; 
+    
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+/* Il blocco colorato della foto diventa enorme visivamente solo nella selezione */
+#schermata-selezione .colonna-starter .blocco-foto { 
+    width: 100% !important;
+    height: 45vh !important; /* Si prende quasi metà altezza schermo */
+    display: flex !important; 
+    justify-content: center !important; 
+    align-items: center !important; 
+    border-bottom: 3px solid #333; 
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+/* La foto ora cresce e riempie il box senza tagliarsi nella selezione */
+#schermata-selezione .colonna-starter .blocco-foto img.sprite-pokemon {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none !important; 
+    max-width: none !important;
+    object-fit: contain !important; /* Mostra l'immagine INTERA senza ritagliarla mai */
+    padding: 10px !important; /* Leggero distacco interno dai bordi neri */
+    box-sizing: border-box !important;
+    background-color: transparent !important;
+}
+
+/* Testi delle statistiche fluidi e leggibili */
+#schermata-selezione .colonna-starter .blocco-stats { 
+    width: 100% !important;
+    padding: 2vh 1.5vw !important; 
+    flex-grow: 1 !important; 
+    background-color: #fafafa; 
+    font-size: 1.8vh !important; /* Testo scalabile in base all'altezza dello schermo */
+    line-height: 1.5 !important; 
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+}
+
+/* Pulsante finale allineato */
+#schermata-selezione .colonna-starter .blocco-pulsante { 
+    width: 100% !important;
+    padding: 15px !important; 
+    text-align: center; 
+    background-color: #fff; 
+    border-top: 1px solid #eee; 
+    box-sizing: border-box !important;
+}
+
+.btn-scegli { 
+    width: 100%; padding: 10px; background-color: #4CAF50; color: white; 
+    border: 2px solid #333; border-radius: 5px; font-weight: bold; cursor: pointer; 
+}
+.btn-scegli:hover { background-color: #45a049; }
+
+/* ==========================================================
+   COMPORTAMENTO DEL POKEDEX (GRIGLIA VERTICALE RESPONSIVE)
+   ========================================================== */
+#info-griglia-schede {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important; /* Griglia responsive */
+    gap: 20px !important;              /* Spazio fisso tra le schede */
+    padding: 10px 15px !important;
+    width: 100% !important;
+    height: 100% !important;           
+    box-sizing: border-box !important;
+    overflow-y: auto !important;       /* Attiva lo scroll verticale */
+    overflow-x: hidden !important;     /* Blocca lo scroll orizzontale */
+}
+
+/* La singola scheda del Pokedex: Altezza fissa, animata all'hover */
+.scheda-info-pokedex {
+    height: 420px !important;          /* Altezza fissa per consistenza nella griglia */
+    display: flex !important; 
+    flex-direction: column !important; /* Immagine sopra, lore sotto */
+    justify-content: space-between !important;
+    align-items: center !important;
+    overflow: hidden !important; 
+    padding: 15px !important;          
+    border: 4px solid #222 !important; 
+    border-radius: 16px !important;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.35) !important;
+    box-sizing: border-box !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.scheda-info-pokedex:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 10px 20px rgba(52, 152, 219, 0.4) !important;
+}
+
+/* Il riquadro della foto */
+.blocco-foto-pokedex { 
+    width: 100% !important;
+    height: 48% !important;            /* Ridotto per dare più spazio alla lore */
+    display: flex !important; 
+    justify-content: center !important; 
+    align-items: center !important; 
+    border: 3px solid #333 !important;
+    border-radius: 10px !important;
+    background: rgba(0, 0, 0, 0.12) !important;
+    margin-bottom: 8px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+.blocco-foto-pokedex img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;     /* Riempie il riquadro senza lasciare vuoti */
+}
+
+/* Bottone Tab Rari/Comuni del Pokedex */
+.btn-rarita-tab {
+    background: #161625;
+    color: #bdc3c7;
+    border: 2px solid #2c3e50;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-family: monospace;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+}
+.btn-rarita-tab:hover {
+    background: #2c3e50;
+    color: white;
+    border-color: #3498db;
+}
+.btn-rarita-tab.attivo {
+    background: #3498db;
+    color: white;
+    border-color: white;
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+}
+
+/* Il riquadro inferiore contenente i testi (In basso) */
+.blocco-stats-pokedex { 
+    display: flex !important;
+    flex-direction: column !important; 
+    width: 100% !important;
+    height: 48% !important;            
+    color: #000 !important;
+    font-weight: bold !important;
+    text-shadow: 0px 1px 0px rgba(255,255,255,0.3) !important;
+    box-sizing: border-box !important;
+    justify-content: flex-start !important;
+}
+
+/* Titolo e Nome Pokémon */
+.blocco-stats-pokedex .info-titolo {
+    text-align: center !important;
+    margin-bottom: 2px !important;
+}
+
+.blocco-stats-pokedex .nome-pkm {
+    font-size: 24px !important;        /* Nome bello grande e leggibile */
+    text-transform: uppercase !important;
+    letter-spacing: 1px;
+}
+
+.blocco-stats-pokedex .rarita-pkm {
+    font-size: 13px !important;
+    opacity: 0.8 !important;
+}
+
+/* Linea separatrice */
+.blocco-stats-pokedex .separatore-pkm {
+    border: 0 !important;
+    border-top: 3px solid rgba(0,0,0,0.2) !important;
+    margin: 4px 0 8px 0 !important;
+}
+
+/* Valori delle statistiche (HP, ATK, DEF, VEL) */
+.blocco-stats-pokedex .valori-stats {
+    text-align: left !important;
+    font-size: 18px !important;        /* Testo delle statistiche ingrandito proporzionalmente */
+    padding-left: 20px !important;     /* Più rientro a sinistra per ordine visivo */
+    line-height: 1.5 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    flex-grow: 1 !important;
+}
+
+/* ==========================================================
+   SCHERMATA DETTAGLIO POKEMON (MODAL)
+   ========================================================== */
+/* Centra la scheda di dettaglio a schermo intero sopra la mappa */
+#schermata-dettaglio {
+    background: rgba(0, 0, 0, 0.85) !important;
+    display: none;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 10000 !important;
+    box-sizing: border-box !important;
+}
+
+#schermata-dettaglio.attiva {
+    display: flex !important;
+}
+
+/* BOX CONTENITORE GIGANTE (Aumentato per renderlo imponente) */
+.contenitore-dettaglio-scheda {
+    width: 480px !important;   /* Molto più larga per valorizzare i dettagli */
+    height: 700px !important;  /* Bella alta stile carta collezionabile */
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+}
+
+/* SCHEDA INTERNA RE-PROPORZIONATA */
+.info-scheda-dettaglio {
+    flex: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    animation: popIn 0.25s ease-out !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 30px !important; /* Più respiro ai bordi */
+    box-sizing: border-box !important;
+    border: 5px solid #2f3640 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+}
+
+/* Ingrandiamo la foto del Pokémon nel dettaglio */
+.info-scheda-dettaglio .blocco-foto-pokedex {
+    width: 100% !important;
+    height: 240px !important; /* Più spazio alla grafica del personaggio */
+    background-color: #f5f6fa !important;
+    border: 3px solid #2f3640 !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    overflow: hidden;
+}
+
+.info-scheda-dettaglio .blocco-foto-pokedex img {
+    height: 90% !important;
+    width: 90% !important;
+    object-fit: contain !important;
+    image-rendering: pixelated !important;
+}
+
+/* Ingrandiamo il blocco delle statistiche */
+.info-scheda-dettaglio .blocco-stats-pokedex {
+    width: 100% !important;
+    background: #ffffff !important;
+    border: 3px solid #2f3640 !important;
+    border-radius: 12px !important;
+    padding: 15px 20px !important;
+    box-sizing: border-box !important;
+    flex-grow: 1 !important;
+    margin: 15px 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+}
+
+.info-scheda-dettaglio .nome-pkm {
+    font-size: 26px !important; /* Nome enorme leggibile */
+    font-weight: bold !important;
+}
+
+.info-scheda-dettaglio .valori-stats div {
+    font-size: 18px !important; /* Numeri di attacco, difesa ecc aumentati */
+    margin-bottom: 4px;
+}
+
+/* STILE RETRO PER IL MENU A TENDINA <SELECT> */
+.select-stile-retro {
+    width: 100% !important;
+    max-width: 320px !important;
+    padding: 10px !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 15px !important;
+    font-weight: bold !important;
+    color: #2f3640 !important;
+    background-color: #ffffff !important;
+    border: 3px solid #2f3640 !important;
+    border-radius: 6px !important;
+    outline: none !important;
+    cursor: pointer !important;
+    box-shadow: 2px 2px 0px #2f3640 !important;
+}
+
+.select-stile-retro:focus {
+    border-color: #ffca28 !important;
+}
+
+/* ALLINEAMENTO E STILE PER IL TIPO NELLA SCHEDA DETTAGLIO */
+#dettaglio-elemento-badge {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    font-weight: bold;
+    color: #1e272e;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Spazio corto e pulito tra la scritta TIPO: e il quadratino colorato */
+}
+
+/* ==========================================================
+   FIX GRAFICO DEFINITIVO PER LA SCHERMATA DETTAGLIO
+   ========================================================== */
+
+/* 1. Allunghiamo la scheda di dettaglio e diamogli una larghezza fissa da vera colonna informativa */
+.info-scheda-dettaglio {
+    height: 92vh !important;        /* Sfrutta quasi tutta l'altezza dello schermo */
+    width: 420px !important;        /* Dimensione solida e quadrata */
+    max-width: 95vw !important;
+    justify-content: flex-start !important; /* Dispone gli elementi dall'alto verso il basso */
+    gap: 12px !important;           /* Spazio controllato tra i macro-blocchi */
+    overflow-y: auto !important;    /* Se lo schermo è piccolo, permette di scorrere senza tagliare i tasti */
+}
+
+/* 2. Riduciamo il box della foto dal 55% a una dimensione proporzionata, liberando spazio per i comandi inferiori */
+.info-scheda-dettaglio .blocco-foto-pokedex {
+    height: 32% !important; 
+    flex-shrink: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* 3. Sblocchiamo l'altezza rigida del box delle statistiche */
+.info-scheda-dettaglio .blocco-stats-pokedex {
+    height: auto !important;
+    flex-shrink: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* 4. Forziamo l'allineamento pixel-art e la dimensione del badge del Tipo */
+#dettaglio-elemento-badge {
+    font-size: 15px !important;     /* Dimensione pulita e leggibile */
+    margin-bottom: 8px !important;  /* Distanza corretta dal livello inferiore */
+    display: flex !important;
+    align-items: center !important; /* Allinea perfettamente la scritta TIPO: e l'icona dell'elemento */
+    gap: 6px !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    color: #1e272e !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+}
+
+/* Assicura che il badge interno generato da getHtmlElemento si allinei in linea flessibile */
+#dettaglio-elemento-badge .badge-elemento {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+}
+
+
+#pokedex-rarita-tabs {
+    display: none !important;
+}
+
+/* STILI MANUALE DI GIOCO */
+.manuale-tab-btn {
+    background: #0f0f1a;
+    color: #7f8fa6;
+    border: 1px solid #34495e;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: monospace;
+    font-size: 14px;
+    transition: 0.3s;
+}
+.manuale-tab-btn:hover {
+    background: #2c3e50;
+    color: #ecf0f1;
+}
+.manuale-tab-btn.attivo {
+    background: #3498db;
+    color: #fff;
+    border-color: #3498db;
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+}
+.manuale-tab-content {
+    animation: fadeIn 0.3s ease-in-out;
+}
+.manuale-content-box::-webkit-scrollbar {
+    width: 8px;
+}
+.manuale-content-box::-webkit-scrollbar-track {
+    background: #0a0a19;
+}
+.manuale-content-box::-webkit-scrollbar-thumb {
+    background: #3498db;
+    border-radius: 4px;
+}

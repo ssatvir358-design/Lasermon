@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" preserveAspectRatio="none">
+  <path fill="#050b16" fill-rule="evenodd" d="M0 0H1600V900H0ZM15 18V880H1585V18Z"/>
+  <path d="M3 100V24L25 3h480l18 12h112M3 635v82l23 23v116l38 38h402l17-12h120" fill="none" stroke="#4c263b" stroke-width="9" vector-effect="non-scaling-stroke"/>
+  <path d="M4 91V27L28 7h472l18 12h90M6 639v73l25 25v116l38 35h395l18-12h101" fill="none" stroke="#ff3b54" stroke-width="2" vector-effect="non-scaling-stroke"/>
+  <path d="M1597 102V24l-22-21h-480l-18 12H967m630 620v82l-23 23v116l-38 38h-402l-17-12H997" fill="none" stroke="#173b62" stroke-width="9" vector-effect="non-scaling-stroke"/>
+  <path d="M1596 91V27l-24-20h-472l-18 12H992m602 620v73l-25 25v116l-38 35h-395l-18-12h-101" fill="none" stroke="#26c7ff" stroke-width="2" vector-effect="non-scaling-stroke"/>
+  <path d="M39 19h80l12 9H51Zm320 0h80l12 9h-80ZM66 872h68l10 9H78Z" fill="#ff9c9c"/>
+  <path d="M1561 19h-80l-12 9h80Zm-320 0h-80l-12 9h80Zm293 853h-68l-10 9h66Z" fill="#a0eaff"/>
+</svg>

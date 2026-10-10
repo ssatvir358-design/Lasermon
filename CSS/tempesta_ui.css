@@ -1,0 +1,265 @@
+/* Tempesta Celeste — cinematic game skin. Gameplay geometry and animations
+   stay in their original modules. This file is loaded after the legacy skins. */
+body.tempesta-theme {
+    --studio-bg:#080e22; --studio-surface:#101b34; --studio-raised:#1c2c49;
+    --studio-border:#435876; --studio-text:#f2f5ff; --studio-muted:#bbc8df;
+    --studio-gold:#efc783; --studio-teal:#66d7ff; --storm-violet:#bd8bff;
+    --storm-scene:url('../Sprite/UI/TempestaCeleste/lobby-desktop-v1.png');
+    --storm-panel:linear-gradient(145deg,#1a2948f5,#0a1227f5);
+    --storm-shadow:0 16px 50px #0007,inset 0 1px #e8f4ff15;
+    color-scheme:dark;
+}
+.tempesta-theme :is(button,input,select,a) { -webkit-tap-highlight-color:transparent; }
+.tempesta-theme button:disabled { cursor:default; }
+.tempesta-theme :is(button,a,input,select):focus-visible { outline:2px solid var(--studio-teal);outline-offset:4px; }
+.tempesta-theme ::selection { background:#438bd066; }
+.tempesta-theme ::-webkit-scrollbar-thumb { background:#517199; }
+
+/* Lobby: illustrated cards sit directly in the world, with real account data. */
+body.tempesta-theme #schermata-start {
+    background:linear-gradient(180deg,#050b2145 0%,#050b210a 40%,#050b21a8 100%),var(--storm-scene) center/cover no-repeat!important;
+    isolation:isolate;
+}
+.tempesta-theme .launcher-shell { width:min(1500px,100%);padding:0 clamp(16px,4vw,64px);min-height:100dvh; }
+.tempesta-theme .launcher-header { min-height:92px;gap:28px;border-bottom:1px solid #b9d7ff25; }
+.tempesta-theme .launcher-profile { min-width:175px;padding:7px 16px 7px 7px;gap:12px;background:linear-gradient(100deg,#070d24ed,#122545a6);border:1px solid #dfba7966;border-radius:8px 20px 8px 20px;box-shadow:0 5px 24px #0006; }
+.tempesta-theme .launcher-profile img { width:54px;height:54px;object-fit:cover;border-radius:50%;border:2px solid #e8c68b;background:#142c4b; }
+.profile-copy { display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0; }
+.tempesta-theme #lobby-profile-name { font:600 21px var(--studio-title);max-width:170px; }
+.profile-copy small { font:10px var(--studio-font);color:#a8c9e4; }
+.tempesta-theme .launcher-nav { gap:28px;margin-left:20px; }
+.tempesta-theme .launcher-nav button { font:600 17px var(--studio-title);letter-spacing:1px;text-transform:uppercase; }
+.tempesta-theme .launcher-nav button[aria-current=page]::after { background:#7bdfff;box-shadow:0 0 12px #399cff; }
+.tempesta-theme .launcher-utilities { gap:10px; }
+.tempesta-theme .studio-icon-btn { color:#e4edff;border:1px solid #94beee55;background:#0b1735bb;border-radius:8px;transition:background .2s,box-shadow .2s; }
+.tempesta-theme .studio-icon-btn:hover { background:#23416acb;box-shadow:0 0 20px #4192f83a; }
+.tempesta-theme .launcher-main { display:flex;flex-direction:column;justify-content:center; }
+.tempesta-theme .launcher-hero { display:flex;flex-direction:column;justify-content:center;min-height:0;padding:25px 0 24px;gap:0;text-align:center; }
+.tempesta-crest { font-size:35px;line-height:1;color:#86e6ff;text-shadow:0 0 16px #159dff; }
+.tempesta-theme #launcher-title { font:900 clamp(42px,6.7vw,104px)/1 Georgia,'Times New Roman',serif;font-style:italic;letter-spacing:-4px;margin:0;text-transform:uppercase;background:linear-gradient(180deg,#fff 10%,#d8e9ff 35%,#4c8bd1 51%,#f9ffff 65%,#a3bbda 85%);color:#e7f6ff;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 3px 1px #040815) drop-shadow(0 0 20px #3597e966); }
+.tempesta-theme .launcher-hero p { color:#dfc69d;letter-spacing:6px;font:600 11px var(--studio-font);margin:12px 0; }
+.title-rule { width:min(380px,65%);height:1px;background:linear-gradient(90deg,transparent,#d9be85,#89d5ff,#d9be85,transparent);position:relative; }
+.title-rule::after { content:'◆';position:absolute;left:50%;top:-7px;color:#a4e3ff;font-size:10px; }
+.tempesta-theme .launcher-section { padding:0 0 18px; }
+.tempesta-theme .section-heading { align-items:center;margin:0 0 14px; }
+.tempesta-theme .section-heading h2 { color:#fff;text-shadow:0 2px 8px #000;font:600 24px var(--studio-title);margin:3px 0 0; }
+.tempesta-theme .section-heading .studio-eyebrow { font-size:9px;letter-spacing:2px;text-shadow:0 2px 6px #000; }
+.tempesta-theme .checkpoint-button { min-height:42px;background:#0a193ddd;border:1px solid #dabc82;color:#fff;font:600 14px var(--studio-title);box-shadow:0 0 16px #518ce523; }
+.tempesta-theme #mode-catalogue { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px; }
+.tempesta-theme #mode-catalogue .mode-card {
+    --mode-accent:#74d6ff;display:flex;position:relative;isolation:isolate;justify-content:flex-end;align-items:flex-start;
+    min-height:clamp(325px,28vw,445px);padding:26px!important;border:1px solid #84c6ef!important;
+    border-radius:5px 26px 5px 26px!important;background:#0b1731!important;box-shadow:0 0 0 3px #061020,0 0 0 4px #c1a57699,0 14px 35px #0007!important;
+    animation:none!important;text-align:left;transition:transform .4s var(--studio-ease),box-shadow .4s!important;
+}
+.tempesta-theme #mode-catalogue .mode-card.mode-challenge { --mode-accent:#da9aff;border-color:#d99af2!important;background:#180d2e!important; }
+.mode-art { position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:70% center;z-index:-3;transition:transform .8s var(--studio-ease),filter .8s; }
+.tempesta-theme #mode-catalogue .mode-card::before { inset:0;width:auto;height:auto;border:0;border-radius:inherit;box-shadow:none;background:linear-gradient(90deg,#040d24ed 0%,#050d2490 38%,#050d2400 74%),linear-gradient(0deg,#030a20ed 0%,#030a2040 45%,transparent 80%);z-index:-2; }
+.tempesta-theme #mode-catalogue .mode-card::after { inset:8px;width:auto;height:auto;border:1px solid #e0c39166;border-radius:1px 18px 1px 18px;background:transparent;opacity:1;pointer-events:none;z-index:-1; }
+.tempesta-theme #mode-catalogue .mode-card-top { width:auto;gap:8px;margin:0 0 auto; }
+.tempesta-theme #mode-catalogue .mode-card-icon { width:34px;height:34px;border-radius:0;background:none;filter:drop-shadow(0 0 6px #1cb7ff); }
+.tempesta-theme .studio-badge { border-radius:2px;background:#060e23bd;color:#e0eaff;font-size:9px; }
+.tempesta-theme #mode-catalogue .mode-card h3 { position:relative;font:800 clamp(32px,3.3vw,50px)/.98 var(--studio-title);letter-spacing:.8px;text-transform:uppercase;margin:38px 0 12px;text-shadow:0 3px 8px #0009;max-width:85%; }
+.tempesta-theme #mode-catalogue .mode-card p { position:relative;color:#e0e9fb;font:12px/1.7 var(--studio-font);max-width:290px;margin:0 0 20px;text-shadow:0 2px 7px #000; }
+.tempesta-theme #mode-catalogue .mode-card-bottom { margin:0;max-width:300px;min-height:49px;padding:12px 18px;color:white;background:linear-gradient(115deg,#125ba6,#12345b 65%,#255b95);border:1px solid #b1deff;box-shadow:0 0 15px #149cf64d,inset 0 0 12px #58a1dc55;clip-path:polygon(5% 0,94% 0,100% 50%,94% 100%,5% 100%,0 50%);font:700 18px var(--studio-title);letter-spacing:.5px; }
+.tempesta-theme #mode-catalogue .mode-challenge .mode-card-bottom { border-color:#d8a8f9;background:linear-gradient(115deg,#69368c,#341b54 65%,#582f80);box-shadow:0 0 15px #b75af44d,inset 0 0 12px #c176dc55; }
+.tempesta-theme #mode-catalogue .mode-card:hover { transform:translateY(-4px)!important;box-shadow:0 0 0 3px #061020,0 0 0 4px #e6cd9a,0 0 30px #398ded66,0 20px 45px #0009!important; }
+.tempesta-theme #mode-catalogue .mode-card:hover .mode-art { transform:scale(1.045);filter:brightness(1.08); }
+.lobby-shortcuts { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:24px; }
+.lobby-shortcut { position:relative;isolation:isolate;display:flex;align-items:center;min-height:122px;padding:20px;overflow:hidden;color:#f5f1ff;text-align:left;border:1px solid #cba96d;border-radius:3px 17px 3px 17px;background:#0d1832;box-shadow:0 0 0 2px #050b1d,0 10px 25px #0006;cursor:pointer;transition:border-color .3s,transform .3s; }
+.lobby-shortcut::before { content:'';position:absolute;inset:0;background:linear-gradient(90deg,#070e27ed,#080e27a0 65%,#080e2740);z-index:-1; }
+.lobby-shortcut>img { position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:70% 35%;z-index:-2;transition:transform .7s; }
+.shortcut-guide { border-color:#b98bea; }
+.shortcut-future { border-color:#6b7b99;cursor:default;background:linear-gradient(120deg,#13243fe8,#07102585),var(--storm-scene) center/cover; }
+.shortcut-copy { display:grid;grid-template-columns:30px 1fr;column-gap:10px;row-gap:5px;width:100%;position:relative; }
+.shortcut-copy>span { grid-row:1/3;align-self:center;color:var(--studio-gold); }
+.shortcut-guide .shortcut-copy>span { color:#d5acff; }
+.shortcut-copy strong { font:700 25px var(--studio-title);text-transform:uppercase;letter-spacing:.5px; }
+.shortcut-copy small { font:11px/1.5 var(--studio-font);color:#d0d8e9; }
+.shortcut-arrow { font-size:20px;margin-left:8px; }
+.future-seal { position:absolute;top:9px;right:12px;font-size:8px;letter-spacing:1px;color:#aab8d0; }
+.lobby-shortcut:hover:not(.shortcut-future) { transform:translateY(-3px);border-color:#eee1c2; }
+.lobby-shortcut:hover>img { transform:scale(1.05); }
+.tempesta-theme .explore-grid { padding:18px 0 35px; }
+.tempesta-theme .explore-card,.tempesta-theme .explore-card#btn-hall-of-fame { background:var(--storm-panel)!important;border-color:#c9af7455!important;border-radius:4px 18px 4px 18px!important;min-height:180px;box-shadow:var(--storm-shadow)!important; }
+.tempesta-theme .explore-card strong { font:700 29px var(--studio-title);text-transform:uppercase; }
+.tempesta-theme .launcher-footer { gap:20px;background:#060e22b3;padding:16px 18px;border:1px solid #a3b7dc44;border-radius:6px;margin:6px 0 18px;color:#d6dff0;min-height:55px;backdrop-filter:blur(8px);letter-spacing:0; }
+.lobby-welcome { display:flex;align-items:center;gap:12px;flex:1;min-width:0; }
+.tempesta-theme #lobby-checkpoint-status { color:#d9e6fa;font-size:11px;margin:0; }
+.tempesta-theme .launcher-footer button { display:flex;align-items:center;gap:8px;background:none;border:0;color:#efcc91;min-height:36px;font:600 13px var(--studio-title);cursor:pointer; }
+.tempesta-theme .launcher-footer svg { width:18px;height:18px; }
+.local-save-label { color:#9baec8;font-size:8px;letter-spacing:1px; }
+.tempesta-theme .launcher-ambient { position:fixed;z-index:0; }
+.tempesta-theme .launcher-ambient i { width:4px;height:4px;border:0;border-radius:50%;box-shadow:0 0 8px 2px #58caff;background:#bcf5ff;left:12%;top:90%;animation:storm-spark 18s linear infinite; }
+.tempesta-theme .launcher-ambient i:nth-child(2) { width:3px;height:3px;left:72%;top:86%;animation-delay:-6s; }
+.tempesta-theme .launcher-ambient i:nth-child(3) { width:4px;height:4px;left:85%;top:75%;animation-delay:-12s; }
+.tempesta-theme .launcher-ambient i:nth-child(4) { left:42%;top:88%;animation-delay:-9s;background:#d6a7ff; }
+
+/* The same world and frame vocabulary on selections, events, shop and challenge. */
+body.tempesta-theme :is(#schermata-selezione,#schermata-disco,#schermata-centro-medico,#schermata-mistero,#schermata-evento-item,#schermata-dettaglio,#schermata-scambio,#schermata-challenge-list,#schermata-challenge-detail,#schermata-challenge-draft,#schermata-hall-of-fame,#schermata-perk).studio-surface,
+body.tempesta-theme :is(#schermata-negozio,#schermata-sandbox,#schermata-scambio-battaglia) {
+    background:linear-gradient(135deg,#061025e8,#0c1631c9),var(--storm-scene) center/cover no-repeat!important;
+}
+.tempesta-theme .studio-surface { scrollbar-gutter:stable; }
+.tempesta-theme .studio-surface :is(h1,h2,.titolo-selezione-retro,.titolo-selezione) { color:#e9f5ff!important;text-shadow:0 2px 10px #0009,0 0 25px #629cfb30!important; }
+.tempesta-theme .studio-surface :is(.contenitore-selezione-retro,.contenitore-disco-full,.challenge-detail-top,.challenge-detail-hints,.info-scheda-dettaglio,.draft-roster,.draft-squadra),
+.tempesta-theme #schermata-selezione .colonna-starter {
+    background:var(--storm-panel)!important;border:1px solid #6d91bf!important;border-top-color:#e2c189!important;border-radius:4px 20px 4px 20px!important;box-shadow:var(--storm-shadow)!important;
+}
+.tempesta-theme #schermata-selezione .colonna-starter .blocco-foto { background:radial-gradient(ellipse at bottom,#225a8366,#14213a00 75%)!important; }
+.tempesta-theme .studio-surface :is(.btn-scegli,.btn-battle),.tempesta-theme #btn-start-challenge-fight { border:1px solid #afd3f8!important;border-radius:4px 12px 4px 12px!important;background:linear-gradient(120deg,#235f9b,#162f54)!important;color:#fff!important;box-shadow:0 4px 18px #235c8b40!important;min-height:44px; }
+.tempesta-theme .studio-surface :is(.btn-scegli,.btn-battle):not(:disabled):hover { filter:brightness(1.18); }
+.tempesta-theme :is(.challenge-header,.studio-surface>h1) { width:min(1200px,100%); }
+.tempesta-theme .challenge-header { border-bottom:1px solid #bb97eb55;padding-bottom:24px!important; }
+.tempesta-theme .challenge-header h1 { letter-spacing:1px; }
+.tempesta-theme .challenge-card { border-color:#9872ca!important;background:var(--storm-panel)!important;border-radius:4px 22px 4px 22px!important;box-shadow:var(--storm-shadow)!important;overflow:hidden;transition:transform .35s,border-color .35s; }
+.tempesta-theme .challenge-card:hover { transform:translateY(-4px);border-color:#d9b7ff!important; }
+.tempesta-theme .challenge-card-portrait { background:radial-gradient(ellipse at bottom,#4b27767a,#0b142a); }
+.tempesta-theme .challenge-detail-left { border-color:#a386c5!important;background:radial-gradient(ellipse,#45336b,#0b1228)!important;box-shadow:0 0 30px #b37def22; }
+.tempesta-theme .challenge-progress i.done { background:#d69cff;box-shadow:0 0 7px #ab6aef66; }
+.tempesta-theme .hof-card { background:linear-gradient(140deg,#202d4d,#10152d)!important;border-color:#ceac7680!important;border-radius:4px 20px 4px 20px!important;box-shadow:var(--storm-shadow); }
+.tempesta-theme .draft-card { background:radial-gradient(ellipse at bottom,#283c64,#10182c)!important;border-color:#5675a0!important; }
+.tempesta-theme .draft-slot { background:#10182bd9!important;border-color:#ac8eca!important; }
+.tempesta-theme :is(#negozio-header,#negozio-footer,#negozio-dettaglio,#scambio-battaglia-header,#scambio-battaglia-footer) { background:var(--storm-panel)!important;border-color:#798ead!important; }
+.tempesta-theme :is(.negozio-item-row,.scheda-disco-pokemon) { background:var(--storm-panel)!important;border-color:#5679a7!important;border-radius:4px 12px 4px 12px!important; }
+
+/* Dialogs retain the archive's navy / turquoise design, with restrained metal. */
+.tempesta-theme .hud-modal { background:#03091bd4;backdrop-filter:blur(9px); }
+.tempesta-theme .hud-modal-dialog { background:var(--storm-panel);border-color:#7187a7;border-top-color:#dfbd81;border-radius:5px 22px 5px 22px;box-shadow:0 0 0 3px #090e20,0 0 35px #4975b822,0 28px 80px #000a; }
+.tempesta-theme .hud-modal-header { background:linear-gradient(100deg,#22345966,transparent);border-bottom-color:#8098bf44; }
+.tempesta-theme .hud-modal-close { min-height:40px;min-width:40px;background:#152540;color:#d7e8ff;border-color:#7088ad; }
+.tempesta-theme .settings-tabs button[aria-selected=true] { color:#9fddff;border-color:#7cbce766;background:#27619830; }
+.tempesta-theme .settings-button { background:linear-gradient(120deg,#367aa7,#16395f);color:white;border-color:#8bc1df;border-radius:4px 10px 4px 10px; }
+.tempesta-theme .settings-button.secondary { background:#182840;border-color:#647c9f; }
+.tempesta-theme .settings-button.danger { background:#3b2238;border-color:#a86680; }
+.tempesta-theme .hud-modal :is(input,select) { background:#0a142c;border-color:#4b6287; }
+.tempesta-theme .hud-modal input[type=range] { accent-color:#71cfff; }
+.tempesta-theme #account-message { background:#0a1328;border-color:#476080; }
+.tempesta-theme :is(#custom-alert-modal,#modal-vittoria-finale,#modal-conferma-lobby,#modal-challenge-saves,#modal-selezione-bersaglio)>div { background:var(--storm-panel)!important;border-color:#7992b8!important;border-top-color:#dfbd81!important;border-radius:5px 22px 5px 22px!important;box-shadow:var(--storm-shadow)!important; }
+.tempesta-theme :is(#schermata-manuale,#schermata-salvataggi,#schermata-sostituzione) { background:linear-gradient(135deg,#0b1737f5,#090f24f5)!important;border-color:#7e9bc3!important;border-radius:5px 20px 5px 20px!important;box-shadow:var(--storm-shadow)!important; }
+.tempesta-theme .manuale-content-box { background:#0e1a33!important;border-color:#496088!important; }
+.tempesta-theme .run-variant { background:linear-gradient(140deg,#163858e8,#0d1932f8),url('../Sprite/UI/TempestaCeleste/run-banner-v2.png') 70% center/cover!important;border-color:#6aafe4; }
+.tempesta-theme .variant-fast { background:linear-gradient(140deg,#2c2655e8,#0d1932f8),url('../Sprite/UI/TempestaCeleste/run-banner-v2.png') 70% center/cover!important;border-color:#b595db; }
+.tempesta-theme .diary-filters { background:#0c1730; }
+.tempesta-theme .diary-entry { border-color:#455b7c; }
+.tempesta-theme .studio-button { border-radius:4px 10px 4px 10px; }
+.tempesta-theme .studio-button.primary { background:linear-gradient(120deg,#377eaf,#1a3c61);color:white;border-color:#9dd4eb; }
+
+/* Prevent all 88 cards being compressed into the visible grid height. */
+.tempesta-theme #modal-info { max-width:none!important;max-height:none!important;overflow:hidden!important;padding:clamp(8px,2vw,24px)!important; }
+.tempesta-theme #modal-info .dex-dialog { display:flex;flex-direction:column;min-height:0;height:90dvh;overflow:hidden; }
+.tempesta-theme #modal-info :is(.hud-modal-header,.dex-controls,.dex-rarity-tabs) { flex-shrink:0; }
+.tempesta-theme #modal-info .dex-body { flex:1 1 0;min-height:0;overflow:hidden; }
+.tempesta-theme #info-griglia-schede { width:auto!important;height:auto!important;flex:1 1 0;min-height:0;min-width:0;grid-template-columns:repeat(auto-fill,minmax(185px,1fr))!important;grid-auto-rows:265px;align-content:start;align-items:stretch;gap:16px!important;padding:20px!important;overflow:auto!important; }
+.tempesta-theme .dex-card { min-height:265px;height:265px;flex-shrink:0;border-color:#476078;border-radius:10px;background:#142337; }
+.tempesta-theme .dex-card-main { height:100%;min-height:0; }
+.tempesta-theme .dex-portrait { height:186px;flex:0 0 186px; }
+.tempesta-theme .dex-card-caption { flex:1 0 auto;min-height:72px; }
+.tempesta-theme .dex-card.selected { border-color:#7adddf;box-shadow:0 0 0 1px #7adddf; }
+.tempesta-theme .dex-detail { background:#101c30; }
+.tempesta-theme #modal-info .studio-eyebrow,.tempesta-theme .dex-detail h4 { color:#70dbd0; }
+
+/* Map: preserve the illustrated world, surround it with the same game's HUD. */
+body.tempesta-theme #schermata-mappa { background:linear-gradient(120deg,#061025d9,#0d1833c9),var(--storm-scene) center/cover no-repeat!important; }
+.tempesta-theme #contenitore-mappa-gioco { border:3px solid #c9ad78;border-radius:5px 24px 5px 24px;box-shadow:0 0 0 3px #172b46,0 0 35px #4d9cdb33,0 25px 60px #0009; }
+.tempesta-theme :is(.ui-box-moderno,.ui-btn-moderno,.lobby-menu-btn,#pannello-zaino-persistente) { background:var(--storm-panel)!important;border-color:#728fb8!important;border-radius:4px 12px 4px 12px!important;box-shadow:0 4px 20px #0006!important; }
+.tempesta-theme #left-squadra-ui #griglia-squadra { background:#0d1732ed;border:1px solid #7591b8!important;border-top-color:#cfb482!important;border-radius:4px 14px 4px 14px;padding:12px; }
+.tempesta-theme #titolo-percorso-mappa { color:#fff;text-shadow:0 2px 8px #000;font:700 28px var(--studio-title);letter-spacing:1px; }
+.tempesta-theme #schermata-mappa .nodo-bottone>img { max-width:none!important;width:104px!important;height:104px!important;object-fit:contain!important;top:-30px!important;left:-27px!important; }
+.tempesta-theme #schermata-mappa .nodo-boss { background-size:contain!important;background-repeat:no-repeat; }
+.tempesta-theme #schermata-mappa .nodo-selezionabile { filter:drop-shadow(0 0 9px #84e6ff); }
+.tempesta-theme #schermata-mappa .nodo-selezionabile:focus-visible { outline:3px solid #89e7ff;outline-offset:6px; }
+.tempesta-theme #schermata-mappa .icona-squadra { border-color:#6682a5!important;background:#13213eeb!important; }
+.tempesta-theme .map-mobile-tools { background:#0b1631ed;border-color:#8babcf; }
+.tempesta-theme .map-mobile-tools button { background:#1b3355;border-color:#6687b4;border-radius:4px 10px 4px 10px; }
+
+/* Battle: consistent metal/navy frames, preserving phase colours and move art. */
+.tempesta-theme #schermata-gioco :is(.trainer-card,.player-card,.enemy-card,.panel-content,.menu-btn,.action-dialog) { background:linear-gradient(130deg,#12203be8,#090f23ee);border-color:#c5ac78;box-shadow:0 3px 16px #0006,inset 0 1px #b6ddff18; }
+.tempesta-theme #schermata-gioco .turn-counter-container { filter:drop-shadow(0 0 12px #4c9ae24d); }
+.tempesta-theme #schermata-gioco .panel-title { color:#e7c895;border-bottom-color:#6984aa; }
+.tempesta-theme #schermata-gioco .hp-label { color:#fff; }
+.tempesta-theme #schermata-gioco .hex-btn { text-shadow:0 2px 4px #0008; }
+.tempesta-theme #schermata-gioco :is(.btn-close-panel,.panel-back) { background:#132d50;color:#d8f0ff;border-color:#8bbbe4; }
+.tempesta-theme #schermata-gioco .enemy-phase-dots { filter:drop-shadow(0 3px 4px #0007); }
+.tempesta-theme #schermata-gioco #console-log { color:#e3ecfc; }
+
+.tempesta-theme #modal-selezione-modalita .hud-modal-header {
+    min-height:130px;background:linear-gradient(90deg,#09142eed,#09142e80),url('../Sprite/UI/TempestaCeleste/run-banner-v2.png') center 33%/cover;
+}
+.tempesta-theme #schermata-challenge-list .challenge-header {
+    min-height:150px;padding:20px 24px!important;border:1px solid #bc95e180;border-radius:4px 18px 4px 18px;
+    background:linear-gradient(90deg,#11112cef,#11112c80),url('../Sprite/UI/TempestaCeleste/challenge-banner-v1.png') center 35%/cover;
+}
+.tempesta-theme #schermata-challenge-list .challenge-header>button { top:16px!important;left:24px!important; }
+.tempesta-theme #schermata-challenge-list .challenge-header h1 { padding-top:65px; }
+.tempesta-theme :is(#perk-pokemon-info,.perk-card,.save-slot-card,.centro-scelta-btn) {
+    background:var(--storm-panel)!important;border:1px solid #688cba!important;border-radius:4px 18px 4px 18px!important;box-shadow:var(--storm-shadow)!important;
+}
+.tempesta-theme .perk-card:hover { border-color:#9fdbff!important;box-shadow:0 0 25px #549bec33!important; }
+.tempesta-theme .perk-card.selezionato { border-color:#89ebcd!important; }
+.tempesta-theme :is(.perk-pokemon-nome,.perk-card-nome) { font-family:var(--studio-title); }
+.tempesta-theme .perk-card-desc { color:var(--studio-muted);font-family:var(--studio-font);line-height:1.8; }
+.tempesta-theme .perk-card-scegli { min-height:44px;background:linear-gradient(120deg,#357aab,#16395f);color:#fff;font-family:var(--studio-font);border:1px solid #9bd4ff;border-radius:4px 10px 4px 10px; }
+.tempesta-theme #perk-coda-info { color:#a4b9d5; }
+.tempesta-theme .studio-empty { background:#0a1530bd;border:1px solid #6384ac55;border-radius:4px 18px 4px 18px; }
+
+@keyframes storm-spark { 0%{transform:translate3d(0,0,0);opacity:0}10%{opacity:.7}80%{opacity:.6}100%{transform:translate3d(45px,-80vh,0);opacity:0} }
+@keyframes storm-pane { from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)} }
+.tempesta-theme .studio-surface.attiva>:is(#contenitore-starter,#challenge-cards-container,.challenge-detail-layout,.hof-gallery-container,.draft-layout,.contenitore-disco-full,.contenitore-selezione-retro,.contenitore-dettaglio-scheda) { animation:storm-pane .4s var(--studio-ease) both; }
+.tempesta-theme .launcher-hero { animation:storm-pane .6s var(--studio-ease) both; }
+@media(min-width:1800px) { .tempesta-theme .launcher-hero { padding:36px 0; }.tempesta-theme #mode-catalogue .mode-card { min-height:455px; }.lobby-shortcut { min-height:142px; } }
+@media(max-width:1100px) {
+    .tempesta-theme .launcher-shell { padding:0 28px; }.tempesta-theme #mode-catalogue .mode-card { min-height:350px;padding:22px!important; }
+    .tempesta-theme #mode-catalogue .mode-card p { max-width:245px;font-size:11px; }.lobby-shortcut { padding:16px; }.shortcut-copy strong { font-size:22px; }.shortcut-copy small { font-size:10px; }
+    .tempesta-theme #schermata-mappa .nodo-bottone>img { width:76px!important;height:76px!important;top:-28px!important;left:-16px!important; }
+    .tempesta-theme #contenitore-mappa-gioco { border-radius:0;border-width:2px 0; }
+}
+@media(max-width:800px) {
+    .tempesta-theme .launcher-shell { padding:0 20px; }.tempesta-theme .launcher-nav { margin-left:0;gap:18px; }
+    .tempesta-theme #mode-catalogue { gap:16px; }.tempesta-theme #mode-catalogue .mode-card { min-height:340px;padding:20px!important; }
+    .tempesta-theme #mode-catalogue .mode-card h3 { font-size:34px; }.tempesta-theme #mode-catalogue .mode-card p { font-size:11px; }
+    .tempesta-theme #mode-catalogue .mode-card-bottom { font-size:16px;padding:12px; }
+    .lobby-shortcuts { gap:12px; }.lobby-shortcut { min-height:125px;padding:14px; }.shortcut-copy { grid-template-columns:1fr;gap:5px; }.shortcut-copy>span { display:none; }.shortcut-arrow { display:none; }
+    .tempesta-theme .local-save-label { display:none; }
+}
+@media(max-width:700px) {
+    body.tempesta-theme { --storm-scene:url('../Sprite/UI/TempestaCeleste/lobby-mobile-v1.png'); }
+    .tempesta-theme .launcher-header { min-height:80px;gap:10px;flex-wrap:wrap; }
+    .tempesta-theme .launcher-profile { min-width:0;padding:5px 9px 5px 5px;gap:8px; }.tempesta-theme .launcher-profile img { width:42px;height:42px; }.tempesta-theme #lobby-profile-name { font-size:18px;max-width:115px; }.profile-copy small { font-size:8px; }
+    .tempesta-theme .launcher-nav { order:3;min-height:40px;width:100%;justify-content:center;gap:40px;border-top:1px solid #b9d7ff20; }.tempesta-theme .launcher-nav button { font-size:14px; }
+    .tempesta-theme .launcher-utilities { margin-left:auto;gap:6px; }.tempesta-theme .studio-icon-btn { min-height:44px;min-width:44px; }
+    .tempesta-theme .launcher-hero { padding:22px 0; }.tempesta-theme #launcher-title { font-size:clamp(38px,10vw,70px);letter-spacing:-2px; }.tempesta-crest { font-size:24px; }.tempesta-theme .launcher-hero p { font-size:9px;letter-spacing:4px; }
+    .tempesta-theme .section-heading { gap:12px;align-items:flex-end; }.tempesta-theme .section-heading h2 { font-size:23px; }.tempesta-theme .section-heading .studio-eyebrow { font-size:7px;letter-spacing:1px; }.tempesta-theme .checkpoint-button { font-size:12px;padding:10px;min-height:44px;gap:5px; }
+    .tempesta-theme #mode-catalogue { grid-template-columns:1fr;gap:22px; }.tempesta-theme #mode-catalogue .mode-card { min-height:350px;padding:24px!important; }
+    .tempesta-theme #mode-catalogue .mode-card h3 { font-size:40px;max-width:80%; }.tempesta-theme #mode-catalogue .mode-card p { font-size:12px;max-width:260px; }.tempesta-theme #mode-catalogue .mode-card-bottom { max-width:280px;font-size:18px; }
+    .lobby-shortcuts { grid-template-columns:1fr 1fr;gap:14px;margin-top:22px; }.shortcut-future { grid-column:1/-1;min-height:85px; }.shortcut-future .shortcut-copy { grid-template-columns:30px 1fr; }.shortcut-future .shortcut-copy>span { display:block; }.lobby-shortcut { min-height:125px; }.shortcut-copy strong { font-size:24px; }.shortcut-copy small { font-size:10px; }
+    .tempesta-theme .launcher-footer { flex-wrap:wrap;gap:8px;padding:12px;margin-top:3px;margin-bottom:max(15px,env(safe-area-inset-bottom)); }.lobby-welcome { flex:1 1 100%; }.tempesta-theme #lobby-checkpoint-status { font-size:10px;line-height:1.6; }.tempesta-theme .launcher-footer button { margin-left:auto; }
+    .tempesta-theme #schermata-gioco .menu-btn { min-height:44px; }.tempesta-theme #schermata-gioco .mossa-riga { min-height:92px; }.tempesta-theme #schermata-gioco .mossa-nome { font-size:11px; }
+    .tempesta-theme #schermata-gioco #lista-mosse { gap:6px; }.tempesta-theme #schermata-gioco .hex-btn { min-height:60px; }
+    .tempesta-theme #schermata-gioco .battle-hud-container { min-height:max(800px,100dvh); }
+}
+@media(max-width:600px) {
+    .tempesta-theme .launcher-shell { padding:0 16px; }.tempesta-theme #modal-info .dex-dialog { height:95dvh;border-radius:10px; }
+    .tempesta-theme #info-griglia-schede { grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:235px;padding:12px!important;gap:10px!important; }
+    .tempesta-theme .dex-card { height:235px;min-height:235px; }.tempesta-theme .dex-portrait { height:155px;flex-basis:155px; }.tempesta-theme .dex-card-caption { padding:12px 9px; }.tempesta-theme .dex-card-caption strong { font-size:20px; }
+    .tempesta-theme .dex-detail { flex-basis:auto; }.tempesta-theme #modal-info .dex-controls { padding:12px; }.tempesta-theme .dex-rarity-tabs { max-height:75px; }
+    .tempesta-theme .hud-modal-dialog { border-radius:10px; }.tempesta-theme .settings-tabs { overflow-x:auto;flex-shrink:0; }.tempesta-theme .settings-tabs button { min-height:44px; }
+    .tempesta-theme #schermata-mappa #albero-container { padding-left:12px;padding-right:12px; }.tempesta-theme #schermata-mappa .piano { gap:clamp(10px,4vw,22px); }.tempesta-theme #schermata-mappa .nodo-bottone>img { width:68px!important;height:68px!important;top:-24px!important;left:-12px!important; }
+    .tempesta-theme .challenge-detail-actions { flex-wrap:wrap; }.tempesta-theme .challenge-detail-actions button { flex:1 1 170px;min-height:44px; }
+    .tempesta-theme #schermata-gioco #lista-mosse { grid-template-columns:1fr;gap:7px; }
+    .tempesta-theme #schermata-gioco .mossa-riga { min-height:78px;aspect-ratio:4.3;padding:12px 16px 12px 23%; }
+    .tempesta-theme #schermata-gioco .mossa-nome { font-size:14px; }.tempesta-theme #schermata-gioco .mossa-tipo-text { font-size:10px; }.tempesta-theme #schermata-gioco .mossa-usi { font-size:18px; }
+    .tempesta-theme #modal-selezione-modalita .hud-modal-header { min-height:112px; }
+    .tempesta-theme #schermata-challenge-list .challenge-header { padding:16px!important; }.tempesta-theme #schermata-challenge-list .challenge-header>button { left:16px!important; }
+    .tempesta-theme #perk-pokemon-info { width:100%;padding:12px;gap:12px; }.tempesta-theme .perk-card { flex-basis:100%;max-width:none; }
+}
+@media(max-width:360px) {
+    .tempesta-theme .launcher-shell { padding:0 12px; }.tempesta-theme #mode-catalogue .mode-card { min-height:330px;padding:20px!important; }.tempesta-theme #mode-catalogue .mode-card h3 { font-size:34px; }.tempesta-theme .section-heading h2 { font-size:20px; }.tempesta-theme #lobby-profile-name { max-width:88px; }.tempesta-theme .shortcut-copy strong { font-size:21px; }.tempesta-theme #info-griglia-schede { grid-auto-rows:215px; }.tempesta-theme .dex-card { height:215px;min-height:215px; }.tempesta-theme .dex-portrait { height:135px;flex-basis:135px; }
+}
+@media(hover:none) {
+    .tempesta-theme #mode-catalogue .mode-card:hover,.lobby-shortcut:hover { transform:none!important; }.tempesta-theme #mode-catalogue .mode-card:hover .mode-art,.lobby-shortcut:hover>img { transform:none; }
+}
+@media(prefers-reduced-motion:reduce) { .tempesta-theme:not([data-ui-motion=full]) .launcher-ambient { display:none; } }
+.tempesta-theme[data-ui-motion=reduced] .launcher-ambient { display:none; }
+.tempesta-theme[data-ui-contrast=true] { --studio-muted:#e2eaff;--studio-border:#9faeca; }
+.tempesta-theme[data-ui-contrast=true] :is(.mode-card::before,.lobby-shortcut::before) { background:linear-gradient(90deg,#030817f5,#030817a6); }

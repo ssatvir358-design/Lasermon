@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="168" viewBox="0 0 720 168">
+  <title>Riga mossa — Normale</title>
+  <path d="M18 2H702L718 18V150L702 166H18L2 150V18Z" fill="#030a1a"/>
+  <path d="M20 7H700L713 20V148L700 161H20L7 148V20Z" fill="#101e35" stroke="#cfb477" stroke-width="2"/>
+  <path d="M24 14H150V154H24L14 144V24Z" fill="#303a4c"/>
+  <path d="M155 16H694L704 26M155 152H694L704 142" fill="none" stroke="#c5d0dd" stroke-width="3"/>
+  <path d="M160 24H690M160 144H690" stroke="#2d3e5b" stroke-width="2"/>
+  <path d="M61 31H105L132 58V110L105 137H61L34 110V58Z" fill="#080f24" stroke="#c5d0dd" stroke-width="2"/>
+  <path d="M65 38H101L125 62V106L101 130H65L41 106V62Z" fill="#303a4c"/>
+  <g transform="translate(57 57) scale(2.2)" fill="none" stroke="#c5d0dd" stroke-width="1.8" stroke-linejoin="miter" stroke-linecap="square"><path d="m12 3 3 5 6 1-4 5 1 7-6-3-6 3 1-7-4-5 6-1Z"/></g>
+  <path d="M152 16V152" stroke="#cfb477" stroke-width="2"/>
+  <path d="M632 26V142" stroke="#2d3e5b" stroke-width="2"/>
+  <path d="M684 64h8v8h-8Zm0 32h8v8h-8Z" fill="#c5d0dd" opacity=".55"/>
+  <path d="M20 20h5v5h-5Zm675 0h5v5h-5ZM20 143h5v5h-5Zm675 0h5v5h-5Z" fill="#f7dca2"/>
+</svg>
